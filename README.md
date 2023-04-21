@@ -9,7 +9,7 @@ Con el desarrollo de este Proyecto, las Unidades de una Base o Acuartelamiento p
 Con la finalidad de que las Unidades se vean motivadas a ofertar material, y no se dediquen solamente a solicitar material, se crea un tipo de economía en la propia aplicación. Los materiales ofertados darán créditos a la Unidades, que a su vez les permitirá solicitar materiales. Por otro lado, los materiales no inventariables que se oferten, tendrán una bonificación extra de créditos. Esta bonificación dependerá del material (materiales más difíciles de ser solicitados, mayor bonificación tendrán).
 
 ## DIAGRAMA DE CLASES
-![Proyecto](/uploads/311a10eabb5951b1916f2416c4f0db62/Proyecto.jpg)
+![](https://git.institutomilitar.com/VICENTEEC/truequet/-/wikis/img/clases.png)
 
 **Cumplimiento de requisitos**
 
