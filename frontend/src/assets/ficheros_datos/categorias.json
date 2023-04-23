@@ -1,0 +1,96 @@
+{
+    "_embedded": {
+      "categorias": [
+        {
+            "id": "1",
+            "categoria": "Ordenador de Sobremesa",
+            "grupo": "Informática",
+            "maxMilis": "500",
+            "minMilis": "200",
+            "descripcion": "Ordenadores de sobremesa, deben estar funcionando correctamente, fabricación posterior al año 2010",
+            "numMateriales": "4",
+            "_links": {
+                "self": {
+                  "href": "http://localhost:8080/api/categorias/1"
+                },
+                "materiales": {
+                    "href": "http://localhost:8080/api/categorias/1/materiales"
+                }
+            }
+        },
+        {
+            "id": "2",
+            "categoria": "Monitor",
+            "grupo": "Informática",
+            "maxMilis": "200",
+            "minMilis": "100",
+            "numMateriales": "2",
+            "descripcion": "Monitores de ordenador de sobremesa",
+            "_links": {
+                "self": {
+                    "href": "http://localhost:8080/api/categorias/2"
+                },
+                "materiales": {
+                    "href": "http://localhost:8080/api/categorias/2/materiales"
+                }
+            }
+        },
+        {
+            "id": "3",
+            "categoria": "Impresora B/N",
+            "grupo": "Informática",
+            "maxMilis": "200",
+            "minMilis": "50",
+            "numMateriales": "1",
+            "descripcion": "Impresoras laser blanco y negro",
+            "_links": {
+                "self": {
+                    "href": "http://localhost:8080/api/categorias/3"
+                },
+                "materiales": {
+                    "href": "http://localhost:8080/api/categorias/3/materiales"
+                    }
+            }
+        },
+        {
+            "id": "4",
+            "categoria": "Pequeños periféricos",
+            "grupo": "Informática",
+            "maxMilis": "100",
+            "minMilis": "50",
+            "numMateriales": "0",
+            "descripcion": "Ratones, teclados, lectores de tarjetas, altavoces...",
+            "_links": {
+                "self": {
+                    "href": "http://localhost:8080/api/categorias/4"
+                },
+                "materiales": {
+                    "href": "http://localhost:8080/api/categorias/4/materiales"
+                    }
+            }
+        },
+        {
+            "id": "5",
+            "categoria": "Cableado",
+            "grupo": "Comunicaciones",
+            "maxMilis": "10",
+            "minMilis": "2",
+            "numMateriales": "0",
+            "descripcion": "Cables HDMI, cables de red, cables RS232, etc...",
+            "_links": {
+                "self": {
+                    "href": "http://localhost:8080/api/categorias/4"
+                },
+                "materiales": {
+                    "href": "http://localhost:8080/api/categorias/4/materiales"
+                    }
+            }
+        }
+    ]
+  },
+  "_links": {
+    "categorias": {
+        "href": "http://localhost:8080/api/categorias"
+    }
+}
+}
