@@ -1,4 +1,11 @@
 {
+    "_nuevacatetoria": {
+    "categoria": "Boligrafos",
+    "descripcion": "bolis bic",
+    "grupo": "Informática",
+    "maxMilis": 2,
+    "minMilis": 1
+  },
     "_embedded": {
       "categorias": [
         {
@@ -48,7 +55,7 @@
                     "href": "http://localhost:8080/api/categorias/3"
                 },
                 "materiales": {
-                    "href": "http://localhost:8080/api/categorias/3/materiales"
+                    "href": "h  ttp://localhost:8080/api/categorias/3/materiales"
                     }
             }
         },

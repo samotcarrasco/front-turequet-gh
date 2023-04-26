@@ -50,37 +50,43 @@ export default {
       this.submitted = false;
     };
 
-    // const saveCategoria = () => {
-    //     console.log("entrando en la funcion saveCategoria")
-    //     this.submitted = true;
-    //     if (this.categoria.categoria && this.categoria.descripcion && this.categoria.milis) {
-    //         if (this.categoria.id) {
-    //             this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
-    //             this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
-    //             toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Updated', life: 3000 });
-    //         } else {
-    //             this.categoria.image = 'categoria-placeholder.svg';
-    //             this.categoria.inventoryStatus = this.categoria.inventoryStatus ? this.categoria.inventoryStatus.value : 'INSTOCK';
-    //             //this.categorias.push(this.categoria);
-    //             this.postCategoria(this.categoria).then(() => { this.getCategorias() });
-    //             toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'La categoría' + this.categoria.categoria + " se ha creado correctamente", life: 4000 });
-    //         }
-    //         this.categoriaDialog = false;
-    //         this.categoria = {};
-    //     }
-    // };
+    const saveCategoria = () => {
+      console.log("entrando en la funcion saveCategoria")
+      this.submitted = true;
 
-    // const editCategoria = (editCategoria) => {
-    //     this.categoria = { ...editCategoria };
-    //     console.log(this.categoria);
-    //     this.categoriaDialog = true;
-    //     this.cabecera = "Editar categoría"
+      if (this.formularioRellenado(this.categoria)) {
+        console.log("punto 1");
+        if (this.categoria.id) {
+          console.log("punto 2");
+          //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
+          // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
+          //llamad a metodo putcategoria(pendiente de desarrollo)
+          toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
+        } else {
+          console.log("punto 3");
+          // this.categoria.image = 'categoria-placeholder.svg';
+          //this.categoria.inventoryStatus = this.categoria.inventoryStatus ? this.categoria.inventoryStatus.value : 'INSTOCK';
+          //this.categorias.push(this.categoria);
+          console.log(this.categoria);
+          this.postCategoria(this.categoria).then(() => { this.getCategorias() });
+          toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'La categoría' + this.categoria.categoria + " se ha creado correctamente", life: 4000 });
+        }
+        this.categoriaDialog = false;
+        this.categoria = {};
+      }
+    };
 
-    // };
+    const editCategoria = (editCategoria) => {
+      this.categoria = { ...editCategoria };
+      console.log(this.categoria);
+      this.categoriaDialog = true;
+      this.cabecera = "Editar categoría"
 
-    // const confirmDeleteCategoria = (editCategoria) => {
-    //     this.categoria = editCategoria;
-    //     this.deleteCategoriaDialog = true;
+    };
+
+    //  const confirmDeleteCategoria = (editCategoria) => {
+    //      this.categoria = editCategoria;
+    //      this.deleteCategoriaDialog = true;
     // };
 
     // const deleteCategoria = () => {
@@ -93,8 +99,8 @@ export default {
     // Variables del componente
     this.openNew = openNew;
     this.hideDialog = hideDialog;
-    // this.saveCategoria = saveCategoria;
-    //  this.editCategoria = editCategoria;
+    this.saveCategoria = saveCategoria;
+    this.editCategoria = editCategoria;
     // this.confirmDeleteCategoria = confirmDeleteCategoria;
     // this.deleteCategoria = deleteCategoria;
   },
@@ -104,6 +110,7 @@ export default {
 
   methods: {
     ...mapActions(categoriasStore, ['getCategorias']),
+    ...mapActions(categoriasStore, ['postCategoria']),
     ...mapActions(categoriasStore, ['getGrupos']),
 
 
@@ -124,6 +131,15 @@ export default {
       this.filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       };
+    },
+
+    formularioRellenado(cat) {
+      return (cat.categoria && 
+              cat.descripcion && 
+              cat.minMilis && 
+              cat.maxMilis &&
+              cat.grupo &&
+              (cat.minMilis <= cat.maxMilis))
     },
 
     getGruposLocal() {
@@ -186,8 +202,8 @@ export default {
           </Column>
           <Column field="minMilis" header="μilis" :sortable="true" headerStyle="width:10%; min-width:4rem;"
             :sort-field="minMilis">
-            <template #body="slotProps">
-              {{ slotProps.data.minMilis }}-{{ slotProps.data.maxMilis }}
+            <template #body="cat">
+              {{ cat.data.minMilis }}-{{ cat.data.maxMilis }}
             </template>
           </Column>
           <Column field="descripcion" header="Descripcion" :sortable="false" headerStyle="width:20%; min-width:20rem;">
@@ -195,12 +211,11 @@ export default {
           <Column field="numMateriales" header="Materiales" :sortable="true" headerStyle="width:10%; min-width:6rem;">
           </Column>
           <Column headerStyle="min-width:10rem;">
-            <template #body="slotProps">
-              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" />
-              <!-- @click="editCategoria(slotProps.data)" /> -->
+            <template #body="cat">
+              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                @click="editCategoria(cat.data)" />
               <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                :disabled="slotProps.data.numMateriales > 0" />
-              <!-- @click="confirmDeleteCategoria(slotProps.data)" /> -->
+                :disabled="cat.data.numMateriales > 0" @click="confirmDeleteCategoria(cat.data)" />
             </template>
           </Column>
         </DataTable>
@@ -211,34 +226,28 @@ export default {
             <label for="name">Nombre de la categoría</label>
             <InputText id="name" v-model.trim="categoria.categoria" required="true" autofocus
               :class="{ 'p-invalid': submitted && !categoria.categoria }" />
-            <small class="p-invalid" v-if="submitted && !categoria.categoria">El nombre de la categoría es
-              obligatorio</small>
           </div>
           <div class="field">
             <label for="descripcion">Descripción</label>
-            <Textarea id="descripcion" v-model="categoria.descripcion" required="true" rows="3" cols="20" />
-            <small class="p-invalid" v-if="submitted && !categoria.descripcion">Es obligatorio aportar una
-              descripción
-            </small>
+            <Textarea id="descripcion" v-model="categoria.descripcion" required="true" rows="3" cols="20"
+              :class="{ 'p-invalid': submitted && !categoria.descripcion }" :required="true" />
           </div>
 
           <div class="field">
             <label for="grupo" class="mb-3">Grupo</label>
-            <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()" optionLabel="label"
-              placeholder="Seleccion grupo">
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span :class="'categoria-badge status-' + slotProps.value.value">{{
-                    slotProps.value.label
+            <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()" 
+               :class="{ 'p-invalid': submitted && !categoria.grupo }"
+               placeholder="Seleccione grupo">
+              <template #value="grupo">
+                <div v-if="grupo.value">
+                  <span :class="'categoria-badge status-' + grupo.value">{{
+                    grupo.value
                   }}</span>
                 </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span :class="'categoria-badge status-' + slotProps.value.toLowerCase()">{{
-                    slotProps.value }}</span>
+                <div v-else>
+                  <span :class="'categoria-badge status-' + grupo.value">{{
+                    grupo.value }}</span>
                 </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
               </template>
             </Dropdown>
           </div>
@@ -247,12 +256,10 @@ export default {
             <div class="field col">
               <label for="minMilis">μilis MIN</label>
               <InputNumber id="minMilis" v-model="categoria.minMilis"
-                :class="{ 'p-invalid': submitted && !categoria.minMilis }" :required="true" />
-              <small class="p-invalid" v-if="submitted && !categoria.minMilis">μilis MIN obligatorio.</small>
+                :class="{ 'p-invalid': submitted && !categoria.minMilis || categoria.minMilis > categoria.maxMilis }" :required="true" />
               <label for="maxMilis">μilis MAX</label>
               <InputNumber id="maxMilis" v-model="categoria.maxMilis"
-                :class="{ 'p-invalid': submitted && !categoria.maxMilis }" :required="true" />
-              <small class="p-invalid" v-if="submitted && !categoria.maxMilis">μilis MAX obligatorio.</small>
+                :class="{ 'p-invalid': submitted && !categoria.maxMilis || categoria.minMilis > categoria.maxMilis}" :required="true" />
             </div>
           </div>
 
