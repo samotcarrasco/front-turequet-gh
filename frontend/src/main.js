@@ -7,7 +7,7 @@ import ToastService from 'primevue/toastservice';
 //componentes para rutas
 import MaterialInfo from '@/components/ComponenteDummy.vue'
 import MaterialesMain from '@/components/ComponenteDummy.vue'
-import Categorias from '@/components/ComponenteDummy.vue'
+import Categorias from '@/components/Categorias.vue'
 import Estadisticas from '@/components/ComponenteDummy.vue'
 
 

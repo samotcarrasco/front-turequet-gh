@@ -1,8 +1,23 @@
 <script>
+import { storeDptoActual } from '@/stores/dptoActual';
+import { mapWritableState, mapState } from 'pinia'
 
 export default {
+  computed: {
+    ...mapState(storeDptoActual, [ 'dptoActual' ])
+  },
+  data() {
+    return {
+      departamentos: ['SIC', 'Formación', 'RRHH', 'Gestor']
+    }
+  },
+  methods: {
+    cambiarDpto(event) {
+      const storeDepto = storeDptoActual();
+      storeDepto.cambiarDpto(event.target.value)
+    }
+  },
 }
-
 </script>
 
 <template>
@@ -18,22 +33,31 @@ export default {
       </button>
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item">
+          <li class="nav-item" v-if="dptoActual != 'Gestor'">
             <router-link class="nav-link"  :to="{ name: 'materiales' }">Ver material</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="dptoActual != 'Gestor'">
             <router-link class="nav-link"  :to="{ name: 'materiales' }">Aportar material</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="dptoActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'categorias' }">Categorías</router-link>
           </li>      
-          <li class="nav-item">
+          <li class="nav-item" v-if="dptoActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'categorias' }">Unidades</router-link>
           </li>      
-          <li class="nav-item">
+          <li class="nav-item" v-if="dptoActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
           </li>      
-          <!-- prueba selector dpto -->
+          <li class="textoDpto">
+            Dpto actual: {{ dptoActual || "seleccione"}}
+          </li>
+          <li class="nav-item" v-if="departamentos.length >  0 && $route.name !== 'material'">
+            <!-- se puede quitar el evento @Change, porque el store es writable-->
+            <select class="form-select" v-model="dptoActual" @change="cambiarDpto">
+              <option value="seleccione" disabled selected></option>
+              <option v-for="(dpto, index) in departamentos" :key="index" :value="dpto">{{ dpto }}</option>
+            </select>
+          </li>
         </ul>
         <ul class="navbar-nav me-5">
           <li class="nav-item dropdown">
@@ -65,7 +89,7 @@ export default {
             </ul>
           </li>
           <li class="nav-item registro">
-            <!-- <a class="nav-link" href="altaUsuarios.html">Registro nuevo usuario</a> -->
+            <a class="nav-link" href="altaUsuarios.html">Registro nuevo usuario</a>
           </li>
         </ul>
       </div>

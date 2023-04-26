@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-// import { storeDptoActual } from './dptoActual'
+ //import { storeDptoActual } from './dptoActual'
 // import { mapState } from 'pinia'
 import { getCategorias } from './api-service'
  
@@ -11,10 +11,11 @@ export const categoriasStore = defineStore('categorias', {
    
   },
   actions: {
-    // categoriasDptoActual(){
-    //   console.log('filtrando categorias por dpto:', this.dptoActual)
-    //   return this.categorias.filter(material => material.departamento === this.dptoActual)
-    // },
+     categoriasDptoActual(){
+       console.log('filtrando categorias por dpto:', this.dptoActual)
+       return this.categorias.filter(material => material.departamento === this.dptoActual)
+     },
+
     getGrupos() {
       const grupos = []
       const grupoSet = new Set()
@@ -33,7 +34,6 @@ export const categoriasStore = defineStore('categorias', {
     async getCategorias() {
       //la de dentro es la funcion importada
       await getCategorias().then(r => this.categorias = r.data._embedded.categorias)
-      //await getCategorias().then(r => this.categorias = r)
     },
 
     },
