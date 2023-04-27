@@ -5,8 +5,8 @@ import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice';
 
 //componentes para rutas
-import MaterialInfo from '@/components/ComponenteDummy.vue'
-import MaterialesMain from '@/components/ComponenteDummy.vue'
+import MaterialInfo from '@/components/MaterialInfo.vue'
+import MaterialesMain from '@/components/MaterialesMain.vue'
 import Categorias from '@/components/Categorias.vue'
 import Estadisticas from '@/components/ComponenteDummy.vue'
 

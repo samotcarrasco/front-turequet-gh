@@ -7,6 +7,7 @@ export const storeDptoActual = defineStore('dptoActual', {
   actions :{
     cambiarDpto(departamento) {
      this.dptoActual = departamento
+     console.log ("dpto actual:", departamento)
      },
   }
 })

@@ -36,9 +36,13 @@ export default {
     };
   },
   mounted() {
+
+    
+    // this.confirmDeleteCategoria = confirmDeleteCategoria;
+    // this.deleteCategoria = deleteCategoria;
     const toast = useToast();
 
-    const openNew = () => {
+    const modalEditCreate = () => {
       this.categoria = {};
       this.submitted = false;
       this.categoriaDialog = true;
@@ -96,13 +100,13 @@ export default {
     //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Eliminada', life: 3000 });
     // };
 
-    // Variables del componente
-    this.openNew = openNew;
+    this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
     this.saveCategoria = saveCategoria;
     this.editCategoria = editCategoria;
-    // this.confirmDeleteCategoria = confirmDeleteCategoria;
-    // this.deleteCategoria = deleteCategoria;
+   
+
+
   },
   computed: {
     ...mapState(categoriasStore, ['categorias']),
@@ -191,7 +195,7 @@ export default {
                 </span>
               </div>
               <div>
-                <Button label="Crear nueva" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                <Button label="Crear nueva" icon="pi pi-plus" class="p-button-success mr-2" @click="modalEditCreate" />
               </div>
             </div>
           </template>
@@ -229,7 +233,7 @@ export default {
           </div>
           <div class="field">
             <label for="descripcion">Descripción</label>
-            <Textarea id="descripcion" v-model="categoria.descripcion" required="true" rows="3" cols="20"
+            <Textarea id="descripcion" v-model="categoria.descripcion" required="true" rows="2" cols="20"
               :class="{ 'p-invalid': submitted && !categoria.descripcion }" :required="true" />
           </div>
 
@@ -255,7 +259,7 @@ export default {
           <div class="formgrid grid">
             <div class="field col">
               <label for="minMilis">μilis MIN</label>
-              <InputNumber id="minMilis" v-model="categoria.minMilis"
+              <InputNumber id="minMilis" v-model="categoria.minMilis" rows="1" cols="3"
                 :class="{ 'p-invalid': submitted && !categoria.minMilis || categoria.minMilis > categoria.maxMilis }" :required="true" />
               <label for="maxMilis">μilis MAX</label>
               <InputNumber id="maxMilis" v-model="categoria.maxMilis"
