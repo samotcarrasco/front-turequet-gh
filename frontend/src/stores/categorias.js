@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 //import { storeDptoActual } from './dptoActual'
 // import { mapState } from 'pinia'
-import { getCategorias } from './api-service'
-import { postCategoria } from './api-service'
+import { getCategorias, putCategoria, postCategoria, deleteCategoria } from './api-service'
 
 
 export const categoriasStore = defineStore('categorias', {
@@ -33,13 +32,24 @@ export const categoriasStore = defineStore('categorias', {
     async getCategorias() {
       //la de dentro es la funcion importada
       await getCategorias().then(r => this.categorias = r.data._embedded.categorias);
-   //   await getCategorias().then(r => this.categorias.push (r.data._nuevacategoria))
+     //await getCategorias().then(r => this.categorias = Object.values(r.data));
     },
 
     async postCategoria(categoria) {
       //la de dentro es la funcion importada
       await postCategoria(categoria);
     },
+
+    async putCategoria(categoria, id) {
+      //la de dentro es la funcion importada
+      await putCategoria(categoria, id);
+    },
+
+    async deleteCategoria(categoria) {
+      //la de dentro es la funcion importada
+      await deleteCategoria(categoria);
+    },
+
 
   },
 })

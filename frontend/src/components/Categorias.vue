@@ -37,9 +37,6 @@ export default {
   },
   mounted() {
 
-    
-    // this.confirmDeleteCategoria = confirmDeleteCategoria;
-    // this.deleteCategoria = deleteCategoria;
     const toast = useToast();
 
     const modalEditCreate = () => {
@@ -55,16 +52,15 @@ export default {
     };
 
     const saveCategoria = () => {
-      console.log("entrando en la funcion saveCategoria")
+      console.log("entrando en la funcion saveCategoria con la categoria: " + this.categoria)
       this.submitted = true;
 
       if (this.formularioRellenado(this.categoria)) {
         console.log("punto 1");
         if (this.categoria.id) {
           console.log("punto 2");
-          //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
-          // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
           //llamad a metodo putcategoria(pendiente de desarrollo)
+          this.putCategoria(this.categoria).then(() => { this.getCategorias() });
           toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
         } else {
           console.log("punto 3");
@@ -88,22 +84,28 @@ export default {
 
     };
 
-    //  const confirmDeleteCategoria = (editCategoria) => {
-    //      this.categoria = editCategoria;
-    //      this.deleteCategoriaDialog = true;
-    // };
+    const confirmDeleteCategoria = (categoria) => {
+          this.categoria = categoria;
+          this.deleteCategoriaDialog = true;
+     };
 
-    // const deleteCategoria = () => {
-    //     this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
-    //     this.deleteCategoriaDialog = false;
-    //     this.categoria = {};
-    //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Eliminada', life: 3000 });
-    // };
+     //cambiamos deleteCategoria por borrarCategoria
+     //para que no entre en bucle con la variable del store
+    const borrarCategoria = () => {
+         //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
+         this.deleteCategoriaDialog = false;
+         console.log("antes de borrar");
+         this.deleteCategoria(this.categoria).then(() => { this.getCategorias() });
+         toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Eliminada', life: 3000 });
+    
+     };
 
     this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
     this.saveCategoria = saveCategoria;
     this.editCategoria = editCategoria;
+    this.confirmDeleteCategoria = confirmDeleteCategoria;
+    this.borrarCategoria = borrarCategoria;
    
 
 
@@ -115,22 +117,10 @@ export default {
   methods: {
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(categoriasStore, ['postCategoria']),
+    ...mapActions(categoriasStore, ['putCategoria']),
+    ...mapActions(categoriasStore, ['deleteCategoria']),
     ...mapActions(categoriasStore, ['getGrupos']),
 
-
-    iconoMateriales() {
-      return '<font-awesome-icon :icon="[\'fa-sharp\', \'fa-solid\', \'fa-boxes-stacked\']" />';
-    },
-    findIndexById(id) {
-      let index = -1;
-      for (let i = 0; i < this.products.length; i++) {
-        if (this.products[i].id === id) {
-          index = i;
-          break;
-        }
-      }
-      return index;
-    },
     initFilters() {
       this.filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -169,6 +159,7 @@ export default {
     console.log("categorias desde el Componente: " + this.categorias)
     this.categorias.forEach(categoria => {
       console.log("categoria: ", categoria.categoria)
+      console.log("id: ", categoria.id)
     })
   },
 }
@@ -227,6 +218,11 @@ export default {
         <Dialog v-model:visible="categoriaDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
           class="p-fluid">
           <div class="field">
+            <label for="id">Id</label>
+            <Textarea id="id" v-model="categoria.id" required="true" 
+              :class="{ 'p-invalid': submitted && !categoria.id }" :required="true" />
+          </div>
+          <div class="field">
             <label for="name">Nombre de la categoría</label>
             <InputText id="name" v-model.trim="categoria.categoria" required="true" autofocus
               :class="{ 'p-invalid': submitted && !categoria.categoria }" />
@@ -281,7 +277,7 @@ export default {
           </div>
           <template #footer>
             <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteCategoriaDialog = false" />
-            <Button label="Si" icon="pi pi-check" class="p-button-text" @click="deleteCategoria" />
+            <Button label="Si" icon="pi pi-check" class="p-button-text" @click="borrarCategoria" />
           </template>
         </Dialog>
       </div>
@@ -290,8 +286,6 @@ export default {
 </template>
 
 <style scoped>
-/* <style scoped lang="scss"> */
-/* @import '@/assets/demo/styles/badges.scss'; */
 
 .flex-row {
   display: flex;

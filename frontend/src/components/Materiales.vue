@@ -3,7 +3,7 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import MultiSelect from 'primevue/multiselect'
-import { storeDptoActual } from '@/stores/dptoActual'
+import { departamentosStore } from '@/stores/departamentos'
 import { materialesStore } from '@/stores/materiales'
 //import { categoriasStore } from '@/stores/categorias'
 import { mapState, mapActions } from 'pinia'
@@ -99,7 +99,7 @@ export default {
   computed: {
     ...mapState(materialesStore, ['materiales']),
    // ...mapState(categoriasStore, ['categorias']),
-    ...mapState(storeDptoActual, ['dptoActual']),
+    ...mapState(departamentosStore, ['dptoActual']),
 
     materialesDtpoActual() {
       //la función llamada en el return está declarada en el store

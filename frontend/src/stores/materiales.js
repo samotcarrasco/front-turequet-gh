@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { storeDptoActual } from './dptoActual'
+import { departamentosStore } from './departamentos.js'
 import { mapState } from 'pinia'
 import { getMateriales } from './api-service'
 import { getMaterialPorIdS } from './api-service'
@@ -14,7 +14,7 @@ export const materialesStore = defineStore('materiales', {
     //materiales: fetchMateriales()
   }),
   getters: {
-    ...mapState(storeDptoActual, [ 'dptoActual' ]),
+    ...mapState(departamentosStore, [ 'dptoActual' ]),
     
     // getMateriales(state){
     //   return state.materiales
@@ -22,6 +22,7 @@ export const materialesStore = defineStore('materiales', {
   },
   actions: {
     async getMateriales() {
+      //la de dentro es la funcion importada
       await getMateriales().then(r => this.materiales = r.data._embedded.materiales)
     },
     getMaterialPorId(id) {
@@ -37,18 +38,18 @@ export const materialesStore = defineStore('materiales', {
       return this.materiales.filter(material => material.dptoOfertante === this.dptoActual)
     },
 
-    getNumeroMaterialesPorCategoria() {
-      //console.log("accediendo a getNumeroMaterialesPorCategoria")
-      const categorias = {}
-      this.materiales.forEach(material => {
-        if (!categorias[material.categoria]) {
-         // console.log(material.categoria)
-          categorias[material.categoria] = 0
-        }
-        categorias[material.categoria]++
-      })
-      //console.log(categorias["Silla"])
-      return categorias
-    }
+    // getNumeroMaterialesPorCategoria() {
+    //   //console.log("accediendo a getNumeroMaterialesPorCategoria")
+    //   const categorias = {}
+    //   this.materiales.forEach(material => {
+    //     if (!categorias[material.categoria]) {
+    //      // console.log(material.categoria)
+    //       categorias[material.categoria] = 0
+    //     }
+    //     categorias[material.categoria]++
+    //   })
+    //   //console.log(categorias["Silla"])
+    //   return categorias
+    // }
   },
 })

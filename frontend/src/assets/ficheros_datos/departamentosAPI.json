@@ -1,0 +1,80 @@
+{
+    "_embedded": {
+        "departamentos": [
+            {
+                "id": "1",
+                "abreviatura": "SIC",
+                "nombre": "Sistemas de Información y Comunicaciones",
+                "responsable-empleo": "Brigada",
+                "responsable-nombre": "Vicente Cimadevila",
+                "telefono": "917655441",
+                "acuartelamiento": "ACING",
+                "numMateriales": "4",
+                "milis": 200,
+                "email": "sic.acing@mde.es",
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/departamentos/1"
+                    },
+                    "materialesOfertados": {
+                        "href": "http://localhost:8080/api/departamentos/1/materialesofertados"
+                    },
+                    "materialesAdquiridos": {
+                        "href": "http://localhost:8080/api/departamentos/1/materialesadquiridos"
+                    }
+                }
+            },
+            {
+                "id": "2",
+                "abreviatura": "RRHH",
+                "nombre": "Recursos humanos",
+                "responsable-empleo": "Capitán",
+                "responsable-nombre": "Pedro Velarde y Santillán",
+                "telefono": "917655441",
+                "acuartelamiento": "ACING",
+                "numMateriales": "4",
+                "email": "rrhh.acing@mde.es",
+                "milis": 200,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/departamentos/2"
+                    },
+                    "materialesOfertados": {
+                        "href": "http://localhost:8080/api/departamentos/2/materialesofertados"
+                    },
+                    "materialesAdquiridos": {
+                        "href": "http://localhost:8080/api/departamentos/2/materialesadquiridos"
+                    }
+                }
+            },
+            {
+                "id": "3",
+                "abreviatura": "Formación",
+                "nombre": "Formación",
+                "responsable-empleo": "Capitán",
+                "responsable-nombre": "Luis Daoiz y Torres",
+                "telefono": "917587441",
+                "acuartelamiento": "ACING",
+                "numMateriales": "3",
+                "email": "formacion.acing@mde.es",
+                "milis": 200,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/departamentos/3"
+                    },
+                    "materialesOfertados": {
+                        "href": "http://localhost:8080/api/departamentos/3/materialesofertados"
+                    },
+                    "materialesAdquiridos": {
+                        "href": "http://localhost:8080/api/departamentos/3/materialesadquiridos"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "categorias": {
+            "href": "http://localhost:8080/api/categorias"
+        }
+    }
+}

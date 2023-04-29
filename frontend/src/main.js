@@ -29,6 +29,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 //import { faFutbolBall, faMobile, faSquareFull, faUser, faBoxesStacked } from '@fortawesome/free-solid-svg-icons'
+import { faUser } from '@fortawesome/free-solid-svg-icons'
 
 //pinia
 import { createPinia } from 'pinia'
@@ -63,7 +64,7 @@ const router = createRouter({
 const pinia = createPinia()
 
 
-// library.add(faUser)
+library.add(faUser)
 // library.add(faBoxesStacked)
 
 
