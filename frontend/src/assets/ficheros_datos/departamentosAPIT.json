@@ -1,0 +1,28 @@
+{
+    "_embedded": {
+        "departamentos": [
+            {
+                "id": 1,
+                "abreviatura": "SIC",
+                "email": "sic.acing@mde.es",
+                "credito": 521,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/departamentos/1"
+                    }
+                }
+            },
+            {
+                "id": 4,
+                "abreviatura": "RRHH",
+                "email": "rrhh.acing@mde.es",
+                "credito": 1000,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/departamentos/4"
+                    }
+                }
+            }
+        ]
+    }
+}

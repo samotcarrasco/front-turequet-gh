@@ -1,0 +1,90 @@
+{
+    "_embedded": {
+        "categorias": [
+            {
+                "id": 1,
+                "categoria": "Ordenadores portátiles",
+                "descripcion": "Todo tipo de ordenadores portátiles. Los ordenadores deben estar funcionando",
+                "grupo": "Informatica",
+                "minMilis": 200,
+                "maxMilis": 100,
+                "numMateriales": 4,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/categorias/1"
+                    }
+                }
+            },
+            {
+                "id": 2,
+                "categoria": "Ordenadores de sobremesa",
+                "descripcion": "Todo tipo de ordenadores de sobremesa. Los ordenadores deben estar funcionando",
+                "grupo": "Informatica",
+                "minMilis": 50,
+                "maxMilis": 150,
+                "numMateriales": 0,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/categorias/2"
+                    }
+                }
+            },
+            {
+                "id": 4,
+                "categoria": "Ordenadores de sobremesa",
+                "descripcion": "Todo tipo de ordenadores de sobremesa. Los ordenadores deben estar funcionando",
+                "grupo": "Informatica",
+                "minMilis": 50,
+                "maxMilis": 150,
+                "numMateriales": 0,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/categorias/4"
+                    }
+                }
+            },
+            {
+                "id": 6,
+                "categoria": "Bolígrafo",
+                "descripcion": "Boligrafos nuevos o seminuevos",
+                "grupo": "MaterialOficina",
+                "minMilis": 1,
+                "maxMilis": 3,
+                "numMateriales": 1,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/categorias/6"
+                    }
+                }
+            },
+            {
+                "id": 9,
+                "categoria": "Router",
+                "descripcion": "Router wifi",
+                "grupo": "Comunicaciones",
+                "minMilis": 70,
+                "maxMilis": 90,
+                "numMateriales": 0,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/categorias/9"
+                    }
+                }
+            },
+            {
+                "id": 7,
+                "categoria": "Folios",
+                "descripcion": "Folios blancos o reciclados, paquete de 500",
+                "grupo": "MaterialOficina",
+                "minMilis": 50,
+                "maxMilis": 60,
+                "numMateriales": 0,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/categorias/7"
+                    }
+                }
+            }
+        ]
+    }
+}

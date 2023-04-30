@@ -20,16 +20,15 @@ export default {
     return {
       disponibles: 'disponibles',
       ofertados: 'ofertados',
-      adquiridos: 'adquiridos',
-      message: 'hello!'
+      adquiridos: 'adquiridos'    
     }
   },
-  provide() {
-    // use function syntax so that we can access `this`
-    return {
-      message: this.message
-    }
-  },
+  // provide() {
+  //   // use function syntax so that we can access `this`
+  //   return {
+  //    // message: this.message
+  //   }
+  // },
   components: { Panel, TabView, TabPanel, Materiales },
   computed: {
 

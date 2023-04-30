@@ -8,7 +8,7 @@ import ToastService from 'primevue/toastservice';
 import MaterialInfo from '@/components/MaterialInfo.vue'
 import MaterialesMain from '@/components/MaterialesMain.vue'
 import Categorias from '@/components/Categorias.vue'
-import Estadisticas from '@/components/ComponenteDummy.vue'
+import ComponenteDummy from '@/components/ComponenteDummy.vue'
 
 
 //Bootstrap
@@ -34,11 +34,13 @@ import { faUser } from '@fortawesome/free-solid-svg-icons'
 //pinia
 import { createPinia } from 'pinia'
 
+import { cors } from 'cors'
+
 
 //definimos objeto rutas
 const routes = [
   {
-    path: '/', component: MaterialesMain, name: 'home'
+    path: '/', component: ComponenteDummy, name: 'home'
   },
   { path: '/materiales', component: MaterialesMain, name: 'materiales' },
   //{ path: '/material/:id/:tipoVista', component: MaterialInfo, name:'material' },
@@ -52,7 +54,7 @@ const routes = [
    // props: route => ({ tipoVista: route.query.tipoVista })
   },
   { path: '/categorias', component: Categorias, name: 'categorias' },
-  { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' }
+  { path: '/estadisticas', component: ComponenteDummy, name: 'estadisticas' }
 
 ]
 
@@ -73,8 +75,10 @@ const app = createApp(App)
 app.use(PrimeVue)
 app.use(router)
 app.use(pinia)
-app.use(ToastService);
-//app.use(cors())
+app.use(ToastService)
+app.use(cors)
+
+
 
 app.component('font-awesome-icon', FontAwesomeIcon)
 

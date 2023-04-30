@@ -112,18 +112,18 @@ export default {
         case "ofertados":
           return this.materiales.filter((material) => {
            //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
-            return material.estado === "disponible" && material.dptoOferta == this.dptoActual;
+            return material.estado === "disponible" && material.dptoOfertaN == this.dptoActual;
           });
         case "disponibles":
               return this.materiales.filter((material) => {
            //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
-            return material.estado === "disponible" && material.dptoOferta !== this.dptoActual;
+            return material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual;
           });
         case "adquiridos":
          // console.log("dpto actual: ",this.dptoActual)
           return this.materiales.filter((material) => {
            //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
-            return material.estado === "adquirido" && material.dptoAdquisicion === this.dptoActual;
+            return material.estado === "adquirido" && material.dptoAdquisicionN === this.dptoActual;
           });
       }
     },
@@ -148,10 +148,10 @@ export default {
     //await this.getCategorias();
     await this.getMateriales();
   
-    this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoria)))
-      .map((categoria, index) => ({ id: index + 1, name: categoria }));
+    this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
+      .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
 
-    console.log("Vista desde materiales:", this.tipoVista)
+    console.log("Vista desde materiales:", this.tipoVista, this.materiales)
   }
 
 }
@@ -188,9 +188,9 @@ export default {
         </template>
       </Column>
       <Column field="milis" header="μilis" :sortable="true"> </Column>
-      <Column field="categoria" header="Categoria" :sortable="true"></Column>
+      <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
       <!-- <Column field="grupo" header="Grupo" :sortable="true"></Column>-->
-      <Column field="dptoOferta" header="Ofertante" :sortable="true"></Column> 
+      <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column> 
        <Column header="VER">
         <template #body="material">
           <router-link :to="{ name: 'material', params: { id: material.data.id }}"><i class="pi pi-info-circle"/></router-link>  

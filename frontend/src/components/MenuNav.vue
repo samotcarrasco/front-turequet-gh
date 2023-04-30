@@ -7,7 +7,9 @@ export default {
     ...mapState(departamentosStore, ['dptoActual']),
     ...mapState(departamentosStore, ['rolActual']),
     ...mapState(departamentosStore, ['departamentos']),
-    ...mapState(departamentosStore, ['departamentosSiglas'])
+    ...mapState(departamentosStore, ['departamentosSiglas']),
+    ...mapState(departamentosStore, ['dptoActualAPI'])
+
   },
   data() {
     return {
@@ -17,6 +19,8 @@ export default {
   methods: {
 
     ...mapActions(departamentosStore, ['getDepartamentos']),
+    ...mapActions(departamentosStore, ['getDeptoActualAPI']),
+
 
     cambiarDpto(event) {
       const storeDepto = departamentosStore();
@@ -33,8 +37,14 @@ export default {
   },
   async created() {
     await this.getDepartamentos();
-    console.log(this.departamentosSiglas)
     //iniciamos la aplicación con rol gestor  
+    
+    await this.getDeptoActualAPI();
+    console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
+    //iniciamos la aplicación con rol gestor  
+
+    
+
   },
 }
 </script>
@@ -70,7 +80,7 @@ export default {
         
         </ul>
         <ul class="navbar-nav me-5">
-           <li v-if="departamentosSiglas.length >   0
+           <li v-if="departamentosSiglas.length > 0
             && $route.name !== 'material'
             && rolActual != 'Gestor'">
             <!-- se puede quitar el evento @Change, porque el store es writable-->

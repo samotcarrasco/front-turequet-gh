@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { departamentosStore } from './departamentos.js'
 import { mapState } from 'pinia'
 import { getMateriales } from './api-service'
+import { putMaterial } from './api-service'
 import { getMaterialPorIdS } from './api-service'
-import axios from "axios"
 
 
  
@@ -15,10 +15,6 @@ export const materialesStore = defineStore('materiales', {
   }),
   getters: {
     ...mapState(departamentosStore, [ 'dptoActual' ]),
-    
-    // getMateriales(state){
-    //   return state.materiales
-    // }
   },
   actions: {
     async getMateriales() {
@@ -38,6 +34,10 @@ export const materialesStore = defineStore('materiales', {
       return this.materiales.filter(material => material.dptoOfertante === this.dptoActual)
     },
 
+    async putMaterial(material, id) {
+      //la de dentro es la funcion importada
+      await putMaterial(material, id);
+    },
     // getNumeroMaterialesPorCategoria() {
     //   //console.log("accediendo a getNumeroMaterialesPorCategoria")
     //   const categorias = {}

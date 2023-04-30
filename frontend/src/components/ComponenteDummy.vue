@@ -1,5 +1,5 @@
 <template>
-  <h1>apartado sin contendido</h1>
+  <h1>Para comenzar a usar la aplicación, seleccione un rol</h1>
 
 </template>
 

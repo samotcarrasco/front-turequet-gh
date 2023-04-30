@@ -31,6 +31,7 @@ export default {
   computed: {
     ...mapState(materialesStore, ['materiales']),
     ...mapState(departamentosStore, ['dptoActual']),
+    ...mapState(departamentosStore, ['dptoActualAPI']),
 
     material() {
       // return this.participantes.find(p => p.id == this.$route.params.id)
@@ -38,9 +39,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['putMaterial']),
-
+    ...mapState(departamentosStore, ['getDeptoActualAPI']),
 
     eliminarMaterial() {
       // Lógica para eliminar el material
@@ -123,24 +125,13 @@ export default {
       this.submitted = true;
 
       this.generarPDF(this.material);
-      // if (this.formularioRellenado(this.categoria)) {
-      //   console.log("punto 1");
-      //   if (this.categoria.id) {
-      //     console.log("punto 2");
-      //     //llamad a metodo putcategoria(pendiente de desarrollo)
-      //     this.putCategoria(this.categoria,this.categoria.id).then(() => { this.getCategorias() });
-      //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
-      //   } else {
-      //     console.log("punto 3");
-      //     // this.categoria.image = 'categoria-placeholder.svg';
-      //     //this.categoria.inventoryStatus = this.categoria.inventoryStatus ? this.categoria.inventoryStatus.value : 'INSTOCK';
-      //     //this.categorias.push(this.categoria);
-      //     console.log(this.categoria);
-      //     this.postCategoria(this.categoria).then(() => { this.getCategorias() });
-      //     toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'La categoría' + this.categoria.categoria + " se ha creado correctamente", life: 4000 });
-      //   }
-      //   this.adquirirDialog = false;
-      //   this.categoria = {};
+      //actualizamos el material con la info correspondiente
+      console.log("actualizando material: " + this.material.id + this.material.nombre)
+      this.material.estado="adquirido";
+      this.material.dptoAdquisicion = this.dptoActualAPI;
+      this.material.fechaAdquisicion = new Date();
+      this.putMaterial(this.material,this.material.id).then(() => { this.getMateriales() });
+      
     }
 
     const adquirirMaterial = (material) => {
@@ -157,8 +148,15 @@ export default {
 
 
   },
-  created() {
-    //console.log("TIPO VISTA DESDE MaterialInfo", this.tipoVista)
+
+ 
+  async created() {
+    
+    console.log("LLAMANDO A DPTO ACTUAL API CON", this.dptoActual);
+    await this.getDeptoActualAPI();
+    console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
+    //iniciamos la aplicación con rol gestor  
+
   }
 }
 </script>
