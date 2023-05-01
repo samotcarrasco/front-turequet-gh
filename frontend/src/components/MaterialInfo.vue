@@ -17,6 +17,7 @@ export default {
       material: {},
       submitted: false,
       adquirirDialog: false,
+      detallesAdqDialog: false,
       cabecera: ""
     }
   },
@@ -27,22 +28,22 @@ export default {
     // }
   },
   components: { Card, Button, Galleria, Dialog, Divider },
-  //   emits: [ 'addGol', 'addTarjeta' ],
+
   computed: {
     ...mapState(materialesStore, ['materiales']),
+    ...mapState(materialesStore, ['materialActual']),
     ...mapState(departamentosStore, ['dptoActual']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
 
-    material() {
-      // return this.participantes.find(p => p.id == this.$route.params.id)
-      return this.getMaterialPorId(this.$route.params.id)
-    },
+    // material() {
+    //   // return this.participantes.find(p => p.id == this.$route.params.id)
+    //   return this.getMaterialPorId(this.$route.params.id)
+    // },
   },
   methods: {
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['putMaterial']),
-    ...mapState(departamentosStore, ['getDeptoActualAPI']),
 
     eliminarMaterial() {
       // Lógica para eliminar el material
@@ -50,18 +51,37 @@ export default {
 
     materialAdquirido(material) {
       console.log("acutal", this.dptoActual)
-      console.log("adquisicion", material.dptoAdquisicion)
+      console.log("adquisicion", this.dptoActualAPI)
+      console.log("ofertante", material.dptoOfertaN)
       console.log("estado", material.estado)
+      //console.log("material actual", JSON.stringify(this.materialActual))
 
-      // console.log( material.dptoAdquisicion , this.dptoActual, material.dptoAdquisicion == this.dptoActual)
-      return material.dptoAdquisicion == this.dptoActual && material.estado == "adquirido"
+      return material.dptoAdquisicionN == this.dptoActual && material.estado == "adquirido"
     },
     materialOfertado(material) {
-      return material.dptoOferta == this.dptoActual && material.estado == "disponible"
+      return material.dptoOfertaN == this.dptoActual && material.estado == "disponible"
     },
     materialDisponible(material) {
-      return material.dptoOferta !== this.dptoActual && material.estado == "disponible"
+      return material.dptoOfertaN !== this.dptoActual && material.estado == "disponible"
     },
+
+    obtenerCategoria(material) {
+    },
+
+    adquirirMaterial(material) {
+      this.material = { ...material };
+      console.log(this.material);
+      this.adquirirDialog = true;
+      this.cabecera = "Adquirir material";
+    },
+
+    mostrarDetallesAdq(material) {
+      this.materal = { ...material};
+      this.detallesAdqDialog = true;
+      this.cabecera = "Detalles de la adquisición"
+    },
+
+
     generarPDF(material) {
       const doc = new jsPDF();
 
@@ -103,6 +123,15 @@ export default {
       doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200);
       doc.save(`intercambio-material${material.nombre}.pdf`);
 
+    },
+
+      goBack() {
+      console.log('Botón "Volver" fue presionado');
+      this.$router.go(-1);
+
+      this.$nextTick(() => {
+        this.$router.go(-1);
+      }); 
     }
 
   },
@@ -116,34 +145,49 @@ export default {
       this.cabecera = "Confirmación de adquisición de material"
     };
 
+    const modalDetallesAdq = () => {
+      this.material = {};
+      this.submitted = false;
+      this.detallesAdqDialog = true;
+      this.cabecera = "Detalles de la adquisición de material"
+    };
+
     const hideDialog = () => {
       this.adquirirDialog = false;
       this.submitted = false;
     };
 
+    const hideDialogDet = () => {
+      this.mostrarDetallesAdq = false;
+      this.submitted = false;
+    };
+
+
     const saveMaterial = () => {
       this.submitted = true;
 
       this.generarPDF(this.material);
+      //console.log("actualizando material: " +  JSON.stringify(this.material))
       //actualizamos el material con la info correspondiente
-      console.log("actualizando material: " + this.material.id + this.material.nombre)
-      this.material.estado="adquirido";
-      this.material.dptoAdquisicion = this.dptoActualAPI;
-      this.material.fechaAdquisicion = new Date();
-      this.putMaterial(this.material,this.material.id).then(() => { this.getMateriales() });
+      this.material.estado = "adquirido"
+      this.material.dptoAdquisicion = this.dptoActualAPI
+      console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
+      //this.material.dptoAdquisicion = "http://localhost:8080/api/departamentos/4"
+      //console.log("Href de categoria: " + categoriaHref);
+      this.material.categoria = this.material._links.categoria.href;
+      this.material.dptoOferta = this.material._links.dptoOferta.href;
+      delete this.material._links;
+      this.material.fechaAdquisicion = new Date()
+      console.log("actualizando material: " +  JSON.stringify(this.material))
+      this.putMaterial(this.material,this.material.id).then(() => { this.getMateriales() })
       
     }
 
-    const adquirirMaterial = (material) => {
-      this.material = { ...material };
-      console.log(this.material);
-      this.adquirirDialog = true;
-      this.cabecera = "Adquirir material"
-    };
-
+ 
     this.modalAdquirirMaterial = modalAdquirirMaterial;
+    this.modalDetallesAdq = modalDetallesAdq;
     this.hideDialog = hideDialog;
-    this.adquirirMaterial = adquirirMaterial;
+    this.hideDialogDet = hideDialogDet;
     this.saveMaterial = saveMaterial;
 
 
@@ -151,25 +195,27 @@ export default {
 
  
   async created() {
-    
-    console.log("LLAMANDO A DPTO ACTUAL API CON", this.dptoActual);
-    await this.getDeptoActualAPI();
-    console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
-    //iniciamos la aplicación con rol gestor  
+  
+     //iniciamos la aplicación con rol gestor  
 
-  }
+    console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
+     await this.getMaterialPorId(this.$route.params.id);
+    console.log("material string: ", JSON.stringify(this.materialActual))
+    this.material = this.materialActual;
+      
+}
 }
 </script>
 
 <template>
   <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
-    <template #subtitle> {{ material.credito }} μ </template>
+    <template #subtitle> {{ material.milis }} μ </template>
     <template #content>
       <div class="row">
         <div class="col-sm-4">
           <div class="p-mb-2"><strong>Descripción:</strong> {{ material.descripcion }}</div>
-          <div class="p-mb-2"><strong>Categoría:</strong> {{ material.categoria }}</div>
+          <div class="p-mb-2"><strong>Categoría:</strong> {{ material.categoriaN }}</div>
           <!-- <div class="p-mb-2"><strong>Grupo:</strong> {{ material.grupo }}</div> -->
           <div class="p-mb-2"><strong>Peso:</strong> {{ material.peso }} kg</div>
           <div class="p-mb-2"><strong>Dimensiones:</strong> {{ material.dimensiones }}</div>
@@ -197,12 +243,18 @@ export default {
           <Button label="Show" icon="pi pi-external-link" @click="displayBasic = true" />
         </div>
         <div class="p-mb-2">
-          <Button v-if="materialDisponible(material)" label="Adquirir" icon="pi pi-shopping-cart" class="p-button-success"
+          <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart" class="p-button-success"
             @click="adquirirMaterial(material)" />
           <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
           <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
           <!-- <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
-          <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info" />
+          <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info" 
+            @click="mostrarDetallesAdq(material)" />
+          <!-- <router-link :to="{ name: 'materiales' }  />"> -->
+            <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" />
+        <!-- </router-link> -->
+        <!-- <router-link class="nav-link" :to="{ name: 'materiales' } @click="goBack" />">volver</router-link> -->
+
         </div>
       </div>
     </template>
@@ -218,12 +270,26 @@ export default {
     <Divider />
     Credito actual 200 milis
     <Divider />
-    Unidad ofertante {{ this.material.dptoOferta }}
+    Unidad ofertante {{ this.material.dptoOfertaN }}
     <Divider />
 
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
       <Button label="Guardar (generar PDF)" icon="pi pi-check" class="p-button-text" @click="saveMaterial" />
+    </template>
+  </Dialog>
+   
+  <Dialog v-model:visible="detallesAdqDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
+    Nombre del material: {{ this.material.nombre }}
+    <Divider />
+    Fecha de la operación:{{ this.material.fechaAdquisicion }}
+    <Divider />
+    Milis: {{ this.material.milis }}
+    <Divider />
+    Unidad ofertante {{ this.material.dptoOfertaN }}
+    <Divider />  
+    <template #footer>
+      <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
     </template>
   </Dialog>
 </template>

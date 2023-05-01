@@ -39,6 +39,7 @@ export default {
     await this.getDepartamentos();
     //iniciamos la aplicación con rol gestor  
     
+    
     await this.getDeptoActualAPI();
     console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
     //iniciamos la aplicación con rol gestor  
@@ -77,8 +78,7 @@ export default {
           <li class="nav-item" v-if="rolActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
           </li>
-        
-        </ul>
+         </ul>
         <ul class="navbar-nav me-5">
            <li v-if="departamentosSiglas.length > 0
             && $route.name !== 'material'

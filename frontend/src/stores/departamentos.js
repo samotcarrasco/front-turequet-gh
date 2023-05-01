@@ -15,6 +15,7 @@ export const departamentosStore = defineStore('departamentos', {
     cambiarDpto(departamento) {
       this.dptoActual = departamento
       console.log("dpto actual:", departamento)
+      this.getDeptoActualAPI(departamento);
       console.log("dpto API:", this.dptoActualAPI)
     },
 
@@ -34,14 +35,18 @@ export const departamentosStore = defineStore('departamentos', {
 
     },
     
-    async getDeptoActualAPI() {
-      console.log("DENTRODEL ASYNC getDeptoActualAPI"+ this.dptoActual)
+    async getDeptoActualAPI(departamento) {
+      //console.log("DENTRODEL ASYNC getDeptoActualAPI"+ departamento)
       //la de dentro es la funcion importada
-      await getDeptoPorSiglas(this.dptoActual).then(r => {
-        console.log("RESPUESTA DE LA API", r); // Imprime la respuesta completa de la API
+      await getDeptoPorSiglas(departamento).then(r => {
+      //  console.log("RESPUESTA DE LA API", r); // Imprime la respuesta completa de la API
         this.dptoActualAPI = r.data._links.self.href;
-        console.log("DEPARTAMENTO ACTUAL RECUPERADO", this.dptoActualAPI);
+      //  console.log("DEPARTAMENTO ACTUAL RECUPERADO", this.dptoActualAPI);
       });
+      //return dptoActAPI
     },
+
+    
+    
   }
 })

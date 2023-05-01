@@ -68,10 +68,10 @@ export default {
     };
 
     const editMaterial = (editMaterial) => {
-      // this.material = { ...editMaterial };
-      // console.log(this.categoria);
-      // this.materialDialog = true;
-      // this.cabecera = "Editar categoría"
+       this.material = { ...editMaterial };
+       console.log(this.categoria);
+       this.materialDialog = true;
+      this.cabecera = "Editar categoría"
 
     };
 
@@ -117,12 +117,12 @@ export default {
         case "disponibles":
               return this.materiales.filter((material) => {
            //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
-            return material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual;
+            return material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual && this.dptoActual;
           });
         case "adquiridos":
          // console.log("dpto actual: ",this.dptoActual)
           return this.materiales.filter((material) => {
-           //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
+             console.log("estado: ",material.id + material.estado + " dptoADQ", material.dptoAdquisicionN + "actual" + this.dptoActual)
             return material.estado === "adquirido" && material.dptoAdquisicionN === this.dptoActual;
           });
       }
@@ -182,6 +182,7 @@ export default {
         </div>
       </template>
       <Column field="nombre" header="Nombre" :sortable="true"></Column>
+      <Column field="estado" header="Estado" :sortable="true"></Column>
       <Column header="imagen">
         <template #body="material">
           <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />

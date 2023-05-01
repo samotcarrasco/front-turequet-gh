@@ -3,7 +3,8 @@ import { departamentosStore } from './departamentos.js'
 import { mapState } from 'pinia'
 import { getMateriales } from './api-service'
 import { putMaterial } from './api-service'
-import { getMaterialPorIdS } from './api-service'
+import { getMaterialPorId } from './api-service'
+//import { getCategoriaDe } from './api-service'
 
 
  
@@ -21,12 +22,12 @@ export const materialesStore = defineStore('materiales', {
       //la de dentro es la funcion importada
       await getMateriales().then(r => this.materiales = r.data._embedded.materiales)
     },
-    getMaterialPorId(id) {
-      return this.materiales.find(m => m.id == id)
-    },
+    // getMaterialPorId(id) {
+    //   return this.materiales.find(m => m.id == id)
+    // },
     
-    async getMaterialPorIdS(id) {
-      await getMaterialPorIdS(id).then(r => this.amterialActual = r.data._data)
+    async getMaterialPorId(id) {
+      await getMaterialPorId(id).then(r => this.materialActual = r.data)
     },
     
     materialesDptoActual() {
@@ -38,18 +39,10 @@ export const materialesStore = defineStore('materiales', {
       //la de dentro es la funcion importada
       await putMaterial(material, id);
     },
-    // getNumeroMaterialesPorCategoria() {
-    //   //console.log("accediendo a getNumeroMaterialesPorCategoria")
-    //   const categorias = {}
-    //   this.materiales.forEach(material => {
-    //     if (!categorias[material.categoria]) {
-    //      // console.log(material.categoria)
-    //       categorias[material.categoria] = 0
-    //     }
-    //     categorias[material.categoria]++
-    //   })
-    //   //console.log(categorias["Silla"])
-    //   return categorias
-    // }
+
+    async getCategoriaDeMaterial(id){
+      await getCategoriaDeMaterial(id)
+    }
+
   },
 })

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 //const host = "https://apipreguntasdim-samotcarrasco.b4a.run/"
-//const host = "http://localhost:8080/"
+const host = "http://localhost:8080/"
 
 function llamadaApiGET(path) {
   let config = {
@@ -54,21 +54,21 @@ function llamadaApiDELETE(path) {
 
 function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
-  return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
-  //return llamadaApiGET(`${host}api/${nombre}`)
+  //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
+  return llamadaApiGET(`${host}api/${nombre}`)
 }
 
 
 function getEntidadPorId(nombre, id) {
-  //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}/${id}.json`)
-  //return llamadaApiGET(`${host}api/${nombre}/${id}`)
+ // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
+  return llamadaApiGET(`${host}api/${nombre}/${id}`)
 }
 
 
 function getEntidadPorNombre(nombre, campo, valor) {
-    console.log("OBTENIDNDO EL DPTO POR SIGLAS")
-   return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${campo}/${valor}.json`)
-   //return llamadaApiGET(`${host}api/${nombre}/${id}`)
+   //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
+  // return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${campo}/${valor}.json`)
+   return llamadaApiGET(`${host}api/${nombre}/${campo}/${valor}`)
 }
 
 
@@ -78,8 +78,8 @@ function postEntidad(modelo, nombre) {
 }
 
 function putEntidad(modelo, id, nombre) {
-  return llamadaApiPUT(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${id}.json`, )
-  //return llamadaApiPUT(modelo, `${host}api/${nombre}/${id}`)
+  //return llamadaApiPUT(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${id}.json`, )
+  return llamadaApiPUT(modelo, `${host}api/${nombre}/${id}`)
 }
 
 function deleteEntidad(id, nombre) {
@@ -113,9 +113,10 @@ export function getMateriales() {
 }
 
 
-export function getMaterialPorIdS(id) {
-  return getEntidadPorId('material', id)
+export function getMaterialPorId(id) {
+  return getEntidadPorId('materiales', id)
 }
+
 
 
 export function getDepartamentos() {
