@@ -39,6 +39,16 @@ function llamadaApiPUT(modeloJSON, path) {
   return axios.request(config);
 }
 
+function llamadaApiPUTParams(path, params = {}) {
+  let config = {
+    method: 'put',
+    maxBodyLength: Infinity,
+    url: path,
+    headers: {},
+    params: params // Añadimos los parámetros a la llamada
+  };
+  return axios.request(config);
+}
 
 function llamadaApiDELETE(path) {
   let config = {
@@ -65,6 +75,12 @@ function getEntidadPorId(nombre, id) {
 }
 
 
+function getEntidadPorLink(nombre) {
+  // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
+   return llamadaApiGET(`${host}api/${nombre}`)
+ }
+
+
 function getEntidadPorNombre(nombre, campo, valor) {
    //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
   // return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${campo}/${valor}.json`)
@@ -87,6 +103,11 @@ function deleteEntidad(id, nombre) {
   return llamadaApiDELETE(`${host}api/${nombre}/${id}`)
 }
 
+function PUTAumentarCretido (nombre, id, creditos) {
+  console.log("llamando a put de departamento:" + id +" milis" + creditos )
+  return llamadaApiPUTParams(`${host}api/${nombre}/${id}/aumentarCredito`, {cantidad: creditos})
+}
+  
 
 export function getCategorias() {
   return getEntidades('categorias')
@@ -106,6 +127,7 @@ export function deleteCategoria(categoria) {
   console.log("llamando a delete ", categoria, categoria.id)
   return deleteEntidad(categoria.id, 'categorias')
 }
+
 
 
 export function getMateriales() {
@@ -131,4 +153,10 @@ export function getDeptoPorSiglas(valor) {
 export function putMaterial(material) {
   console.log("llamando a put ", material, material.id)
   return putEntidad(material, material.id, 'materiales')
+}
+
+
+export function putAumentarCretido(id, creditos) {
+  //la personalizamos porque no es un put estandar
+     return PUTAumentarCretido('departamentos', id, creditos)
 }

@@ -33,6 +33,9 @@ export default {
       dt: null,
       filters: {},
       submitted: false,
+      minMilis: undefined,  //para solucionar warings al cargar las categorias
+      modalEditCreate: null,
+
     };
   },
   mounted() {
@@ -85,20 +88,20 @@ export default {
     };
 
     const confirmDeleteCategoria = (categoria) => {
-          this.categoria = categoria;
-          this.deleteCategoriaDialog = true;
-     };
+      this.categoria = categoria;
+      this.deleteCategoriaDialog = true;
+    };
 
-     //cambiamos deleteCategoria por borrarCategoria
-     //para que no entre en bucle con la variable del store
+    //cambiamos deleteCategoria por borrarCategoria
+    //para que no entre en bucle con la variable del store
     const borrarCategoria = () => {
-         //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
-         this.deleteCategoriaDialog = false;
-         console.log("antes de borrar");
-         this.deleteCategoria(this.categoria).then(() => { this.getCategorias() });
-         toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Eliminada', life: 3000 });
-    
-     };
+      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
+      this.deleteCategoriaDialog = false;
+      console.log("antes de borrar");
+      this.deleteCategoria(this.categoria).then(() => { this.getCategorias() });
+      toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Eliminada', life: 3000 });
+
+    };
 
     this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
@@ -106,7 +109,7 @@ export default {
     this.editCategoria = editCategoria;
     this.confirmDeleteCategoria = confirmDeleteCategoria;
     this.borrarCategoria = borrarCategoria;
-   
+
 
 
   },
@@ -128,12 +131,12 @@ export default {
     },
 
     formularioRellenado(cat) {
-      return (cat.categoria && 
-              cat.descripcion && 
-              cat.minMilis && 
-              cat.maxMilis &&
-              cat.grupo &&
-              (cat.minMilis <= cat.maxMilis))
+      return (cat.categoria &&
+        cat.descripcion &&
+        cat.minMilis &&
+        cat.maxMilis &&
+        cat.grupo &&
+        (cat.minMilis <= cat.maxMilis))
     },
 
     getGruposLocal() {
@@ -156,7 +159,7 @@ export default {
   async created() {
     this.initFilters()
     await this.getCategorias()
-    console.log("categorias desde el Componente: " + this.categorias)
+    //console.log("categorias desde el Componente: " + this.categorias)
     this.categorias.forEach(categoria => {
       console.log("categoria: ", categoria.categoria)
       console.log("id: ", categoria.id)
@@ -190,15 +193,14 @@ export default {
               </div>
             </div>
           </template>
-
           <Column field="categoria" header="Categoria" :sortable="true" headerStyle="width:16%; min-width:12rem;">
           </Column>
           <Column field="grupo" header="Grupo" :sortable="true" headerStyle="width:14%; min-width:10rem;">
           </Column>
-          <Column field="minMilis" header="μilis" :sortable="true" headerStyle="width:10%; min-width:4rem;"
-            :sort-field="minMilis">
+          <Column field="minMilis" header="μilis" :sortable="true" headerStyle="width:10%; min-width:4rem;" 
+          :sort-field="minMilis">
             <template #body="cat">
-              {{ cat.data.minMilis }}-{{ cat.data.maxMilis }}
+              {{ cat.data.minMilis ? cat.data.minMilis + '-' + cat.data.maxMilis : null }}
             </template>
           </Column>
           <Column field="descripcion" header="Descripcion" :sortable="false" headerStyle="width:20%; min-width:20rem;">
@@ -217,11 +219,11 @@ export default {
 
         <Dialog v-model:visible="categoriaDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
           class="p-fluid">
-          <div class="field">
+          <!-- <div class="field">
             <label for="id">Id</label>
             <Textarea id="id" v-model="categoria.id" required="true" 
               :class="{ 'p-invalid': submitted && !categoria.id }" :required="true" />
-          </div>
+          </div> -->
           <div class="field">
             <label for="name">Nombre de la categoría</label>
             <InputText id="name" v-model.trim="categoria.categoria" required="true" autofocus
@@ -235,9 +237,8 @@ export default {
 
           <div class="field">
             <label for="grupo" class="mb-3">Grupo</label>
-            <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()" 
-               :class="{ 'p-invalid': submitted && !categoria.grupo }"
-               placeholder="Seleccione grupo">
+            <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()"
+              :class="{ 'p-invalid': submitted && !categoria.grupo }" placeholder="Seleccione grupo">
               <template #value="grupo">
                 <div v-if="grupo.value">
                   <span :class="'categoria-badge status-' + grupo.value">{{
@@ -256,10 +257,12 @@ export default {
             <div class="field col">
               <label for="minMilis">μilis MIN</label>
               <InputNumber id="minMilis" v-model="categoria.minMilis" rows="1" cols="3"
-                :class="{ 'p-invalid': submitted && !categoria.minMilis || categoria.minMilis > categoria.maxMilis }" :required="true" />
+                :class="{ 'p-invalid': submitted && !categoria.minMilis || categoria.minMilis > categoria.maxMilis }"
+                :required="true" />
               <label for="maxMilis">μilis MAX</label>
               <InputNumber id="maxMilis" v-model="categoria.maxMilis"
-                :class="{ 'p-invalid': submitted && !categoria.maxMilis || categoria.minMilis > categoria.maxMilis}" :required="true" />
+                :class="{ 'p-invalid': submitted && !categoria.maxMilis || categoria.minMilis > categoria.maxMilis }"
+                :required="true" />
             </div>
           </div>
 
@@ -286,7 +289,6 @@ export default {
 </template>
 
 <style scoped>
-
 .flex-row {
   display: flex;
   flex-direction: row;

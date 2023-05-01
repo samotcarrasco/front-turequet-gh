@@ -31,20 +31,25 @@ export default {
       const storeDepto = departamentosStore();
       storeDepto.cambiarRol(event.target.value)
       if (event.target.value === 'Gestor') {
-       this.$router.push({ name: 'categorias' });
-      } else this.$router.push({ name: 'materiales' });
+        this.$router.push({ name: 'categorias' });
+      } else {
+        this.$router.push({ name: 'materiales' });
+        this.getDepartamentos();
+        this.getDeptoActualAPI();
+      }
     }
   },
   async created() {
-    await this.getDepartamentos();
-    //iniciamos la aplicación con rol gestor  
-    
-    
-    await this.getDeptoActualAPI();
-    console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
+    //await this.getDepartamentos();
     //iniciamos la aplicación con rol gestor  
 
-    
+
+    // await this.getDeptoActualAPI();
+    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
+    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
+    //iniciamos la aplicación con rol gestor  
+
+
 
   },
 }
@@ -73,16 +78,17 @@ export default {
             <router-link class="nav-link" :to="{ name: 'categorias' }">Categorías</router-link>
           </li>
           <li class="nav-item" v-if="rolActual == 'Gestor'">
-            <router-link class="nav-link" :to="{ name: 'categorias' }">Unidades</router-link>
+            <router-link class="nav-link" :to="{ name: 'unidades' }">Unidades</router-link>
           </li>
           <li class="nav-item" v-if="rolActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
           </li>
-         </ul>
+        </ul>
         <ul class="navbar-nav me-5">
-           <li v-if="departamentosSiglas.length > 0
+          <li v-if="departamentosSiglas.length > 0
             && $route.name !== 'material'
-            && rolActual != 'Gestor'">
+            && rolActual != 'Gestor'
+            && rolActual != null">
             <!-- se puede quitar el evento @Change, porque el store es writable-->
             <select class="form-select mr-2" v-model="dptoActual" @change="cambiarDpto">
               <option v-for="dep in departamentosSiglas" :key="dep.id" :value="dep.siglas">{{ dep.siglas }}</option>
@@ -94,7 +100,7 @@ export default {
               <option v-for="(rol, index) in roles" :key="index" :value="rol">{{ rol }}</option>
             </select>
           </li>
-    
+
         </ul>
       </div>
     </div>

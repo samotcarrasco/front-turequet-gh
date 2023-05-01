@@ -44,16 +44,18 @@ export default {
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['putMaterial']),
+    ...mapActions(departamentosStore, ['putAumentarCretido']),
 
     eliminarMaterial() {
       // Lógica para eliminar el material
     },
 
     materialAdquirido(material) {
-      console.log("acutal", this.dptoActual)
-      console.log("adquisicion", this.dptoActualAPI)
+       console.log("acutal", this.dptoActual)
+       console.log("adquisicion", this.dptoActualAPI);
+       console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
       console.log("ofertante", material.dptoOfertaN)
-      console.log("estado", material.estado)
+       console.log("estado", material.estado)
       //console.log("material actual", JSON.stringify(this.materialActual))
 
       return material.dptoAdquisicionN == this.dptoActual && material.estado == "adquirido"
@@ -127,11 +129,8 @@ export default {
 
       goBack() {
       console.log('Botón "Volver" fue presionado');
-      this.$router.go(-1);
-
-      this.$nextTick(() => {
-        this.$router.go(-1);
-      }); 
+      this.$router.push({ name: 'materiales' });  
+          
     }
 
   },
@@ -170,16 +169,20 @@ export default {
       //console.log("actualizando material: " +  JSON.stringify(this.material))
       //actualizamos el material con la info correspondiente
       this.material.estado = "adquirido"
-      this.material.dptoAdquisicion = this.dptoActualAPI
-      console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
-      //this.material.dptoAdquisicion = "http://localhost:8080/api/departamentos/4"
-      //console.log("Href de categoria: " + categoriaHref);
+      //this.material.dptoAdquisicion = this.dptoActualAPI
       this.material.categoria = this.material._links.categoria.href;
+      this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
+     // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
       this.material.dptoOferta = this.material._links.dptoOferta.href;
       delete this.material._links;
       this.material.fechaAdquisicion = new Date()
-      console.log("actualizando material: " +  JSON.stringify(this.material))
+      //console.log("actualizando material: " +  JSON.stringify(this.material))
       this.putMaterial(this.material,this.material.id).then(() => { this.getMateriales() })
+      console.log("Actualizando credito de unidades implicadas")
+      
+      //obtenemos los IDs de los departamentos a actualizar y llamamos a put:
+      this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis)
+      this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)
       
     }
 
@@ -275,7 +278,7 @@ export default {
 
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-      <Button label="Guardar (generar PDF)" icon="pi pi-check" class="p-button-text" @click="saveMaterial" />
+      <Button label="Confirmar (generar PDF)" icon="pi pi-check" class="p-button-text" @click="saveMaterial(); hideDialog()" />
     </template>
   </Dialog>
    

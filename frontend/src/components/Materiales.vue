@@ -1,5 +1,6 @@
 <script>
 import Card from 'primevue/card'
+import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import MultiSelect from 'primevue/multiselect'
@@ -28,7 +29,7 @@ export default {
     }
   },
   mounted() {
-   
+
     const modalEditCreate = () => {
       this.material = {}
       this.submitted = false
@@ -68,9 +69,9 @@ export default {
     };
 
     const editMaterial = (editMaterial) => {
-       this.material = { ...editMaterial };
-       console.log(this.categoria);
-       this.materialDialog = true;
+      this.material = { ...editMaterial };
+      console.log(this.categoria);
+      this.materialDialog = true;
       this.cabecera = "Editar categoría"
 
     };
@@ -79,7 +80,7 @@ export default {
     this.hideDialog = hideDialog;
     this.saveMaterial = saveMaterial;
     this.editMaterial = editMaterial;
-    
+
 
   },
   props: {
@@ -98,7 +99,7 @@ export default {
   },
   computed: {
     ...mapState(materialesStore, ['materiales']),
-   // ...mapState(categoriasStore, ['categorias']),
+    // ...mapState(categoriasStore, ['categorias']),
     ...mapState(departamentosStore, ['dptoActual']),
 
     materialesDtpoActual() {
@@ -110,21 +111,30 @@ export default {
       // console.log('materiales ', this.materiales)
       switch (this.tipoVista) {
         case "ofertados":
-          return this.materiales.filter((material) => {
-           //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
-            return material.estado === "disponible" && material.dptoOfertaN == this.dptoActual;
-          });
+          return this.categoriasSeleccionadas.length === 0
+            ? this.materiales.filter((material) => material.estado === "disponible" && material.dptoOfertaN == this.dptoActual)
+            : this.materiales.filter((material) =>
+              material.estado === "disponible" &&
+              material.dptoOfertaN == this.dptoActual &&
+              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+            );
         case "disponibles":
-              return this.materiales.filter((material) => {
-           //  console.log("estado: ",material.estado + " dptoADQ", material.dptoAdquisicion)
-            return material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual && this.dptoActual;
-          });
+          return this.categoriasSeleccionadas.length === 0
+            ? this.materiales.filter((material) => material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual && this.dptoActual)
+            : this.materiales.filter((material) =>
+              material.estado === "disponible" &&
+              material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
+              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+            );
+
         case "adquiridos":
-         // console.log("dpto actual: ",this.dptoActual)
-          return this.materiales.filter((material) => {
-             console.log("estado: ",material.id + material.estado + " dptoADQ", material.dptoAdquisicionN + "actual" + this.dptoActual)
-            return material.estado === "adquirido" && material.dptoAdquisicionN === this.dptoActual;
-          });
+          return this.categoriasSeleccionadas.length === 0
+            ? this.materiales.filter((material) => material.estado === "adquirido" && material.dptoOfertaN == this.dptoActual && this.dptoActual)
+            : this.materiales.filter((material) =>
+              material.estado === "adquirido" &&
+              material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
+              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+            );
       }
     },
   },
@@ -132,13 +142,25 @@ export default {
   methods: {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
-   // ...mapActions(categoriasStore, ['getCategorias']),
-   
+    // ...mapActions(categoriasStore, ['getCategorias']),
+
     initFilters() {
       this.filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       };
     },
+    getSeverity(material) {
+      switch (material.data.estado) {
+        case 'adquirido':
+          return 'success';
+        case 'disponible':
+          return 'warning';
+        case 'ofertado':
+          return 'danger';
+        default:
+          return null;
+      }
+    }
 
   },
 
@@ -147,7 +169,7 @@ export default {
 
     //await this.getCategorias();
     await this.getMateriales();
-  
+
     this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
       .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
 
@@ -162,8 +184,7 @@ export default {
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       :rowsPerPageOptions="[5, 10, 25]"
-      currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} materiales" 
-      responsiveLayout="scroll">
+      currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} materiales" responsiveLayout="scroll">
 
       <template #header>
         <div class="row justify-content-between align-items-center">
@@ -182,7 +203,13 @@ export default {
         </div>
       </template>
       <Column field="nombre" header="Nombre" :sortable="true"></Column>
-      <Column field="estado" header="Estado" :sortable="true"></Column>
+      <Column header="Status">
+        <template #body="material">
+          <Tag :value="material.data.estado" :severity="getSeverity(material)" />
+        </template>
+      </Column>
+      <Column field="nombre" header="Nombre" :sortable="true"></Column>
+
       <Column header="imagen">
         <template #body="material">
           <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
@@ -191,33 +218,33 @@ export default {
       <Column field="milis" header="μilis" :sortable="true"> </Column>
       <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
       <!-- <Column field="grupo" header="Grupo" :sortable="true"></Column>-->
-      <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column> 
-       <Column header="VER">
+      <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
+      <Column header="VER">
         <template #body="material">
-          <router-link :to="{ name: 'material', params: { id: material.data.id }}"><i class="pi pi-info-circle"/></router-link>  
-            <!-- <router-link :to="{ name: 'material', params: { id: material.data.id }, query: { tipoVista: tipoVista } }"><i class="pi pi-info-circle"/></router-link>   
+          <router-link :to="{ name: 'material', params: { id: material.data.id } }"><i
+              class="pi pi-info-circle" /></router-link>
+          <!-- <router-link :to="{ name: 'material', params: { id: material.data.id }, query: { tipoVista: tipoVista } }"><i class="pi pi-info-circle"/></router-link>   
          -->
         </template>
-      </Column> 
+      </Column>
 
       <!-- <template #footer> Total: {{ materialesFiltrados ? materialesFiltrados.length : 0 }} </template> -->
     </DataTable>
 
 
 
-    <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
-          class="p-fluid">
-          <div class="field">
-            <label for="name">Nombre:</label>
-            <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
-              :class="{ 'p-invalid': submitted && !material.nombre }" />
-          </div>
-          <div class="field">
-            <label for="descripcion">Descripción</label>
-            <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
-              :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
-          </div>
-<!-- 
+    <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
+      <div class="field">
+        <label for="name">Nombre:</label>
+        <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
+          :class="{ 'p-invalid': submitted && !material.nombre }" />
+      </div>
+      <div class="field">
+        <label for="descripcion">Descripción</label>
+        <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
+          :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
+      </div>
+      <!-- 
           <div class="field">
             <label for="grupo" class="mb-3">Grupo</label>
             <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()" 
@@ -248,14 +275,14 @@ export default {
             </div>
           </div> -->
 
-          <template #footer>
-            <!-- <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
+      <template #footer>
+        <!-- <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
             <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveCategoria" /> -->
-          </template> 
-        </Dialog>
+      </template>
+    </Dialog>
 
   </div>
- </template>
+</template>
 
 <style scoped>
 .img-small {
@@ -285,8 +312,8 @@ export default {
   background: rgb(136, 158, 89);
   border: 0 none;
 }
+
 .pi {
   color: #4b5320;
 }
-
 </style>
