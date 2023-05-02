@@ -1,5 +1,5 @@
-<template>
-  <h1>apartado sin contendido</h1>
+
+ <template>
+  <h1>En construcción</h1>
 
 </template>
-

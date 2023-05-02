@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+const host ="http://localhost:8080"
 export function llamadaApiGET(path) {
   let config = {
     method: 'get',
@@ -12,7 +13,7 @@ export function llamadaApiGET(path) {
 }
 
 export function getEntidades(nombre) {
-  return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}`)
+  return llamadaApiGET(`${host}/api/${nombre}`)
 }
 
 
