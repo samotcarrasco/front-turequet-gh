@@ -1,21 +1,45 @@
 <script>
-import { storeDptoActual } from '@/stores/dptoActual';
-import { mapWritableState, mapState } from 'pinia'
-
+import { departamentosStore } from '@/stores/departamentos';
+import { mapWritableState, mapState, mapActions } from 'pinia'
 export default {
   computed: {
-    ...mapState(storeDptoActual, [ 'dptoActual' ])
+    ...mapState(departamentosStore, ['dptoActual']),
+    ...mapState(departamentosStore, ['rolActual']),
+    ...mapState(departamentosStore, ['departamentos']),
+    ...mapState(departamentosStore, ['departamentosSiglas']),
+    ...mapState(departamentosStore, ['dptoActualAPI'])
   },
   data() {
     return {
-      departamentos: ['SIC', 'Formación', 'RRHH', 'Gestor']
+      roles: ['Unidad', 'Gestor']
     }
   },
   methods: {
+    ...mapActions(departamentosStore, ['getDepartamentos']),
+    ...mapActions(departamentosStore, ['getDeptoActualAPI']),
     cambiarDpto(event) {
-      const storeDepto = storeDptoActual();
+      const storeDepto = departamentosStore();
       storeDepto.cambiarDpto(event.target.value)
+    },
+    cambiarRol(event) {
+      const storeDepto = departamentosStore();
+      storeDepto.cambiarRol(event.target.value)
+      if (event.target.value === 'Gestor') {
+        this.$router.push({ name: 'categorias' });
+      } else {
+        this.$router.push({ name: 'materiales' });
+        this.getDepartamentos();
+        this.getDeptoActualAPI();
+      }
     }
+  },
+  async created() {
+    //await this.getDepartamentos();
+    //iniciamos la aplicación con rol gestor  
+    // await this.getDeptoActualAPI();
+    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
+    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
+    //iniciamos la aplicación con rol gestor  
   },
 }
 </script>
@@ -25,7 +49,7 @@ export default {
     <div class="container-fluid">
       <a class="navbar-brand">
         <router-link :to="{ name: 'home' }">
-          <img class="logo" src="../assets/logo.png" alt="Logo Truequet">
+          <img class="logo" src="../assets/img/logos/logo.png" alt="Logo Truequet">
         </router-link>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -33,64 +57,39 @@ export default {
       </button>
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item" v-if="dptoActual != 'Gestor'">
-            <router-link class="nav-link"  :to="{ name: 'materiales' }">Ver material</router-link>
+          <!-- <li class="nav-item" v-if="rolActual != 'Gestor' && rolActual != null">
+            <router-link class="nav-link" :to="{ name: 'materiales' }">Ver material</router-link>
           </li>
-          <li class="nav-item" v-if="dptoActual != 'Gestor'">
-            <router-link class="nav-link"  :to="{ name: 'materiales' }">Aportar material</router-link>
-          </li>
-          <li class="nav-item" v-if="dptoActual == 'Gestor'">
+          <li class="nav-item" v-if="rolActual != 'Gestor' && rolActual != null">
+            <router-link class="nav-link" :to="{ name: 'materiales' }">Aportar material</router-link>
+          </li> -->
+          <li class="nav-item" v-if="rolActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'categorias' }">Categorías</router-link>
-          </li>      
-          <li class="nav-item" v-if="dptoActual == 'Gestor'">
-            <router-link class="nav-link" :to="{ name: 'categorias' }">Unidades</router-link>
-          </li>      
-          <li class="nav-item" v-if="dptoActual == 'Gestor'">
-            <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
-          </li>      
-          <li class="textoDpto">
-            Dpto actual: {{ dptoActual || "seleccione"}}
           </li>
-          <li class="nav-item" v-if="departamentos.length >  0 && $route.name !== 'material'">
-            <!-- se puede quitar el evento @Change, porque el store es writable-->
-            <select class="form-select" v-model="dptoActual" @change="cambiarDpto">
-              <option value="seleccione" disabled selected></option>
-              <option v-for="(dpto, index) in departamentos" :key="index" :value="dpto">{{ dpto }}</option>
-            </select>
+          <li class="nav-item" v-if="rolActual == 'Gestor'">
+            <router-link class="nav-link" :to="{ name: 'unidades' }">Unidades</router-link>
+          </li>
+          <li class="nav-item" v-if="rolActual == 'Gestor'">
+            <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
           </li>
         </ul>
         <ul class="navbar-nav me-5">
-          <li class="nav-item dropdown">
-            <!-- en lugar de "login", ponemos un icono de awesome font para el LOGIN-->
-            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"> <!--Login-->
-              <font-awesome-icon icon="fa-solid fa-user" />
-            </a>
-            <ul id="login-bar" class="dropdown-menu p-2 mb-0">
-              <li>
-                <div class="row">
-                  <div class="containerL mb-0">
-                    <form>
-                      <div class="form-group">
-                        <!--<label class="sr-only" -->
-                        <label id="usuario">Usuario</label>
-                        <input type="email" class="form-control obligatorioL" required>
-                      </div>
-                      <div class="form-group">
-                        <label id="passwd">Contraseña</label>
-                        <input type="password" class="form-control obligatorioL" required>
-                      </div>
-                      <div class="d-flex justify-content-center">
-                        <button id="enviarLogin" class="btn btn-outline-success  fw-bold" disabled>Acceder</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </li>
-            </ul>
+          <li v-if="departamentosSiglas.length > 0
+            && $route.name !== 'material'
+            && rolActual != 'Gestor'
+            && rolActual != null">
+            <!-- se puede quitar el evento @Change, porque el store es writable-->
+            <select class="form-select mr-2" v-model="dptoActual" @change="cambiarDpto">
+              <option v-for="dep in departamentosSiglas" :key="dep.id" :value="dep.siglas">{{ dep.siglas }}</option>
+            </select>
           </li>
-          <li class="nav-item registro">
-            <a class="nav-link" href="altaUsuarios.html">Registro nuevo usuario</a>
+          <li>
+
+            <select class="form-select mr-2" v-model="rolActual" @change="cambiarRol">
+              <option v-for="(rol, index) in roles" :key="index" :value="rol">{{ rol }}</option>
+            </select>
           </li>
+
         </ul>
       </div>
     </div>
@@ -101,11 +100,9 @@ export default {
 /* .navbar-nav .nav-link {
   width: 100%;
 } */
-
 .fixed-top {
   position: relative
 }
-
 .textoDpto {
   color: white;
   align-self: center;
