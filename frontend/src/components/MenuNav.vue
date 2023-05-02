@@ -121,4 +121,9 @@ export default {
   align-self: center;
   margin-right: 2vw
 }
+
+.nav-link {
+  font-size: 1.2em;
+}
+
 </style>

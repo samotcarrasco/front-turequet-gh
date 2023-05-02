@@ -46,7 +46,7 @@ export default {
   <div class="tab-view-container">
     <TabView>
       <TabPanel header="MATERIALES DISPONIBLES">
-        <Materiales :tipoVista="disponibles" badge="8" />
+        <Materiales :tipoVista="disponibles" />
       </TabPanel>
       <TabPanel header="MIS MATERIALES OFERTADOS">
         <Materiales :tipoVista="ofertados" /> 
