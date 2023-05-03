@@ -139,10 +139,10 @@ export default {
         (cat.minMilis <= cat.maxMilis))
     },
 
-    getGruposLocal() {
-      //     //la función llamada en el return está declarada en el store
-      return this.getGrupos()
-    },
+    // getGruposLocal() {
+    //   //     //la función llamada en el return está declarada en el store
+    //   return this.getGrupos()
+    // },
 
     // getNumMaterialesPorCategoria(){
     //    return this.getNumeroMaterialesPorCategoria()
@@ -164,6 +164,7 @@ export default {
       console.log("categoria: ", categoria.categoria)
       console.log("id: ", categoria.id)
     })
+    console.log("grupos", this.getGrupos)
   },
 }
 </script>

@@ -18,15 +18,17 @@ export const categoriasStore = defineStore('categorias', {
     },
 
     getGrupos() {
-      const grupos = []
-      const grupoSet = new Set()
-      this.categorias.forEach(categoria => {
-        if (!grupoSet.has(categoria.grupo)) {
-          grupoSet.add(categoria.grupo)
-          grupos.push(categoria.grupo)
-        }
-      })
-      return grupos
+       //const grupos = ["Informática", "Comunicaciones", "Mobiliario", "Material de oficina"]
+       const grupos = ["Informatica"," Comunicaciones", "Mobiliario_Oficina", "Material_Oficina", "Otros"]
+      return grupos;
+      // const grupoSet = new Set()
+      // this.categorias.forEach(categoria => {
+      //   if (!grupoSet.has(categoria.grupo)) {
+      //     grupoSet.add(categoria.grupo)
+      //     grupos.push(categoria.grupo)
+      //   }
+      // })
+      // return grupos
     },
 
     async getCategorias() {
