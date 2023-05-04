@@ -50,6 +50,9 @@ function llamadaApiPUTParams(path, params = {}) {
   return axios.request(config);
 }
 
+
+
+
 function llamadaApiDELETE(path) {
   let config = {
     method: 'delete',
@@ -61,7 +64,7 @@ function llamadaApiDELETE(path) {
   return axios.request(config);
 }
 
-
+// GETS
 function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
   //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
@@ -88,26 +91,37 @@ function getEntidadPorNombre(nombre, campo, valor) {
 }
 
 
+
+//POST
 function postEntidad(modelo, nombre) {
   // return llamadaApiPOST(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}.json` )
   return llamadaApiPOST(modelo, `${host}api/${nombre}`)
 }
 
+
+//PUT
 function putEntidad(modelo, id, nombre) {
   //return llamadaApiPUT(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${id}.json`, )
   return llamadaApiPUT(modelo, `${host}api/${nombre}/${id}`)
 }
 
-function deleteEntidad(id, nombre) {
-  //return llamadaApiDELETE(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}/${id}.json`, )
-  return llamadaApiDELETE(`${host}api/${nombre}/${id}`)
-}
 
 function PUTAumentarCretido (nombre, id, creditos) {
   console.log("llamando a put de departamento:" + id +" milis" + creditos )
   return llamadaApiPUTParams(`${host}api/${nombre}/${id}/aumentarCredito`, {cantidad: creditos})
 }
   
+// DELETE
+function deleteEntidad(id, nombre) {
+  //return llamadaApiDELETE(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}/${id}.json`, )
+  return llamadaApiDELETE(`${host}api/${nombre}/${id}`)
+}
+
+
+
+
+
+//CATEGORÍAS
 
 export function getCategorias() {
   return getEntidades('categorias')
@@ -129,7 +143,7 @@ export function deleteCategoria(categoria) {
 }
 
 
-
+//MATERIALES
 export function getMateriales() {
   return getEntidades('materiales')
 }
@@ -139,7 +153,13 @@ export function getMaterialPorId(id) {
   return getEntidadPorId('materiales', id)
 }
 
+export function putMaterial(material) {
+  console.log("llamando a put ", material, material.id)
+  return putEntidad(material, material.id, 'materiales')
+}
 
+
+//DEPARTAMENTOS
 
 export function getDepartamentos() {
   return getEntidades('departamentos')
@@ -147,12 +167,6 @@ export function getDepartamentos() {
 
 export function getDeptoPorSiglas(valor) {
   return getEntidadPorNombre('departamentos', 'siglas', valor) 
-}
-
-
-export function putMaterial(material) {
-  console.log("llamando a put ", material, material.id)
-  return putEntidad(material, material.id, 'materiales')
 }
 
 

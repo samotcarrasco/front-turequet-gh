@@ -123,6 +123,7 @@ export default {
     ...mapActions(categoriasStore, ['putCategoria']),
     ...mapActions(categoriasStore, ['deleteCategoria']),
     ...mapActions(categoriasStore, ['getGrupos']),
+    
 
     initFilters() {
       this.filters = {

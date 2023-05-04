@@ -1,6 +1,6 @@
 <script>
-// import participantesJson from '@/assets/participantes.json'
-//import Participante from '../practica-componentes/Participante.vue'
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
 import { mapActions, mapState } from 'pinia'
 import { materialesStore } from '@/stores/materiales'
 import { departamentosStore } from '@/stores/departamentos'
@@ -27,7 +27,7 @@ export default {
     //   required: true
     // }
   },
-  components: { Card, Button, Galleria, Dialog, Divider },
+  components: { Toast, Card, Button, Galleria, Dialog, Divider },
 
   computed: {
     ...mapState(materialesStore, ['materiales']),
@@ -51,11 +51,11 @@ export default {
     },
 
     materialAdquirido(material) {
-      console.log("acutal", this.dptoActual)
-      console.log("adquisicion", this.dptoActualAPI);
-      console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
-      console.log("ofertante", material.dptoOfertaN)
-      console.log("estado", material.estado)
+      // console.log("acutal", this.dptoActual)
+      // console.log("adquisicion", this.dptoActualAPI);
+      // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
+      // console.log("ofertante", material.dptoOfertaN)
+      // console.log("estado", material.estado)
       //console.log("material actual", JSON.stringify(this.materialActual))
 
       return material.dptoAdquisicionN == this.dptoActual && material.estado == "adquirido"
@@ -129,89 +129,96 @@ export default {
 
     goBack() {
       console.log('Botón volver presionado');
-        this.$router.push({ name: 'materiales' });
-        window.location.reload();
+      this.$router.push({ name: 'materiales' });
+      window.location.reload();
     }
-  
-
-},
-mounted() {
-  // console.log("mountedddd ", this.$route.query.tipoVista);
-
-  const modalAdquirirMaterial = () => {
-    this.material = {};
-    this.submitted = false;
-    this.adquirirDialog = true;
-    this.cabecera = "Confirmación de adquisición de material"
-  };
-
-  const modalDetallesAdq = () => {
-    this.material = {};
-    this.submitted = false;
-    this.detallesAdqDialog = true;
-    this.cabecera = "Detalles de la adquisición de material"
-  };
-
-  const hideDialog = () => {
-    this.adquirirDialog = false;
-    this.submitted = false;
-  };
-
-  const hideDialogDet = () => {
-    this.mostrarDetallesAdq = false;
-    this.submitted = false;
-  };
 
 
-  const saveMaterial = () => {
-    this.submitted = true;
+  },
+  mounted() {
+    // console.log("mountedddd ", this.$route.query.tipoVista);
 
-    this.generarPDF(this.material);
-    //console.log("actualizando material: " +  JSON.stringify(this.material))
-    //actualizamos el material con la info correspondiente
-    this.material.estado = "adquirido"
-    //this.material.dptoAdquisicion = this.dptoActualAPI
-    this.material.categoria = this.material._links.categoria.href;
-    this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
-    // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
-    this.material.dptoOferta = this.material._links.dptoOferta.href;
-    delete this.material._links;
-    this.material.fechaAdquisicion = new Date()
-    //console.log("actualizando material: " +  JSON.stringify(this.material))
-    this.putMaterial(this.material, this.material.id).then(() => { this.getMateriales() })
-    console.log("Actualizando credito de unidades implicadas")
+    const toast = useToast();
 
-    //obtenemos los IDs de los departamentos a actualizar y llamamos a put:
-    this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis)
-    this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)
+    const modalAdquirirMaterial = () => {
+      this.material = {};
+      this.submitted = false;
+      this.adquirirDialog = true;
+      this.cabecera = "Confirmación de adquisición de material"
+    };
 
-  }
+    const modalDetallesAdq = () => {
+      this.material = {};
+      this.submitted = false;
+      this.detallesAdqDialog = true;
+      this.cabecera = "Detalles de la adquisición de material"
+    };
 
+    const hideDialog = () => {
+      this.adquirirDialog = false;
+      this.submitted = false;
+    };
 
-  this.modalAdquirirMaterial = modalAdquirirMaterial;
-  this.modalDetallesAdq = modalDetallesAdq;
-  this.hideDialog = hideDialog;
-  this.hideDialogDet = hideDialogDet;
-  this.saveMaterial = saveMaterial;
+    const hideDialogDet = () => {
+      this.mostrarDetallesAdq = false;
+      this.submitted = false;
+    };
 
 
-},
+    const saveMaterial = () => {
+      this.submitted = true;
 
- 
+      this.generarPDF(this.material);
+      //console.log("actualizando material: " +  JSON.stringify(this.material))
+      //actualizamos el material con la info correspondiente
+      this.material.estado = "adquirido"
+      //this.material.dptoAdquisicion = this.dptoActualAPI
+      this.material.categoria = this.material._links.categoria.href;
+      this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
+      // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
+      this.material.dptoOferta = this.material._links.dptoOferta.href;
+      delete this.material._links;
+      this.material.fechaAdquisicion = new Date()
+      //console.log("actualizando material: " +  JSON.stringify(this.material))
+      Promise.all([
+        this.putMaterial(this.material, this.material.id),
+        this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis),
+        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)
+      ]).then(() => {
+        this.getMateriales();
+        console.log("Actualizando credito de unidades implicadas");
+        toast.add({ severity: 'success', summary: 'OK', detail: 'Adquisición de material finalizada', life: 3000 });
+      }).catch((error) => {
+        console.error('Error al actualizar material:', error);
+      });
+    }
+
+
+    this.modalAdquirirMaterial = modalAdquirirMaterial;
+    this.modalDetallesAdq = modalDetallesAdq;
+    this.hideDialog = hideDialog;
+    this.hideDialogDet = hideDialogDet;
+    this.saveMaterial = saveMaterial;
+
+
+  },
+
+
   async created() {
 
-  //iniciamos la aplicación con rol gestor  
+    //iniciamos la aplicación con rol gestor  
 
-  console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
-  await this.getMaterialPorId(this.$route.params.id);
-  console.log("material string: ", JSON.stringify(this.materialActual))
-  this.material = this.materialActual;
+    console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
+    await this.getMaterialPorId(this.$route.params.id);
+    console.log("material string: ", JSON.stringify(this.materialActual))
+    this.material = this.materialActual;
 
-}
+  }
 }
 </script>
 
 <template>
+  <Toast />
   <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
     <template #subtitle> {{ material.milis }} μ </template>
@@ -284,7 +291,8 @@ mounted() {
     </template>
   </Dialog>
 
-  <Dialog v-model:visible=" detallesAdqDialog " :style=" { width: '50vw' } " :header=" cabecera " :modal=" true " class="p-fluid">
+  <Dialog v-model:visible=" detallesAdqDialog " :style=" { width: '50vw' } " :header=" cabecera " :modal=" true "
+    class="p-fluid">
     Nombre del material: {{ this.material.nombre }}
     <Divider />
     Fecha de la operación:{{ this.material.fechaAdquisicion }}

@@ -6,8 +6,6 @@ import Materiales from './Materiales.vue';
 //import Carrusel from './Carrusel.vue';
 
 
-
-
 export default {
 
   props: {
@@ -20,7 +18,8 @@ export default {
     return {
       disponibles: 'disponibles',
       ofertados: 'ofertados',
-      adquiridos: 'adquiridos'    
+      adquiridos: 'adquiridos',
+      valorReactivo: 0
     }
   },
   // provide() {
@@ -36,35 +35,31 @@ export default {
   methods: {
 
   },
-  created() {
+  mounted() {
 
   }
 }
 </script>
 
 <template>
-  <div class="tab-view-container">
-    <TabView>
-      <TabPanel header="MATERIALES DISPONIBLES">
-        <Materiales :tipoVista="disponibles" />
-      </TabPanel>
-      <TabPanel header="MIS MATERIALES OFERTADOS">
-        <Materiales :tipoVista="ofertados" /> 
-      </TabPanel>
-      <TabPanel header="MIS MATERIALES ADQUIRIDOS">
-         <Materiales :tipoVista="adquiridos" /> 
-      </TabPanel>
-      <!-- <TabPanel header="CARRUSEL">
+  <!-- <div class="tab-view-container"> -->
+  <TabView>
+    <TabPanel> 
+        <template #header>
+          <span>MATERIALES DISPONIBLES <b style="background-color: #bec092;">({{this.valorReactivo}})</b></span>
+      </template>
+    <Materiales :tipoVista="disponibles" />
+    </TabPanel>
+    <TabPanel header="MIS MATERIALES OFERTADOS">
+      <Materiales :tipoVista="ofertados" />
+    </TabPanel>
+    <TabPanel header="MATERIALES INTERCAMBIADOS">
+      <Materiales :tipoVista="adquiridos" />
+    </TabPanel>
+    <!-- <TabPanel header="CARRUSEL">
         <Carrusel :tipoVista="undefined" />
       </TabPanel> -->
 
-    </TabView>
-  </div>
+  </TabView>
+  <!-- </div> -->
 </template>
-
-<style lang="scss" scoped>
-.tab-view-container {
-  margin-top: 30px;
-  /* Ajusta el valor del margen superior según sea necesario */
-}
-</style>

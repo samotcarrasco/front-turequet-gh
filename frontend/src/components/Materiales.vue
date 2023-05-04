@@ -6,17 +6,32 @@ import Dialog from 'primevue/dialog'
 import MultiSelect from 'primevue/multiselect'
 import { departamentosStore } from '@/stores/departamentos'
 import { materialesStore } from '@/stores/materiales'
+import { categoriasStore } from '@/stores/categorias'
 //import { categoriasStore } from '@/stores/categorias'
 import { mapState, mapActions } from 'pinia'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Textarea from 'primevue/textarea'
+import InputNumber from 'primevue/inputnumber'
+import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext';
 import { FilterMatchMode } from 'primevue/api';
 
 
 export default {
+  components: {
+    Button, Dropdown, DataTable, Textarea,
+    InputText, Column, InputNumber, Dialog,
+    Card, Button, MultiSelect, Tag
+  },
   provide: {
     tipoVista: undefined
+  },
+  props: {
+    tipoVista: {
+      type: String,
+      required: true
+    }
   },
   data() {
     return {
@@ -25,10 +40,39 @@ export default {
       categoriasFiltro: [],
       categoriasSeleccionadas: [],
       visible: false,
-      filters: {}
+      filters: {},
+      materialDialog: false,
+      material: {
+        nombre: '',
+        descripcion: '',
+        fechaAdquisicion: null,
+        fechaOferta: null,
+        imagen: '',
+        estado: '',
+        milis: 0,
+        cantidad: 0,
+        dimensiones: '',
+        peso: '',
+        tipoMaterial: '',
+        noc: '',
+        numeroSerie: '',
+        bonificacion: 0
+      },
+      categoriasAgrupadas: [],
+      submitted: false,
+      estados: [
+        { label: 'Disponible', value: 'disponible' },
+        { label: 'No disponible', value: 'noDisponible' }
+      ],
+      tiposMaterial: [
+        { label: 'Inventariable', value: 'inventariable' },
+        { label: 'No inventariable', value: 'noInventariable' }
+      ],
+      cabecera: 'Crear material'
     }
   },
   mounted() {
+    console.log(this.categoriasAgrupadas);
 
     const modalEditCreate = () => {
       this.material = {}
@@ -81,31 +125,16 @@ export default {
     this.saveMaterial = saveMaterial;
     this.editMaterial = editMaterial;
 
+    //  //Agrupar categorías por grupo
+
 
   },
-  props: {
-    tipoVista: {
-      type: String,
-      required: true
-    }
-  },
-  components: {
-    Card,
-    Button,
-    Dialog,
-    MultiSelect,
-    DataTable,
-    Column, InputText
-  },
+
   computed: {
     ...mapState(materialesStore, ['materiales']),
-    // ...mapState(categoriasStore, ['categorias']),
+    ...mapState(categoriasStore, ['categorias']),
     ...mapState(departamentosStore, ['dptoActual']),
 
-    materialesDtpoActual() {
-      //la función llamada en el return está declarada en el store
-      return this.materialesDptoActual()
-    },
 
     materialesFiltrados() {
       // console.log('materiales ', this.materiales)
@@ -116,7 +145,7 @@ export default {
             : this.materiales.filter((material) =>
               material.estado === "disponible" &&
               material.dptoOfertaN == this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
         case "disponibles":
           return this.categoriasSeleccionadas.length === 0
@@ -124,16 +153,16 @@ export default {
             : this.materiales.filter((material) =>
               material.estado === "disponible" &&
               material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
 
         case "adquiridos":
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => material.estado === "adquirido" && material.dptoOfertaN == this.dptoActual && this.dptoActual)
+            ? this.materiales.filter((material) => material.estado === "adquirido" && (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
             : this.materiales.filter((material) =>
-              material.estado === "adquirido" &&
-              material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+              material.estado === "adquirido" && (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual)
+              && this.dptoActual &&
+              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
       }
     },
@@ -142,7 +171,8 @@ export default {
   methods: {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
-    // ...mapActions(categoriasStore, ['getCategorias']),
+    ...mapActions(categoriasStore, ['getCategorias']),
+
 
     initFilters() {
       this.filters = {
@@ -160,20 +190,50 @@ export default {
         default:
           return null;
       }
-    }
+    },
+
+
 
   },
 
   async created() {
     this.initFilters();
 
-    //await this.getCategorias();
+    await this.getCategorias();
+
     await this.getMateriales();
 
-    this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
-      .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
 
     console.log("Vista desde materiales:", this.tipoVista, this.materiales)
+
+    console.log("categorias", this.categorias)
+    this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
+      let grupo = grupos.find(g => g.label === categoria.grupo);
+      if (!grupo) {
+        // Si no existe, crear un nuevo grupo
+        grupo = {
+          label: categoria.grupo,
+          code: categoria.grupo,
+          items: []
+        };
+        console.log("leido grupo", grupo)
+        grupos.push(grupo);
+      }
+      //grupos.push(grupo);
+      // Agregar la categoría al grupo
+      grupo.items.push({ label: categoria.categoria, value: categoria.categoria });
+      return grupos;
+    }, []);
+
+    // // Resultado final: categorías agrupadas por grupo
+    console.log("categorias agrupadas", this.categoriasAgrupadas);
+
+    // this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
+    //   .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
+    //  this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
+    // .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
+
+
   }
 
 }
@@ -188,13 +248,20 @@ export default {
 
       <template #header>
         <div class="row justify-content-between align-items-center">
-          <div class="col-6">
-            <span class="block mt-2 p-input-icon-left mr-2">
+          <div class="col-6 d-flex align-items-center">
+            <span class="block p-input-icon-left mr-2 flex-grow-1">
               <i class="pi pi-search" />
-              <InputText v-model="filters['global'].value" placeholder="Buscar..." />
+              <InputText v-model="filters['global'].value" placeholder="Buscar..." class="flex-grow-1" />
             </span>
-            <MultiSelect v-model="categoriasSeleccionadas" display="chip" :options="categoriasFiltro" optionLabel="name"
-              placeholder="Categorías" :maxSelectedLabels="3" class="w-full md:w-20rem multiSelect" />
+            <MultiSelect v-model="categoriasSeleccionadas" :options="categoriasAgrupadas" optionLabel="label"
+              optionGroupLabel="label" optionGroupChildren="items" display="chip" placeholder="Categorías"
+              :maxSelectedLabels="3" class="w-50 multiSelect">
+              <template #optiongroup="slotProps">
+                <div class="flex align-items-center">
+                  <div>{{ slotProps.option.label }}</div>
+                </div>
+              </template>
+            </MultiSelect>
           </div>
           <div class="col-4 text-right">
             <Button v-if="this.tipoVista == 'ofertados'" label="Crear nuevo" icon="pi pi-plus"
@@ -202,12 +269,6 @@ export default {
           </div>
         </div>
       </template>
-      <Column field="nombre" header="Nombre" :sortable="true"></Column>
-      <Column header="Status">
-        <template #body="material">
-          <Tag :value="material.data.estado" :severity="getSeverity(material)" />
-        </template>
-      </Column>
       <Column field="nombre" header="Nombre" :sortable="true"></Column>
 
       <Column header="imagen">
@@ -218,6 +279,12 @@ export default {
       <Column field="milis" header="μilis" :sortable="true"> </Column>
       <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
       <!-- <Column field="grupo" header="Grupo" :sortable="true"></Column>-->
+      <Column header="Estado">
+        <template #body="material">
+          <Tag :value="material.data.estado" :severity="getSeverity(material)" />
+        </template>
+      </Column>
+
       <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
       <Column header="VER">
         <template #body="material">
@@ -231,57 +298,75 @@ export default {
       <!-- <template #footer> Total: {{ materialesFiltrados ? materialesFiltrados.length : 0 }} </template> -->
     </DataTable>
 
-
-
-    <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
-      <div class="field">
-        <label for="name">Nombre:</label>
-        <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
-          :class="{ 'p-invalid': submitted && !material.nombre }" />
-      </div>
-      <div class="field">
-        <label for="descripcion">Descripción</label>
-        <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
-          :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
-      </div>
-      <!-- 
-          <div class="field">
-            <label for="grupo" class="mb-3">Grupo</label>
-            <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()" 
-               :class="{ 'p-invalid': submitted && !categoria.grupo }"
-               placeholder="Seleccione grupo">
-              <template #value="grupo">
-                <div v-if="grupo.value">
-                  <span :class="'categoria-badge status-' + grupo.value">{{
-                    grupo.value
-                  }}</span>
-                </div>
-                <div v-else>
-                  <span :class="'categoria-badge status-' + grupo.value">{{
-                    grupo.value }}</span>
-                </div>
-              </template>
-            </Dropdown>
-          </div>
-
-          <div class="formgrid grid">
-            <div class="field col">
-              <label for="minMilis">μilis MIN</label>
-              <InputNumber id="minMilis" v-model="categoria.minMilis"
-                :class="{ 'p-invalid': submitted && !categoria.minMilis || categoria.minMilis > categoria.maxMilis }" :required="true" />
-              <label for="maxMilis">μilis MAX</label>
-              <InputNumber id="maxMilis" v-model="categoria.maxMilis"
-                :class="{ 'p-invalid': submitted && !categoria.maxMilis || categoria.minMilis > categoria.maxMilis}" :required="true" />
-            </div>
-          </div> -->
-
-      <template #footer>
-        <!-- <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-            <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveCategoria" /> -->
-      </template>
-    </Dialog>
-
   </div>
+  <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
+    <div class="field">
+      <label for="name">Nombre:</label>
+      <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
+        :class="{ 'p-invalid': submitted && !material.nombre }" />
+    </div>
+    <div class="field">
+      <label for="descripcion">Descripción</label>
+      <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
+        :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
+    </div>
+    <!-- <div class="field">
+        <label for="fechaOferta">Fecha de oferta:</label>
+        <Calendar id="fechaOferta" v-model="material.fechaOferta" required="true"
+          :class="{ 'p-invalid': submitted && !material.fechaOferta }" :required="true" />
+      </div> -->
+    <div class="field">
+      <label for="imagen">Imagen:</label>
+      <InputText id="imagen" v-model.trim="material.imagen" />
+    </div>
+    <div class="field">
+      <label for="estado">Estado:</label>
+      <Dropdown id="estado" v-model="material.estado" :options="estados" optionLabel="label" optionValue="value"
+        required="true" :class="{ 'p-invalid': submitted && !material.estado }" :required="true" />
+    </div>
+    <div class="field">
+      <label for="milis">Milis:</label>
+      <InputNumber id="milis" v-model.number="material.milis" required="true"
+        :class="{ 'p-invalid': submitted && !material.milis }" :required="true" />
+    </div>
+    <div class="field">
+      <label for="cantidad">Cantidad:</label>
+      <InputNumber id="cantidad" v-model.number="material.cantidad" required="true"
+        :class="{ 'p-invalid': submitted && !material.cantidad }" :required="true" />
+    </div>
+    <div class="field">
+      <label for="dimensiones">Dimensiones:</label>
+      <InputText id="dimensiones" v-model.trim="material.dimensiones" />
+    </div>
+    <div class="field">
+      <label for="peso">Peso:</label>
+      <InputText id="peso" v-model.trim="material.peso" />
+    </div>
+    <div class="field">
+      <label for="tipoMaterial">Tipo de material:</label>
+      <Dropdown id="tipoMaterial" v-model="material.tipoMaterial" :options="tiposMaterial" optionLabel="label"
+        optionValue="value" required="true" :class="{ 'p-invalid': submitted && !material.tipoMaterial }"
+        :required="true" />
+    </div>
+
+    <!-- <div class="field" v-if="material.tipoMaterial.value === 'inventariable'">
+        <label for="noc">NOC:</label>
+        <InputText id="noc" v-model.trim="material.noc" />
+      </div>
+      <div class="field" v-if="material.tipoMaterial.value === 'inventariable'">
+        <label for="numeroSerie">Número de serie:</label>
+        <InputText id="numeroSerie" v-model.trim="material.numeroSerie" />
+      </div>
+      <div class="field" v-if="material.tipoMaterial.value !== 'inventariable'">
+        <label for="bonificacion">Bonificación:</label>
+        <InputNumber id="bonificacion" v-model.number="material.bonificacion" required="true"
+          :class="{ 'p-invalid': submitted && !material.bonificacion }" :required="true" />
+      </div> -->
+    <template #footer>
+      <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
+      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="guardarMaterial" />
+    </template>
+  </Dialog>
 </template>
 
 <style scoped>
