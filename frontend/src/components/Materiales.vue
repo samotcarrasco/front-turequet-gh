@@ -273,7 +273,8 @@ export default {
 
       <Column header="imagen">
         <template #body="material">
-          <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
+          <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
+          <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
         </template>
       </Column>
       <Column field="milis" header="μilis" :sortable="true"> </Column>
