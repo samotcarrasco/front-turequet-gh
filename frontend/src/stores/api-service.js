@@ -3,41 +3,60 @@ import axios from 'axios'
 //const host = "https://apipreguntasdim-samotcarrasco.b4a.run/"
 const host = "http://localhost:8080/"
 
-function llamadaApiGET(path) {
+//Llamada a la API genérica, parametrizada con method, body y path
+function llamadaAPI(method, body, path) {
   let config = {
-    method: 'get',
+    method: method ?? 'get',
     maxBodyLength: Infinity,
     url: path,
     headers: {}
+  }
+
+  if (body) {
+    config.data = body,
+      config.headers['Content-Type'] = 'application/json'
   }
 
   return axios.request(config)
 }
 
 
-function llamadaApiPOST(modeloJSON, path) {
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: path,
-    headers: {
-    },
-    data: modeloJSON
-  };
-  return axios.request(config);
-}
 
-function llamadaApiPUT(modeloJSON, path) {
-  let config = {
-    method: 'put',
-    maxBodyLength: Infinity,
-    url: path,
-    headers: {
-    },
-    data: modeloJSON
-  };
-  return axios.request(config);
-}
+// function llamadaApiGET(path) {
+//   let config = {
+//     method: 'get',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {}
+//   }
+
+//   return axios.request(config)
+// }
+
+
+// function llamadaApiPOST(modeloJSON, path) {
+//   let config = {
+//     method: 'post',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {
+//     },
+//     data: modeloJSON
+//   };
+//   return axios.request(config);
+// }
+
+// function llamadaApiPUT(modeloJSON, path) {
+//   let config = {
+//     method: 'put',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {
+//     },
+//     data: modeloJSON
+//   };
+//   return axios.request(config);
+// }
 
 function llamadaApiPUTParams(path, params = {}) {
   let config = {
@@ -53,41 +72,41 @@ function llamadaApiPUTParams(path, params = {}) {
 
 
 
-function llamadaApiDELETE(path) {
-  let config = {
-    method: 'delete',
-    maxBodyLength: Infinity,
-    url: path,
-    headers: {
-    },
-  };
-  return axios.request(config);
-}
+// function llamadaApiDELETE(path) {
+//   let config = {
+//     method: 'delete',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {
+//     },
+//   };
+//   return axios.request(config);
+// }
 
 // GETS
 function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
   //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
-  return llamadaApiGET(`${host}api/${nombre}`)
+  return llamadaAPI('get',null,`${host}api/${nombre}`)
 }
 
 
 function getEntidadPorId(nombre, id) {
- // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
-  return llamadaApiGET(`${host}api/${nombre}/${id}`)
+  // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
+  return llamadaAPI('get', null, `${host}api/${nombre}/${id}`)
 }
 
 
-function getEntidadPorLink(nombre) {
-  // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
-   return llamadaApiGET(`${host}api/${nombre}`)
- }
+// function getEntidadPorLink(nombre) {
+//   // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
+//   return llamadaAPI('get',null,`${host}api/${nombre}`)
+// }
 
 
 function getEntidadPorNombre(nombre, campo, valor) {
-   //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
+  //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
   // return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${campo}/${valor}.json`)
-   return llamadaApiGET(`${host}api/${nombre}/${campo}/${valor}`)
+  return llamadaAPI('get',null,`${host}api/${nombre}/${campo}/${valor}`)
 }
 
 
@@ -95,26 +114,26 @@ function getEntidadPorNombre(nombre, campo, valor) {
 //POST
 function postEntidad(modelo, nombre) {
   // return llamadaApiPOST(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}.json` )
-  return llamadaApiPOST(modelo, `${host}api/${nombre}`)
+  return llamadaAPI('post', modelo, `${host}api/${nombre}`)
 }
 
 
 //PUT
 function putEntidad(modelo, id, nombre) {
   //return llamadaApiPUT(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${id}.json`, )
-  return llamadaApiPUT(modelo, `${host}api/${nombre}/${id}`)
+  return llamadaAPI('put',modelo, `${host}api/${nombre}/${id}`)
 }
 
 
-function PUTAumentarCretido (nombre, id, creditos) {
-  console.log("llamando a put de departamento:" + id +" milis" + creditos )
-  return llamadaApiPUTParams(`${host}api/${nombre}/${id}/aumentarCredito`, {cantidad: creditos})
+function PUTAumentarCretido(nombre, id, creditos) {
+  console.log("llamando a put de departamento:" + id + " milis" + creditos)
+  return llamadaApiPUTParams(`${host}api/${nombre}/${id}/aumentarCredito`, { cantidad: creditos })
 }
-  
+
 // DELETE
 function deleteEntidad(id, nombre) {
   //return llamadaApiDELETE(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}/${id}.json`, )
-  return llamadaApiDELETE(`${host}api/${nombre}/${id}`)
+  return llamadaAPI('delete',null,`${host}api/${nombre}/${id}`)
 }
 
 
@@ -166,11 +185,11 @@ export function getDepartamentos() {
 }
 
 export function getDeptoPorSiglas(valor) {
-  return getEntidadPorNombre('departamentos', 'siglas', valor) 
+  return getEntidadPorNombre('departamentos', 'siglas', valor)
 }
 
 
 export function putAumentarCretido(id, creditos) {
   //la personalizamos porque no es un put estandar
-     return PUTAumentarCretido('departamentos', id, creditos)
+  return PUTAumentarCretido('departamentos', id, creditos)
 }

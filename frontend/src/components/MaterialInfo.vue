@@ -131,6 +131,10 @@ export default {
       console.log('Botón volver presionado');
       this.$router.push({ name: 'materiales' });
       window.location.reload();
+      window.location.reload();
+      window.location.reload();
+      window.location.reload();
+      
     }
 
 
@@ -219,6 +223,8 @@ export default {
 
 <template>
   <Toast />
+   dddd
+  <p @click="goBack">asasdf</p>
   <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
     <template #subtitle> {{ material.milis }} μ </template>
@@ -240,14 +246,18 @@ export default {
 
         </div>
         <div class="col-sm-4">
-          <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
+          <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->
+          <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen"
+            class="w-6rem shadow-2 border-round img-small" />
           <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
             containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
             <template #item="slotProps">
-              <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />
+              <!-- <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" /> -->
+              <!-- <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen" -->
+            <!-- class="w-6rem shadow-2 border-round img-small" /> -->
             </template>
             <template #thumbnail="slotProps">
-              <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
+              <!-- <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" /> -->
             </template>
           </Galleria>
 
@@ -262,7 +272,7 @@ export default {
           <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info"
             @click="mostrarDetallesAdq(material)" />
           <!-- <router-link :to="{ name: 'materiales' }  />"> -->
-          <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" />
+          <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
           <!-- </router-link> -->
           <!-- <router-link class="nav-link" :to="{ name: 'materiales' } @click="goBack" />">volver</router-link> -->
 
@@ -270,6 +280,9 @@ export default {
       </div>
     </template>
   </Card>
+  dddd
+  <p @click="goBack">asasdf</p>
+  <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" />
 
 
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">

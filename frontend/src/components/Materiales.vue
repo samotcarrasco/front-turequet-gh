@@ -15,6 +15,7 @@ import Textarea from 'primevue/textarea'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext';
+import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api';
 
 
@@ -22,7 +23,7 @@ export default {
   components: {
     Button, Dropdown, DataTable, Textarea,
     InputText, Column, InputNumber, Dialog,
-    Card, Button, MultiSelect, Tag
+    Card, Button, MultiSelect, Tag, FileUpload
   },
   provide: {
     tipoVista: undefined
@@ -35,6 +36,7 @@ export default {
   },
   data() {
     return {
+      foto: null,
       materialDialog: false,
       deleteMaterialDialog: false,
       categoriasFiltro: [],
@@ -91,6 +93,8 @@ export default {
       this.submitted = true;
 
       // if (this.formularioRellenado(this.categoria)) {
+      console.log("nomre", this.material.nombre)
+      console.log("imgen", this.material.imagen)
       //   console.log("punto 1");
       //   if (this.categoria.id) {
       //     console.log("punto 2");
@@ -137,6 +141,7 @@ export default {
 
 
     materialesFiltrados() {
+
       // console.log('materiales ', this.materiales)
       switch (this.tipoVista) {
         case "ofertados":
@@ -150,20 +155,24 @@ export default {
         case "disponibles":
           return this.categoriasSeleccionadas.length === 0
             ? this.materiales.filter((material) => material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual && this.dptoActual)
-            : this.materiales.filter((material) =>
-              material.estado === "disponible" &&
+            : this.materiales.filter((material) => material.estado === "disponible" &&
               material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
               this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
 
-        case "adquiridos":
+        case "intercambiados":
+          //asiganmos el valor "entregado" en los casos que corresponda
+          this.asignarEntregados();
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => material.estado === "adquirido" && (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
-            : this.materiales.filter((material) =>
-              material.estado === "adquirido" && (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual)
-              && this.dptoActual &&
+            ? this.materiales.filter((material) => (material.estado === "adquirido" || material.estado === "entregado") &&
+              (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
+            : this.materiales.filter((material) => (material.estado === "adquirido" || material.estado === "entregado") &&
+              (material.estado === "adquirido" || material.estado === "entregado") &&
+              (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual) &&
+              this.dptoActual &&
               this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
+
       }
     },
   },
@@ -187,11 +196,34 @@ export default {
           return 'warning';
         case 'ofertado':
           return 'danger';
+        case 'entregado':
+          return 'info';
         default:
           return null;
       }
     },
 
+    cargarImagen(e) {
+      console.log("subiendo fichero...");
+      let file = e.target.files[0];
+      let reader = new FileReader();
+      reader.onload = () => {
+        this.material.imagen = reader.result;
+        console.log("resultado", this.material.imagen);
+      };
+      reader.readAsDataURL(file);
+    },
+
+    asignarEntregados() {
+      // Actualizar el estado a "adquirido" en los materiales entregados y de la unidad actual
+      this.materiales.forEach(material => {
+        if (material.estado === "adquirido" && material.dptoOfertaN === this.dptoActual) {
+          material.estado = "entregado"
+        } else if (material.estado === "entregado" && material.dptoAdquisicionN === this.dptoActual) {
+          material.estado = "adquirido"
+        }
+      });
+    },
 
 
   },
@@ -274,13 +306,16 @@ export default {
       <Column header="imagen">
         <template #body="material">
           <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
-          <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
+          <!-- <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen"
+            class="w-6rem shadow-2 border-round img-small" /> -->
+            <img :src="material.data.imagen" :alt="material.data.imagen"
+            class="w-6rem shadow-2 border-round img-small" />
         </template>
       </Column>
       <Column field="milis" header="μilis" :sortable="true"> </Column>
       <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
       <!-- <Column field="grupo" header="Grupo" :sortable="true"></Column>-->
-      <Column header="Estado">
+      <Column header="Estado" :sortable="true">
         <template #body="material">
           <Tag :value="material.data.estado" :severity="getSeverity(material)" />
         </template>
@@ -298,8 +333,8 @@ export default {
 
       <!-- <template #footer> Total: {{ materialesFiltrados ? materialesFiltrados.length : 0 }} </template> -->
     </DataTable>
-
   </div>
+
   <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
     <div class="field">
       <label for="name">Nombre:</label>
@@ -311,15 +346,14 @@ export default {
       <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
         :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
     </div>
-    <!-- <div class="field">
-        <label for="fechaOferta">Fecha de oferta:</label>
-        <Calendar id="fechaOferta" v-model="material.fechaOferta" required="true"
-          :class="{ 'p-invalid': submitted && !material.fechaOferta }" :required="true" />
-      </div> -->
-    <div class="field">
-      <label for="imagen">Imagen:</label>
-      <InputText id="imagen" v-model.trim="material.imagen" />
-    </div>
+
+     <FileUpload @upload="cargarFichero($event)" :multiple="true" accept="image/*" :maxFileSize="1000000">
+      <template #empty>
+        <p>Arrastre aquí las imagenes</p>
+      </template>
+    </FileUpload> 
+    <!-- <input type="file" @change="cargarImagen" name="nada" class="form-input" />  -->
+
     <div class="field">
       <label for="estado">Estado:</label>
       <Dropdown id="estado" v-model="material.estado" :options="estados" optionLabel="label" optionValue="value"
@@ -365,7 +399,7 @@ export default {
       </div> -->
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="guardarMaterial" />
+      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveMaterial" />
     </template>
   </Dialog>
 </template>

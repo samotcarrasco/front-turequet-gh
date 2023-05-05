@@ -1,6 +1,7 @@
 <script>
 import { departamentosStore } from '@/stores/departamentos';
 import { mapWritableState, mapState, mapActions } from 'pinia'
+
 export default {
   computed: {
     ...mapState(departamentosStore, ['dptoActual']),
@@ -8,26 +9,26 @@ export default {
     ...mapState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['departamentosSiglas']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
-    
-    getMilisUnidad(){
-       // return this.dptoActualAPI.credito ? this.dptoActualAPI.credito : 0
-       return null;
-      }
+
   },
   data() {
     return {
       roles: ['Unidad', 'Gestor'],
+      milisUnidad: 0
     }
   },
   methods: {
+
     ...mapActions(departamentosStore, ['getDepartamentos']),
     ...mapActions(departamentosStore, ['getDeptoActualAPI']),
-   
+
+
     cambiarDpto(event) {
-      const storeDepto = departamentosStore();
+      const storeDepto = departamentosStore()
       storeDepto.cambiarDpto(event.target.value)
-      console.log("milis", this.getMilisUnidad)
+     // this.milisUnidad = this.dptoActualAPI.credito
     },
+
     cambiarRol(event) {
       const storeDepto = departamentosStore();
       storeDepto.cambiarRol(event.target.value)
@@ -40,14 +41,23 @@ export default {
       }
     }
   },
+  // computed: {
+  //   getMilisUnidad(){
+  //     return this.milisUnidad
+  //   }
+  // }
+  ,
   async created() {
     //await this.getDepartamentos();
     //iniciamos la aplicación con rol gestor  
-    // await this.getDeptoActualAPI();
+
+
+    //await this.getDeptoActualAPI();
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
     //iniciamos la aplicación con rol gestor  
-  },
+ },
+ 
 }
 </script>
 
@@ -81,8 +91,8 @@ export default {
           </li>
         </ul>
         <ul class="navbar-nav me-5">
-            <li class="milisMenu" v-if="getMilisUnidad > 0"> milis: {{ getMilisUnidad }}  </li> 
-          <li v-if="departamentosSiglas.length > 0
+           <!-- <li class="milisMenu" v-if="getMilisUnidad > 0"> milis: {{ getMilisUnidad }}  </li>  -->
+           <li v-if="departamentosSiglas.length > 0 
             && $route.name !== 'material'
             && rolActual != 'Gestor'
             && rolActual != null">
@@ -108,17 +118,21 @@ export default {
 /* .navbar-nav .nav-link {
   width: 100%;
 } */
+
 .fixed-top {
   position: relative
 }
+
 .textoDpto {
   color: white;
   align-self: center;
   margin-right: 2vw
 }
+
 .nav-link {
   font-size: 1.2em;
 }
+
 .milisMenu {
   color:aquamarine;
   margin-top: 7px;
