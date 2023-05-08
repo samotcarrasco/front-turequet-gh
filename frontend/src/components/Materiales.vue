@@ -17,6 +17,8 @@ import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext';
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api';
+import { llamadaAPI } from '@/stores/api-service';
+
 
 
 export default {
@@ -41,6 +43,9 @@ export default {
       deleteMaterialDialog: false,
       categoriasFiltro: [],
       categoriasSeleccionadas: [],
+      categoriasAgrupadas: [], 
+      grupoSeleccionado: null,
+      categoriaSeleccionada: null,
       visible: false,
       filters: {},
       materialDialog: false,
@@ -62,21 +67,34 @@ export default {
       },
       categoriasAgrupadas: [],
       submitted: false,
-      estados: [
-        { label: 'Disponible', value: 'disponible' },
-        { label: 'No disponible', value: 'noDisponible' }
-      ],
       tiposMaterial: [
         { label: 'Inventariable', value: 'inventariable' },
         { label: 'No inventariable', value: 'noInventariable' }
       ],
-      cabecera: 'Crear material'
+      cabecera: 'Crear material',
+      categoriasAgrupadas2: [
+        {
+          label: "Grupo 1",
+          items: [
+            { label: "Categoría 1", value: "categoria1" },
+            { label: "Categoría 2", value: "categoria2" }
+          ]
+        },
+        {
+          label: "Grupo 2",
+          items: [
+            { label: "Categoría 3", value: "categoria3" },
+            { label: "Categoría 4", value: "categoria4" }
+          ]
+        }
+      ],
     }
   },
   mounted() {
     console.log(this.categoriasAgrupadas);
 
     const modalEditCreate = () => {
+      this.inicializarSelectorCategorias();
       this.material = {}
       this.submitted = false
       this.materialDialog = true
@@ -225,21 +243,19 @@ export default {
       });
     },
 
+    asignarCategoriaMaterial() {
+      this.materiales.forEach(m => {
+        //console.log("URL LINK " + m._links.categoria.href)
+        llamadaAPI('get', null, m._links.categoria.href).then(r => {
+          m.categoria = r.data;
+          console.log("ASDFASDF" + m.categoria)
+        })
+      })
 
-  },
+    },
 
-  async created() {
-    this.initFilters();
-
-    await this.getCategorias();
-
-    await this.getMateriales();
-
-
-    console.log("Vista desde materiales:", this.tipoVista, this.materiales)
-
-    console.log("categorias", this.categorias)
-    this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
+    inicializarSelectorCategorias() {
+      this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
       let grupo = grupos.find(g => g.label === categoria.grupo);
       if (!grupo) {
         // Si no existe, crear un nuevo grupo
@@ -256,9 +272,36 @@ export default {
       grupo.items.push({ label: categoria.categoria, value: categoria.categoria });
       return grupos;
     }, []);
+    },
+
+    actualizarCategorias() {
+      // Actualiza las categorías del grupo seleccionado
+      const grupoSeleccionado = this.categoriasAgrupadas2.find(g => g.label === this.grupoSeleccionado);
+      this.categoriasDelGrupo = grupoSeleccionado?.items || [];
+      // Reinicia la categoría seleccionada
+      this.categoriaSeleccionada = null;
+    }
+
+
+
+
+  },
+
+  async created() {
+    this.initFilters();
+
+    await this.getCategorias();
+
+    await this.getMateriales();
+
+    this.asignarCategoriaMaterial();
+
+    this.inicializarSelectorCategorias();
+    
+ 
 
     // // Resultado final: categorías agrupadas por grupo
-    console.log("categorias agrupadas", this.categoriasAgrupadas);
+    //console.log("categorias agrupadas", this.categoriasAgrupadas);
 
     // this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
     //   .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
@@ -286,8 +329,8 @@ export default {
               <InputText v-model="filters['global'].value" placeholder="Buscar..." class="flex-grow-1" />
             </span>
             <MultiSelect v-model="categoriasSeleccionadas" :options="categoriasAgrupadas" optionLabel="label"
-              optionGroupLabel="label" optionGroupChildren="items" display="chip" placeholder="Categorías"
-              :maxSelectedLabels="3" class="w-50 multiSelect">
+              optionGroupLabel="label" optionGroupChildren="items" placeholder="Categorías"
+              :maxSelectedLabels="3" class="w-80 multiSelect">
               <template #optiongroup="slotProps">
                 <div class="flex align-items-center">
                   <div>{{ slotProps.option.label }}</div>
@@ -308,8 +351,7 @@ export default {
           <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
           <!-- <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen"
             class="w-6rem shadow-2 border-round img-small" /> -->
-            <img :src="material.data.imagen" :alt="material.data.imagen"
-            class="w-6rem shadow-2 border-round img-small" />
+          <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
         </template>
       </Column>
       <Column field="milis" header="μilis" :sortable="true"> </Column>
@@ -347,20 +389,19 @@ export default {
         :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
     </div>
 
-     <FileUpload @upload="cargarFichero($event)" :multiple="true" accept="image/*" :maxFileSize="1000000">
+    <FileUpload @upload="cargarFichero($event)" :multiple="true" accept="image/*" :maxFileSize="1000000">
       <template #empty>
         <p>Arrastre aquí las imagenes</p>
       </template>
-    </FileUpload> 
-    <!-- <input type="file" @change="cargarImagen" name="nada" class="form-input" />  -->
+    </FileUpload>
 
-    <div class="field">
-      <label for="estado">Estado:</label>
-      <Dropdown id="estado" v-model="material.estado" :options="estados" optionLabel="label" optionValue="value"
-        required="true" :class="{ 'p-invalid': submitted && !material.estado }" :required="true" />
-    </div>
-    <div class="field">
-      <label for="milis">Milis:</label>
+
+    <Dropdown v-model="grupoSeleccionado" :options="categoriasAgrupadas2" optionLabel="label" placeholder="Seleccione un grupo" @change="actualizarCategorias()" />
+    <Dropdown v-model="categoriaSeleccionada" :options="categoriasDelGrupo" optionLabel="label" placeholder="Seleccione una categoría" />
+  
+
+    <!-- <div class="field">
+      <label for="milis">Milis {{ material.categoria.minMilis }}:</label>
       <InputNumber id="milis" v-model.number="material.milis" required="true"
         :class="{ 'p-invalid': submitted && !material.milis }" :required="true" />
     </div>
@@ -382,7 +423,7 @@ export default {
       <Dropdown id="tipoMaterial" v-model="material.tipoMaterial" :options="tiposMaterial" optionLabel="label"
         optionValue="value" required="true" :class="{ 'p-invalid': submitted && !material.tipoMaterial }"
         :required="true" />
-    </div>
+    </div> -->
 
     <!-- <div class="field" v-if="material.tipoMaterial.value === 'inventariable'">
         <label for="noc">NOC:</label>

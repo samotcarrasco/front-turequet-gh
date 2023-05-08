@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-//const host = "https://apipreguntasdim-samotcarrasco.b4a.run/"
-const host = "http://localhost:8080/"
+const host = "https://truequet-carrascodim.b4a.run/"
+//const host = "http://localhost:8080/"
 
 //Llamada a la API genérica, parametrizada con method, body y path
-function llamadaAPI(method, body, path) {
+export function llamadaAPI(method, body, path) {
   let config = {
     method: method ?? 'get',
     maxBodyLength: Infinity,
@@ -84,7 +84,7 @@ function llamadaApiPUTParams(path, params = {}) {
 // }
 
 // GETS
-function getEntidades(nombre) {
+export function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
   //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
   return llamadaAPI('get',null,`${host}api/${nombre}`)

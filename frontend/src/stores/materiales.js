@@ -4,6 +4,7 @@ import { mapState } from 'pinia'
 import { getMateriales } from './api-service'
 import { putMaterial } from './api-service'
 import { getMaterialPorId } from './api-service'
+
 //import { getCategoriaDe } from './api-service'
 
 
@@ -21,11 +22,13 @@ export const materialesStore = defineStore('materiales', {
     async getMateriales() {
       //la de dentro es la funcion importada
       await getMateriales().then(r => this.materiales = r.data._embedded.materiales)
+      //añadimos la categoria de cada material
     },
     // getMaterialPorId(id) {
     //   return this.materiales.find(m => m.id == id)
     // },
     
+
     async getMaterialPorId(id) {
       await getMaterialPorId(id).then(r => this.materialActual = r.data)
     },

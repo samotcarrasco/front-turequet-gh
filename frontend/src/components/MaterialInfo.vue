@@ -247,13 +247,12 @@ export default {
         </div>
         <div class="col-sm-4">
           <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->
-          <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen"
-            class="w-6rem shadow-2 border-round img-small" />
+           <img :src="material.imagen" :alt="material.imagen" class="w-6rem shadow-2 border-round img-small" />  
           <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
             containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
             <template #item="slotProps">
-              <!-- <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" /> -->
-              <!-- <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen" -->
+               <!-- <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />  -->
+                <!-- <img :src="material.imagen" :alt="material.imagen" --> 
             <!-- class="w-6rem shadow-2 border-round img-small" /> -->
             </template>
             <template #thumbnail="slotProps">
