@@ -97,8 +97,8 @@ export default {
       const logoACINGHeight = 18;
 
 
-      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
-      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
+    //  doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
+   //   doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
       doc.setFontSize(16);
       doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center');
       doc.setFontSize(14);
