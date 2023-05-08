@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-//const host = "https://apipreguntasdim-samotcarrasco.b4a.run/"
-const host = "http://localhost:8080/"
+const host = "https://truequet-carrascodim.b4a.run/"
+//const host = "http://localhost:8080/"
 
 function llamadaApiGET(path) {
   let config = {
