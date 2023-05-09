@@ -89,16 +89,17 @@ export default {
 
       const logo = new Image();
       const logoACING = new Image();
-      logo.src = '/src/assets/img/logos/logo.png';
-      logoACING.src = '/src/assets/img/logos/logoACING.png';
+      logo.src = '../assets/img/logos/logo.png';
+     
+      logoACING.src = '../assets/img/logos/logoACIsssNG.png';
       const logoWidth = 12;
       const logoHeight = 12;
       const logoACINGWidth = 12;
       const logoACINGHeight = 18;
 
 
-    //  doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
-   //   doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
+      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
+      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
       doc.setFontSize(16);
       doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center');
       doc.setFontSize(14);

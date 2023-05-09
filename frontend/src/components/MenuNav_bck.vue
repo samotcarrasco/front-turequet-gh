@@ -10,7 +10,7 @@ export default {
     <div class="container-fluid">
       <a class="navbar-brand">
         <router-link :to="{ name: 'home' }">
-          <img class="logo" src="../assets/logo.png" alt="Logo Truequet">
+          <img class="logo" src="../assets/img/logos/logo.png" alt="Logo Truequet">
         </router-link>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
