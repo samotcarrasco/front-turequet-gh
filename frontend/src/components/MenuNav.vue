@@ -57,12 +57,6 @@ export default {
       </button>
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav me-auto">
-          <!-- <li class="nav-item" v-if="rolActual != 'Gestor' && rolActual != null">
-            <router-link class="nav-link" :to="{ name: 'materiales' }">Ver material</router-link>
-          </li>
-          <li class="nav-item" v-if="rolActual != 'Gestor' && rolActual != null">
-            <router-link class="nav-link" :to="{ name: 'materiales' }">Aportar material</router-link>
-          </li> -->
           <li class="nav-item" v-if="rolActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'categorias' }">Categorías</router-link>
           </li>

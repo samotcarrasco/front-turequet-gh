@@ -1,9 +1,10 @@
 import axios from 'axios'
 
-const host = "http://localhost:8080/"
+const host = "https://truequet-carrascodim.b4a.run/"
+//const host = "http://localhost:8080/"
 
 //Llamada a la API genérica, parametrizada con method, body y path
-function llamadaAPI(method, body, path) {
+export function llamadaAPI(method, body, path) {
   let config = {
     method: method ?? 'get',
     maxBodyLength: Infinity,
@@ -20,6 +21,43 @@ function llamadaAPI(method, body, path) {
 }
 
 
+
+// function llamadaApiGET(path) {
+//   let config = {
+//     method: 'get',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {}
+//   }
+
+//   return axios.request(config)
+// }
+
+
+// function llamadaApiPOST(modeloJSON, path) {
+//   let config = {
+//     method: 'post',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {
+//     },
+//     data: modeloJSON
+//   };
+//   return axios.request(config);
+// }
+
+// function llamadaApiPUT(modeloJSON, path) {
+//   let config = {
+//     method: 'put',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {
+//     },
+//     data: modeloJSON
+//   };
+//   return axios.request(config);
+// }
+
 function llamadaApiPUTParams(path, params = {}) {
   let config = {
     method: 'put',
@@ -32,8 +70,21 @@ function llamadaApiPUTParams(path, params = {}) {
 }
 
 
+
+
+// function llamadaApiDELETE(path) {
+//   let config = {
+//     method: 'delete',
+//     maxBodyLength: Infinity,
+//     url: path,
+//     headers: {
+//     },
+//   };
+//   return axios.request(config);
+// }
+
 // GETS
-function getEntidades(nombre) {
+export function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
   //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
   return llamadaAPI('get',null,`${host}api/${nombre}`)
@@ -44,6 +95,12 @@ function getEntidadPorId(nombre, id) {
   // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
   return llamadaAPI('get', null, `${host}api/${nombre}/${id}`)
 }
+
+
+// function getEntidadPorLink(nombre) {
+//   // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
+//   return llamadaAPI('get',null,`${host}api/${nombre}`)
+// }
 
 
 function getEntidadPorNombre(nombre, campo, valor) {

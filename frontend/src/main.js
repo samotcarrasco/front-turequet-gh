@@ -5,10 +5,11 @@ import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice';
 
 //componentes para rutas
-import MaterialInfo from '@/components/ComponenteDummy.vue'
-import MaterialesMain from '@/components/ComponenteDummy.vue'
+import MaterialInfo from '@/components/MaterialInfo.vue'
+import MaterialesMain from '@/components/MaterialesMain.vue'
 import Categorias from '@/components/Categorias.vue'
-import Estadisticas from '@/components/ComponenteDummy.vue'
+import ComponenteDummy from '@/components/ComponenteDummy.vue'
+import ComponenteInicio from '@/components/ComponenteInicio.vue'
 
 
 //Bootstrap
@@ -29,6 +30,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 //import { faFutbolBall, faMobile, faSquareFull, faUser, faBoxesStacked } from '@fortawesome/free-solid-svg-icons'
+import { faUser } from '@fortawesome/free-solid-svg-icons'
 
 //pinia
 import { createPinia } from 'pinia'
@@ -37,21 +39,15 @@ import { createPinia } from 'pinia'
 //definimos objeto rutas
 const routes = [
   {
-    path: '/', component: MaterialesMain, name: 'home'
+    path: '/', component: ComponenteInicio, name: 'home'
   },
   { path: '/materiales', component: MaterialesMain, name: 'materiales' },
-  //{ path: '/material/:id/:tipoVista', component: MaterialInfo, name:'material' },
    {
      path: '/material/:id', component: MaterialInfo, name: 'material', props: true 
    },
-   {
-    path: '/material/:id',
-    component: MaterialInfo,
-    name: 'material',
-   // props: route => ({ tipoVista: route.query.tipoVista })
-  },
   { path: '/categorias', component: Categorias, name: 'categorias' },
-  { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' }
+  { path: '/estadisticas', component: ComponenteDummy, name: 'estadisticas' },
+  { path: '/unidades', component: ComponenteDummy, name: 'unidades' }
 
 ]
 
@@ -63,20 +59,16 @@ const router = createRouter({
 const pinia = createPinia()
 
 
-// library.add(faUser)
+library.add(faUser)
 // library.add(faBoxesStacked)
-
-
 
 const app = createApp(App)
 app.use(PrimeVue)
 app.use(router)
 app.use(pinia)
-app.use(ToastService);
-//app.use(cors())
+app.use(ToastService)
 
 app.component('font-awesome-icon', FontAwesomeIcon)
 
 app.mount('#app')
-
 
