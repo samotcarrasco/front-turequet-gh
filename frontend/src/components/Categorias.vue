@@ -67,7 +67,6 @@ export default {
           toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
         } else {
           console.log("punto 3");
-          // this.categoria.image = 'categoria-placeholder.svg';
           //this.categoria.inventoryStatus = this.categoria.inventoryStatus ? this.categoria.inventoryStatus.value : 'INSTOCK';
           //this.categorias.push(this.categoria);
           console.log(this.categoria);

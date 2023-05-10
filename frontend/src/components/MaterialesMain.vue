@@ -44,10 +44,10 @@ export default {
 <template>
   <!-- <div class="tab-view-container"> -->
   <TabView>
-    <TabPanel> 
-        <template #header>
+    <TabPanel header="MATERIALES DISPONIBLES"> 
+        <!-- <template #header>
           <span>MATERIALES DISPONIBLES <b style="background-color: #bec092;">({{this.valorReactivo}})</b></span>
-      </template>
+      </template> -->
     <Materiales :tipoVista="disponibles" />
     </TabPanel>
     <TabPanel header="MIS MATERIALES OFERTADOS">
