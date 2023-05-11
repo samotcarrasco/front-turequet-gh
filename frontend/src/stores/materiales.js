@@ -1,9 +1,7 @@
 import { defineStore } from 'pinia'
 import { departamentosStore } from './departamentos.js'
 import { mapState } from 'pinia'
-import { getMateriales } from './api-service'
-import { putMaterial } from './api-service'
-import { getMaterialPorId } from './api-service'
+import { getMateriales, postMaterial, putMaterial, getMaterialPorId } from './api-service'
 
 //import { getCategoriaDe } from './api-service'
 
@@ -45,7 +43,12 @@ export const materialesStore = defineStore('materiales', {
 
     async getCategoriaDeMaterial(id){
       await getCategoriaDeMaterial(id)
-    }
+    },
+
+    async postMaterial(material) {
+      //la de dentro es la funcion importada
+      await postMaterial(material);
+    },
 
   },
 })

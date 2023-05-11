@@ -1,4 +1,6 @@
 <script>
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
@@ -7,7 +9,6 @@ import MultiSelect from 'primevue/multiselect'
 import { departamentosStore } from '@/stores/departamentos'
 import { materialesStore } from '@/stores/materiales'
 import { categoriasStore } from '@/stores/categorias'
-//import { categoriasStore } from '@/stores/categorias'
 import { mapState, mapActions } from 'pinia'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -19,13 +20,14 @@ import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api';
-import { llamadaAPI } from '@/stores/api-service';
+import { llamadaAPI, host } from '@/stores/api-service';
+
 
 
 
 export default {
   components: {
-    Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
+    Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
     Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch
   },
   provide: {
@@ -55,8 +57,7 @@ export default {
         descripcion: '',
         fechaAdquisicion: null,
         fechaOferta: null,
-        //no pertenece al modelo, revisar al hacer post
-        categoriaSeleccionada: null,
+        categoria: '',
         imagen: '',
         estado: '',
         milis: 0,
@@ -65,19 +66,23 @@ export default {
         peso: '',
         tipoMaterial: '',
         inventariable: '',
-        isInventariable: true,
         noc: '',
         numeroSerie: '',
         bonificacion: 0
       },
+      isInventariable: undefined,
+      idCategoria: undefined,
       submitted: false,
       cabecera: 'Crear material',
       grupos: [],
       minMilis: null,
-      maxMilis: null
+      maxMilis: null,
+      categoriaSeleccionada: null,
+
     }
   },
   mounted() {
+    const toast = useToast();
     console.log(this.categoriasAgrupadas);
 
     const modalEditCreate = () => {
@@ -94,29 +99,48 @@ export default {
     };
 
     const saveMaterial = () => {
-      console.log("entrando en la funcion saveMaterial")
+      //this.material.categoria
+      //console.log("CATEG", this.material)
+      this.material.categoria = host + "api/categorias/" + this.idCategoria;
+      this.material.estado = 0;
+      this.material.fechaOferta = new Date();
+      console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
+      console.log("DPTO API" + this.dptoActualAPI._links.self.href);
+
+      this.material.dptoOferta = this.dptoActualAPI._links.self.href
+
+      switch (this.isInventariable) {
+        case true:
+          this.material.tipoMaterial = "Inventariable";
+          break;
+        case false:
+          this.material.tipoMaterial = "noInventariable";
+          break;
+      }
+      
+      console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
+
       this.submitted = true;
 
       // if (this.formularioRellenado(this.categoria)) {
-      console.log("nombre", this.material.nombre)
-      console.log("imgen", this.material.imagen)
+      // console.log("nombre", this.material.nombre)
+      // console.log("imgen", this.material.imagen)
       console.log("punto 1");
-      if (this.material.id) {
+      //if (this.material.id) {
         //     console.log("punto 2");
         //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
         //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
         //     //llamad a metodo putcategoria(pendiente de desarrollo)
         //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
-      } else {
-        console.log("punto 3");
+      // } else {
+      //   console.log("punto 3");
 
-        //     console.log(this.categoria);
-        //     this.postCategoria(this.categoria).then(() => { this.getCategorias() });
-        //     toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'La categoría' + this.categoria.categoria + " se ha creado correctamente", life: 4000 });
-        //   }
-        //   this.categoriaDialog = false;
-        //   this.categoria = {};
-      }
+             this.postMaterial(this.material).then(() => { this.getMateriales() });
+             toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.material + " se ha creado correctamente", life: 4000 });
+           //}
+           this.materialDialog = false;
+           this.material = {};
+     // }
     };
 
     const editMaterial = (editMaterial) => {
@@ -142,6 +166,8 @@ export default {
     ...mapState(materialesStore, ['materiales']),
     ...mapState(categoriasStore, ['categorias']),
     ...mapState(departamentosStore, ['dptoActual']),
+    ...mapState(departamentosStore, ['dptoActualAPI']),
+
 
 
     materialesFiltrados() {
@@ -180,11 +206,12 @@ export default {
     },
 
     getMilisDeCategoria() {
-      if (this.material.categoriaSeleccionada) {
-        const categoria = this.categorias.find(c => c.categoria === this.material.categoriaSeleccionada.value);
+      if (this.categoriaSeleccionada) {
+        const categoria = this.categorias.find(c => c.categoria === this.categoriaSeleccionada.value);
         if (categoria) {
           this.minMilis = categoria.minMilis;
           this.maxMilis = categoria.maxMilis;
+          this.idCategoria = categoria.id;
         }
       } else {
         this.minMilis = null;
@@ -196,7 +223,9 @@ export default {
   methods: {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
+    ...mapActions(materialesStore, ['postMaterial']),
     ...mapActions(categoriasStore, ['getCategorias']),
+    
 
 
     initFilters() {
@@ -328,6 +357,7 @@ export default {
 </script>
 <template>
   <div class="materiales-container">
+    <Toast/>
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -413,12 +443,12 @@ export default {
     <div class="field d-flex mt-2">
       <Dropdown v-model="grupoSeleccionado" :options="grupos" placeholder="Seleccione un grupo"
         @change="actualizarCategorias" />
-      <Dropdown v-model="material.categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
+      <Dropdown v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
         placeholder="Seleccione una categoría" class="mx-2" @change="getMilisDeCategoria" />
       <label for="milis">Milis: </label>
       <InputNumber id="milis" v-model="material.milis" required="true"
         :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis) }" :required="true"
-        :placeholder="material.categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
+        :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
     </div>
     <div class="field d-flex mt-2">
 
@@ -438,16 +468,16 @@ export default {
 
     <div class="field">
       <label for="inventariable">Inventariable: </label>
-      <InputSwitch v-model="material.isInventariable" />
+      <InputSwitch v-model="isInventariable" />
     </div>
 
 
-    <div v-if="material.isInventariable" class="field">
+    <div v-if="isInventariable" class="field">
       <label for="noc">NOC: </label>
       <InputText id="noc" v-model="material.noc" :class="{ 'p-invalid': submitted && !material.noc }" :required="true" />
     </div>
 
-    <div v-if="material.isInventariable" class="field">
+    <div v-if="isInventariable" class="field">
       <label for="numSerie">Número de Serie: </label>
       <InputText id="numSerie" v-model="material.numSerie" :class="{ 'p-invalid': submitted && !material.numSerie }"
         :required="true" />

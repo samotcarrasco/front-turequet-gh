@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const host = "https://truequet-carrascodim.b4a.run/"
+export const host = "https://truequet-carrascodim.b4a.run/"
 //const host = "http://localhost:8080/"
 
 //Llamada a la API genérica, parametrizada con method, body y path
@@ -86,7 +86,6 @@ function llamadaApiPUTParams(path, params = {}) {
 // GETS
 export function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
-  //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
   return llamadaAPI('get',null,`${host}api/${nombre}`)
 }
 
@@ -105,7 +104,6 @@ function getEntidadPorId(nombre, id) {
 
 function getEntidadPorNombre(nombre, campo, valor) {
   //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
-  // return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${campo}/${valor}.json`)
   return llamadaAPI('get',null,`${host}api/${nombre}/${campo}/${valor}`)
 }
 
@@ -113,14 +111,12 @@ function getEntidadPorNombre(nombre, campo, valor) {
 
 //POST
 function postEntidad(modelo, nombre) {
-  // return llamadaApiPOST(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}.json` )
   return llamadaAPI('post', modelo, `${host}api/${nombre}`)
 }
 
 
 //PUT
 function putEntidad(modelo, id, nombre) {
-  //return llamadaApiPUT(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${id}.json`, )
   return llamadaAPI('put',modelo, `${host}api/${nombre}/${id}`)
 }
 
@@ -132,7 +128,6 @@ function PUTAumentarCretido(nombre, id, creditos) {
 
 // DELETE
 function deleteEntidad(id, nombre) {
-  //return llamadaApiDELETE(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}/${id}.json`, )
   return llamadaAPI('delete',null,`${host}api/${nombre}/${id}`)
 }
 
@@ -175,6 +170,10 @@ export function getMaterialPorId(id) {
 export function putMaterial(material) {
   console.log("llamando a put ", material, material.id)
   return putEntidad(material, material.id, 'materiales')
+}
+
+export function postMaterial(material) {
+  return postEntidad(material, 'materiales')
 }
 
 
