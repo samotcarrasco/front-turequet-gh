@@ -247,18 +247,17 @@ export default {
         </div>
         <div class="col-sm-4">
           <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->
-           <img :src="material.imagen" :alt="material.imagen" class="w-6rem shadow-2 border-round img-small" />  
-          <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
+           <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
+           <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
             containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
             <template #item="slotProps">
-               <!-- <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />  -->
-                <!-- <img :src="material.imagen" :alt="material.imagen" --> 
-            <!-- class="w-6rem shadow-2 border-round img-small" /> -->
+              <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />
             </template>
             <template #thumbnail="slotProps">
-              <!-- <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" /> -->
+              <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
             </template>
           </Galleria>
+
 
           <Button label="Show" icon="pi pi-external-link" @click="displayBasic = true" />
         </div>

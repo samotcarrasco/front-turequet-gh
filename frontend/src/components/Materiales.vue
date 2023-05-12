@@ -70,7 +70,7 @@ export default {
         numeroSerie: '',
         bonificacion: 0
       },
-      isInventariable: undefined,
+      isInventariable: true,
       idCategoria: undefined,
       submitted: false,
       cabecera: 'Crear material',
@@ -105,9 +105,12 @@ export default {
       this.material.estado = 0;
       this.material.fechaOferta = new Date();
       console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
-      console.log("DPTO API" + this.dptoActualAPI._links.self.href);
+      console.log("DPTO API" + this.dptoActualAPI._links.self.href)
 
       this.material.dptoOferta = this.dptoActualAPI._links.self.href
+
+      this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
+
 
       switch (this.isInventariable) {
         case true:
@@ -117,30 +120,28 @@ export default {
           this.material.tipoMaterial = "noInventariable";
           break;
       }
-      
+
       console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
 
       this.submitted = true;
 
-      // if (this.formularioRellenado(this.categoria)) {
-      // console.log("nombre", this.material.nombre)
-      // console.log("imgen", this.material.imagen)
-      console.log("punto 1");
+      if (this.formularioRellenado(this.material)) {
       //if (this.material.id) {
-        //     console.log("punto 2");
-        //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
-        //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
-        //     //llamad a metodo putcategoria(pendiente de desarrollo)
-        //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
+      //     console.log("punto 2");
+      //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
+      //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
+      //     //llamad a metodo putcategoria(pendiente de desarrollo)
+      //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
       // } else {
       //   console.log("punto 3");
 
-             this.postMaterial(this.material).then(() => { this.getMateriales() });
-             toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.material + " se ha creado correctamente", life: 4000 });
-           //}
-           this.materialDialog = false;
-           this.material = {};
-     // }
+
+      this.postMaterial(this.material).then(() => { this.getMateriales() });
+      toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.material + " se ha creado correctamente", life: 4000 });
+      //}
+      this.materialDialog = false;
+      this.material = {};
+       }
     };
 
     const editMaterial = (editMaterial) => {
@@ -171,7 +172,6 @@ export default {
 
 
     materialesFiltrados() {
-
       // console.log('materiales ', this.materiales)
       switch (this.tipoVista) {
         case "ofertados":
@@ -218,6 +218,15 @@ export default {
         this.maxMilis = null;
       }
     },
+
+    fechaFormateada() {
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const year = today.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
   },
 
   methods: {
@@ -225,7 +234,7 @@ export default {
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['postMaterial']),
     ...mapActions(categoriasStore, ['getCategorias']),
-    
+
 
 
     initFilters() {
@@ -251,7 +260,7 @@ export default {
 
     cargarImagen(e) {
       console.log("subiendo fichero...");
-      let file = e.target.files[0];
+      let file = e.files[0];
       let reader = new FileReader();
       reader.onload = () => {
         this.material.imagen = reader.result;
@@ -312,8 +321,8 @@ export default {
       return (mat.nombre &&
         mat.descripcion &&
         mat.milis >= this.minMilis &&
-        mat.milis <= this.maxMilis)
-
+        mat.milis <= this.maxMilis
+        && mat.milis > 0)
     },
 
     incrementarCantidad() {
@@ -357,7 +366,7 @@ export default {
 </script>
 <template>
   <div class="materiales-container">
-    <Toast/>
+    <Toast />
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -421,73 +430,102 @@ export default {
     </DataTable>
   </div>
 
-  <Dialog v-model:visible="materialDialog" :style="{ width: '80vw' }" :header="cabecera" :modal="true" class="p-fluid">
-    <div class="field">
-      <label for="name">Nombre:</label>
-      <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
-        :class="{ 'p-invalid': submitted && !material.nombre }" />
+  <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
+    <div class="field d-flex mt-2">
+      <div class="field col custom-field">
+        <label for="name">Nombre:</label>
+        <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
+          :class="{ 'p-invalid': submitted && !material.nombre }" />
+      </div>
+      <div class="field col custom-field">
+        <label for="name">Fecha oferta:</label>
+        <InputText id="name" v-model.trim="fechaFormateada" disabled />
+      </div>
     </div>
     <div class="field">
-      <label for="descripcion">Descripción</label>
+      <label for="descripcion">Descripción:</label>
       <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
         :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
     </div>
     <div class="field">
-      <FileUpload @upload="cargarFichero($event)" :multiple="true" accept="image/*" :maxFileSize="1000000">
+      <!-- <input type="file" @change="cargarImagen" accept="image/*"> -->
+       <!-- <FileUpload @upload="cargarImagen($event)" url="null" :multiple="false" accept="image/*" :maxFileSize="1000000">
         <template #empty>
-          <p>Arrastre aquí las imagenes</p>
+          <p>Seleccione o arrastre aquí la imagen y pulse en Upload</p>
+        </template>
+      </FileUpload>  -->  
+      <FileUpload @select="cargarImagen($event)" :showUploadButton="true" accept="image/*"  chooseLabel="Seleccionar" cancel-label="Cancelar">
+            <!-- <img :src="material.imagen" v-if="imagen" alt="Imagen cargada correctamente"> -->
+        <template #empty>
+          <p>Seleccione o arrastre aquí la imagen</p>
         </template>
       </FileUpload>
+
     </div>
 
     <div class="field d-flex mt-2">
-      <Dropdown v-model="grupoSeleccionado" :options="grupos" placeholder="Seleccione un grupo"
-        @change="actualizarCategorias" />
-      <Dropdown v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
-        placeholder="Seleccione una categoría" class="mx-2" @change="getMilisDeCategoria" />
-      <label for="milis">Milis: </label>
-      <InputNumber id="milis" v-model="material.milis" required="true"
-        :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis) }" :required="true"
-        :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
+      <div class="field col custom-field">
+        <label for="grupo">Grupo: </label>
+        <Dropdown v-model="grupoSeleccionado" :options="grupos" placeholder="Seleccione un grupo"
+          @change="actualizarCategorias" />
+      </div>
+      <div class="field col custom-field">
+        <label for="categoria">Categoría: </label>
+        <Dropdown v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
+          placeholder="Seleccione una categoría" @change="getMilisDeCategoria" />
+      </div>
+      <div class="field col custom-field">
+        <label for="milis">Milis: </label>
+        <InputNumber id="milis" v-model="material.milis" required="true"
+          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis ) }" :required="true"
+          :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
+      </div>
     </div>
     <div class="field d-flex mt-2">
+      <div class="field col custom-field">
+        <label for="cantidad">Cantidad: </label>
+        <div class="p-inputgroup">
+          <Button icon="pi pi-minus" @click="decrementarCantidad" />
+          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" :placeholder="1"
+            class="c-cantidad" />
+          <Button icon="pi pi-plus" @click="incrementarCantidad" />
+        </div>
+      </div>
+      <div class="field col custom-field">
+        <label for="peso">Peso (kg):</label>
+        <InputText id="peso" v-model="material.peso" class="p-inputtext" />
+      </div>
+      <div class="field col custom-field">
+        <label for="dimensiones">Dimensiones:</label>
+        <InputText id="dimensiones" v-model="material.dimensiones" class="p-inputtext" />
+      </div>
+    </div>
 
-      <label for="cantidad">Cantidad: </label>
-      <div class="p-inputgroup">
-        <Button icon="pi pi-minus" @click="decrementarCantidad" />
-        <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" :placeholder="1" />
-        <Button icon="pi pi-plus" @click="incrementarCantidad" />
+    <div class="field d-flex mt-2">
+      <div class="field col custom-field-switch">
+        <label for="inventariable" class="custom-label">Inventariable: </label>
+        <InputSwitch v-model="isInventariable" class="custom-input-switch" />
+      </div>
+      <div v-if="isInventariable" class="field col custom-field">
+        <label for="noc">NOC: </label>
+        <InputText id="noc" v-model="material.noc"
+          :required="false" />
+      </div>
+      <div v-if="isInventariable" class="field col custom-field">
+        <label for="numSerie">Número de Serie: </label>
+        <InputText id="numSerie" v-model="material.numSerie"
+          :required="false" />
+      </div>
+      <div v-if="!isInventariable" class="field col custom-field">
+        <label for="bonificacion">Bonificación: </label>
+        <InputText id="bonificacion" v-model="material.bonificacion" :required="false" />
+      </div>
+      <div v-if="!isInventariable" class="field col custom-field">
+        <label for="null"> </label>
       </div>
 
-      <label for="peso">Peso (kg):</label>
-      <InputText id="peso" v-model="material.peso" class="p-inputtext" />
-
-      <label for="dimensiones">Dimensiones:</label>
-      <InputText id="dimensiones" v-model="material.dimensiones" class="p-inputtext" />
     </div>
 
-    <div class="field">
-      <label for="inventariable">Inventariable: </label>
-      <InputSwitch v-model="isInventariable" />
-    </div>
-
-
-    <div v-if="isInventariable" class="field">
-      <label for="noc">NOC: </label>
-      <InputText id="noc" v-model="material.noc" :class="{ 'p-invalid': submitted && !material.noc }" :required="true" />
-    </div>
-
-    <div v-if="isInventariable" class="field">
-      <label for="numSerie">Número de Serie: </label>
-      <InputText id="numSerie" v-model="material.numSerie" :class="{ 'p-invalid': submitted && !material.numSerie }"
-        :required="true" />
-    </div>
-
-    <div v-else class="field">
-      <label for="bonificacion">Bonificación: </label>
-      <InputText id="bonificacion" v-model="material.bonificacion"
-        :class="{ 'p-invalid': submitted && !material.bonificacion }" :required="true" />
-    </div>
 
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -527,5 +565,32 @@ export default {
 
 .pi {
   color: #4b5320;
+}
+
+.c-cantidad {
+  text-align: center;
+}
+
+.field.d-flex {
+  margin-bottom: 1rem;
+}
+
+.custom-field {
+  margin-right: 1rem;
+}
+
+.custom-field-switch {
+  display: flex;
+  justify-content: center;
+}
+
+.custom-input-switch {
+  margin-top: 2rem;
+  margin-right: 1rem;
+}
+
+.custom-label {
+  margin-top: 1.7rem;
+  margin-right: 1rem;
 }
 </style>
