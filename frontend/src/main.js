@@ -8,6 +8,7 @@ import ToastService from 'primevue/toastservice';
 import MaterialInfo from '@/components/MaterialInfo.vue'
 import MaterialesMain from '@/components/MaterialesMain.vue'
 import Categorias from '@/components/Categorias.vue'
+import Estadisticas from '@/components/Estadisticas.vue'
 import ComponenteDummy from '@/components/ComponenteDummy.vue'
 import ComponenteInicio from '@/components/ComponenteInicio.vue'
 
@@ -46,7 +47,7 @@ const routes = [
      path: '/material/:id', component: MaterialInfo, name: 'material', props: true 
    },
   { path: '/categorias', component: Categorias, name: 'categorias' },
-  { path: '/estadisticas', component: ComponenteDummy, name: 'estadisticas' },
+  { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
   { path: '/unidades', component: ComponenteDummy, name: 'unidades' }
 
 ]

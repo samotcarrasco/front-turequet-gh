@@ -392,7 +392,7 @@ export default {
           </div>
           <div class="col-4 text-right">
             <Button v-if="this.tipoVista == 'ofertados'" label="Crear nuevo" icon="pi pi-plus"
-              class="p-button-success mr-2" @click="modalEditCreate" />
+              @click="modalEditCreate" />
           </div>
         </div>
       </template>

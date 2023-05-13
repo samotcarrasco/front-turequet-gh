@@ -129,12 +129,8 @@ export default {
 
     goBack() {
       console.log('Botón volver presionado');
-      this.$router.push({ name: 'materiales' });
+      this.$router.back();
       window.location.reload();
-      window.location.reload();
-      window.location.reload();
-      window.location.reload();
-      
     }
 
 
@@ -223,7 +219,7 @@ export default {
 
 <template>
   <Toast />
-   dddd
+   
   <p @click="goBack">asasdf</p>
   <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
@@ -259,11 +255,11 @@ export default {
           </Galleria>
 
 
-          <Button label="Show" icon="pi pi-external-link" @click="displayBasic = true" />
+          <!-- <Button label="Show" icon="pi pi-external-link" @click="displayBasic = true" /> -->
         </div>
         <div class="p-mb-2">
           <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart"
-            class="p-button-success" @click="adquirirMaterial(material)" />
+           @click="adquirirMaterial(material)" />
           <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
           <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
           <!-- <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
@@ -278,7 +274,7 @@ export default {
       </div>
     </template>
   </Card>
-  dddd
+  
   <p @click="goBack">asasdf</p>
   <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" />
 

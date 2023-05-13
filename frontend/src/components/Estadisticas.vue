@@ -15,6 +15,7 @@ export default {
   },
   data() {
     return {
+      categMateriales: [],
       maxMin: "",
       barData: {
         labels: [],
@@ -63,30 +64,41 @@ export default {
     ...mapActions(materialesStore, ['getNumeroMaterialesPorCategoria']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(materialesStore, ['getMateriales']),
-    ...mapActions(materialesStore, ['getNumeroMaterialesPorCategoria']),
 
 
     getNumMaterialesPorCategoria() {
-      return this.getNumeroMaterialesPorCategoria()
+      const categMateriales = [];
+
+      for (let i = 0; i < this.categorias.length; i++) {
+        const categoria = this.categorias[i].categoria;
+        const numMateriales = this.categorias[i].numMateriales;
+
+        // Crear un objeto de categoría y agregarlo al array
+        const categObjeto = { categoria: categoria, numMateriales: numMateriales };
+        categMateriales.push(categObjeto);
+      }
+
+      return categMateriales;
     },
 
-    asignarMaterialesACategorias() {
-      this.categorias.forEach(categoria => {
-        categoria.cantidadMateriales = this.getNumMaterialesPorCategoria()[categoria.categoria] || 0
-        //console.log ("categoria: ", categoria.categoria , " materiales: ", this.getNumMaterialesPorCategoria()[categoria.categoria] )
-      })
-    },
+    // asignarMaterialesACategorias() {
+    //   this.categorias.forEach(categoria => {
+    //     categoria.cantidadMateriales = this.getNumMaterialesPorCategoria()[categoria.categoria] || 0
+    //     //console.log ("categoria: ", categoria.categoria , " materiales: ", this.getNumMaterialesPorCategoria()[categoria.categoria] )
+    //   })
+    // },
 
     actualizarDatosGrafico() {
-      this.asignarMaterialesACategorias()
+      // this.asignarMaterialesACategorias()
       // console.log(this.categorias)
 
       let labels = []
       let data = []
 
-      this.categorias.forEach(categoria => {
+      this.categMateriales.forEach(categoria => {
         labels.push(categoria.categoria)
-        data.push(categoria.cantidadMateriales)
+        data.push(categoria.numMateriales)
+        console.log("PUSHH" + categoria.categoria, categoria.numMateriales)
       })
 
       this.barData.labels = labels;
@@ -115,24 +127,28 @@ export default {
   },
   async created() {
     await this.getCategorias()
-    await this.getMateriales()
+    //await this.getMateriales()
+      
+    this.categMateriales = this.getNumMaterialesPorCategoria();
     this.actualizarDatosGrafico()
     this.maxMin = this.obtenerMaxMin()
     console.log(this.maxMin)
+
   },
 
 }
 </script>
 
 <template>
+  
   <div>
+    <Chart type="bar" :data="barData" :options="barOptions" />
     <div class="grid p-fluid">
-      
       <div class="col-12 xl:col-6">
         <div class="card flex flex-column align-items-center">
-          <h5 class="text-left w-full">Pie Chart</h5>
+          <h5 class="text-left w-full">Número de materiales por categoría</h5>
           <Accordion>
-            <AccordionTab :header="`Matariales por categoría: ${maxMin}`">
+            <AccordionTab :header="`${maxMin}`">
               <Chart type="bar" :data="barData" :options="barOptions" />
             </AccordionTab>
           </Accordion>
@@ -171,6 +187,7 @@ export default {
     </div>
 
 
-</div></template>
+  </div>
+</template>
 
   
