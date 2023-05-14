@@ -11,6 +11,7 @@ import Categorias from '@/components/Categorias.vue'
 import Estadisticas from '@/components/Estadisticas.vue'
 import ComponenteDummy from '@/components/ComponenteDummy.vue'
 import ComponenteInicio from '@/components/ComponenteInicio.vue'
+import Departamentos from '@/components/Departamentos.vue'
 
 
 //Bootstrap
@@ -48,7 +49,7 @@ const routes = [
    },
   { path: '/categorias', component: Categorias, name: 'categorias' },
   { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
-  { path: '/unidades', component: ComponenteDummy, name: 'unidades' }
+  { path: '/unidades', component: Departamentos, name: 'unidades' }
 
 ]
 
