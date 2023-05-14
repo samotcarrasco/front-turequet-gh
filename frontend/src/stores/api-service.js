@@ -107,8 +107,6 @@ function getEntidadPorNombre(nombre, campo, valor) {
   return llamadaAPI('get',null,`${host}api/${nombre}/${campo}/${valor}`)
 }
 
-
-
 //POST
 function postEntidad(modelo, nombre) {
   return llamadaAPI('post', modelo, `${host}api/${nombre}`)
@@ -191,4 +189,8 @@ export function getDeptoPorSiglas(valor) {
 export function putAumentarCretido(id, creditos) {
   //la personalizamos porque no es un put estandar
   return PUTAumentarCretido('departamentos', id, creditos)
+}
+
+export function getEmpleos() {
+  return getEntidades('departamentos/empleos')
 }

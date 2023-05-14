@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia'
-import { getDepartamentos, getDeptoPorSiglas, putAumentarCretido } from './api-service'
+import { getDepartamentos, getDeptoPorSiglas, putAumentarCretido, getEmpleos } from './api-service'
 
 
 export const departamentosStore = defineStore('departamentos', {
   state: () => ({
-    // departamentos: [],
+    departamentos: [],
     departamentosSiglas: [],
     dptoActual: undefined,
     dptoActualAPI: undefined,
-    rolActual: undefined
+    rolActual: undefined,
+    empleos: []
   }),
 
   actions: {
@@ -52,6 +53,13 @@ export const departamentosStore = defineStore('departamentos', {
       console.log ("llamando a putaumentarcredito ", departamento, creditos)
       await putAumentarCretido(departamento,creditos)
     },
+
+    async getEmpleos() {
+      await getEmpleos().then (r => {
+        console.log("eleyendo empleo", r)
+        this.empleos =  r.data;
+      });
+    },  
 
    
   }

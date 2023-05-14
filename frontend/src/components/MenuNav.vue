@@ -74,7 +74,7 @@ export default {
             <router-link class="nav-link" :to="{ name: 'categorias' }">Categorías</router-link>
           </li>
           <li class="nav-item" v-if="rolActual == 'Gestor'">
-            <router-link class="nav-link" :to="{ name: 'unidades' }">Unidades</router-link>
+            <router-link class="nav-link" :to="{ name: 'unidades' }">Departamentos</router-link>
           </li>
           <li class="nav-item" v-if="rolActual == 'Gestor'">
             <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>

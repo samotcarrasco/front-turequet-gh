@@ -41,7 +41,6 @@ export default {
   },
   data() {
     return {
-      foto: null,
       materialDialog: false,
       deleteMaterialDialog: false,
       categoriasFiltro: [],
@@ -51,7 +50,6 @@ export default {
       // categoriaSeleccionada: null,
       visible: false,
       filters: {},
-      materialDialog: false,
       material: {
         nombre: '',
         descripcion: '',
@@ -137,7 +135,7 @@ export default {
 
 
       this.postMaterial(this.material).then(() => { this.getMateriales() });
-      toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.material + " se ha creado correctamente", life: 4000 });
+      toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.nombre + " se ha creado correctamente", life: 4000 });
       //}
       this.materialDialog = false;
       this.material = {};
@@ -367,6 +365,12 @@ export default {
 <template>
   <div class="materiales-container">
     <Toast />
+
+    <!-- <div v-if="!this.departamentos">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      {{ console.log('Mostrando icono') }}
+    </div> -->
+    
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -396,7 +400,8 @@ export default {
           </div>
         </div>
       </template>
-      <Column field="nombre" header="Nombre" :sortable="true"></Column>
+
+     <Column field="nombre" header="Nombre" :sortable="true"></Column>
 
       <Column header="imagen">
         <template #body="material">
