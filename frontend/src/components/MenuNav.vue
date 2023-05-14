@@ -17,6 +17,7 @@ export default {
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
     ...mapActions(departamentosStore, ['getDeptoActualAPI']),
+
     cambiarDpto(event) {
       const storeDepto = departamentosStore();
       storeDepto.cambiarDpto(event.target.value)
@@ -28,15 +29,16 @@ export default {
         this.$router.push({ name: 'categorias' });
       } else {
         this.$router.push({ name: 'materiales' });
-        this.getDepartamentos();
+        //this.getDepartamentos();
         this.getDeptoActualAPI();
       }
     }
   },
   async created() {
     await this.getDepartamentos();
+    console.log("long dptos siglas:" + this.departamentosSiglas.length)
     //iniciamos la aplicación con rol gestor  
-    // await this.getDeptoActualAPI();
+    await this.getDeptoActualAPI();
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
     //iniciamos la aplicación con rol gestor  

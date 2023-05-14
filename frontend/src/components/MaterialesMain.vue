@@ -5,6 +5,7 @@ import TabPanel from 'primevue/tabpanel';
 import Materiales from './Materiales.vue';
 
 export default {
+  components: { Panel, TabView, TabPanel, Materiales },
   props: {
     tipoVista: {
       type: String,
@@ -19,7 +20,6 @@ export default {
     }
   },
 
-  components: { Panel, TabView, TabPanel, Materiales },
   computed: {
   },
   methods: {

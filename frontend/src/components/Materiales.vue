@@ -11,13 +11,16 @@ import { mapState, mapActions } from 'pinia'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext';
+//import Textarea from 'primevue/textarea';
 import { FilterMatchMode } from 'primevue/api';
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 
 export default {
   components: {
-     Button, DataTable, InputText, Column, Dialog,
-    Card, Button, MultiSelect, Tag
+    Button, DataTable, InputText, Column, Dialog,
+    Card, Button, MultiSelect, Tag, ProgressSpinner
   },
   provide: {
     tipoVista: undefined
@@ -59,6 +62,7 @@ export default {
       minMilis: null,
       maxMilis: null,
       categoriaSeleccionada: null,
+      isLoading: true,
     }
   },
   mounted() {
@@ -160,10 +164,9 @@ export default {
               this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
             );
 
-          case "intercambiados":
-          //asiganmos el valor "entregado" en los casos que corresponda
+        case "intercambiados":
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => material.estado === "adquirido"  &&
+            ? this.materiales.filter((material) => material.estado === "adquirido" &&
               (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
             : this.materiales.filter((material) => material.estado === "adquirido" &&
               material.estado === "adquirido" &&
@@ -205,24 +208,29 @@ export default {
     this.initFilters();
 
     //await this.getCategorias();
+    this.isLoading = true;
     await this.getMateriales();
+    this.isLoading = false;
 
     this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
       .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
 
-    console.log("Vista desde materiales:", this.tipoVista, this.materiales)
+    //console.log("Vista desde materiales:", this.tipoVista, this.materiales)
   }
 
 }
 </script>
 <template>
+  <!-- <div class="card flex justify-content-center" v-if="isLoading">
+    <ProgressSpinner />
+  </div> -->
   <div class="materiales-container">
+
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       :rowsPerPageOptions="[5, 10, 25]"
       currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} materiales" responsiveLayout="scroll">
-
       <template #header>
         <div class="row justify-content-between align-items-center">
           <div class="col-6">
@@ -240,7 +248,7 @@ export default {
         </div>
       </template>
       <Column field="nombre" header="Nombre" :sortable="true"></Column>
-      <Column field="desripcion" header="Descripcion" :sortable="false"></Column>
+      <Column field="descripcion" header="Descripcion" :sortable="false"></Column>
       <Column header="imagen">
         <template #body="material">
           <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
@@ -276,12 +284,12 @@ export default {
         <InputText id="name" v-model.trim="material.nombre" required="true" autofocus
           :class="{ 'p-invalid': submitted && !material.nombre }" />
       </div>
-      <div class="field">
+      <!-- <div class="field">
         <label for="descripcion">Descripción</label>
         <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
           :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
       </div>
-      <!-- 
+     
         ......
         -->
 
@@ -295,7 +303,7 @@ export default {
 </template>
 
 
-<style >
+<style scoped>
 .img-small {
   width: 50px;
   height: auto;

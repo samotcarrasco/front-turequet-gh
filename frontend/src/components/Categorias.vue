@@ -13,6 +13,7 @@ import InputText from 'primevue/inputtext';
 import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
 import Dialog from 'primevue/dialog';
+import ProgressSpinner from 'primevue/progressspinner';
 import { categoriasStore } from '@/stores/categorias';
 import { mapState, mapActions } from 'pinia'
 
@@ -20,7 +21,7 @@ import { mapState, mapActions } from 'pinia'
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea,
-    InputText, Column, InputNumber, Dialog
+    InputText, Column, InputNumber, Dialog, ProgressSpinner
   },
 
   data() {
@@ -35,6 +36,7 @@ export default {
       submitted: false,
       minMilis: undefined,  //para solucionar warings al cargar las categorias
       modalEditCreate: null,
+      isLoading: true,
 
     };
   },
@@ -158,13 +160,17 @@ export default {
   },
   async created() {
     this.initFilters()
+    this.isLoading = true;
     await this.getCategorias()
+
+    this.isLoading = false;
+
     //console.log("categorias desde el Componente: " + this.categorias)
-    this.categorias.forEach(categoria => {
-      console.log("categoria: ", categoria.categoria)
-      console.log("id: ", categoria.id)
-    })
-    console.log("grupos", this.getGrupos)
+    // this.categorias.forEach(categoria => {
+    //   console.log("categoria: ", categoria.categoria)
+    //   console.log("id: ", categoria.id)
+    // })
+    // console.log("grupos", this.getGrupos)
   },
 }
 </script>
@@ -177,7 +183,12 @@ export default {
       <div class="card">
         <Toast />
         <!-- <DataTable ref="dt" :value="categorias" v-model:selection="selectedCategorias" dataKey="categoria.id" -->
-        <DataTable ref="dt" :value="categorias" dataKey="categoria.id" :paginator="true" :rows="10" :filters="filters"
+        <div class="card flex justify-content-center" v-if="isLoading">
+          <ProgressSpinner />
+        </div>
+
+        <DataTable v-else ref="dt" :value="categorias" dataKey="categoria.id" :paginator="true" :rows="10"
+          :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           :rowsPerPageOptions="[5, 10, 25]"
           currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} categorias" responsiveLayout="scroll">
@@ -198,8 +209,8 @@ export default {
           </Column>
           <Column field="grupo" header="Grupo" :sortable="true" headerStyle="width:14%; min-width:10rem;">
           </Column>
-          <Column field="minMilis" header="μilis" :sortable="true" headerStyle="width:10%; min-width:4rem;" 
-          :sort-field="minMilis">
+          <Column field="minMilis" header="μilis" :sortable="true" headerStyle="width:10%; min-width:4rem;"
+            :sort-field="minMilis">
             <template #body="cat">
               {{ cat.data.minMilis ? cat.data.minMilis + '-' + cat.data.maxMilis : null }}
             </template>

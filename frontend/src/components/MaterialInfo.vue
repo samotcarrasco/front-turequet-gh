@@ -10,6 +10,8 @@ import Button from 'primevue/button';
 import Galleria from 'primevue/galleria';
 import Dialog from 'primevue/dialog';
 import Divider from 'primevue/divider'
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 export default {
   data() {
@@ -18,7 +20,8 @@ export default {
       submitted: false,
       adquirirDialog: false,
       detallesAdqDialog: false,
-      cabecera: ""
+      cabecera: "",
+      isLoading: true,
     }
   },
   props: {
@@ -27,7 +30,7 @@ export default {
     //   required: true
     // }
   },
-  components: { Toast, Card, Button, Galleria, Dialog, Divider },
+  components: { Toast, Card, Button, Galleria, Dialog, Divider, ProgressSpinner },
 
   computed: {
     ...mapState(materialesStore, ['materiales']),
@@ -67,7 +70,7 @@ export default {
       return material.dptoOfertaN !== this.dptoActual && material.estado == "disponible"
     },
 
-   
+
     adquirirMaterial(material) {
       //this.material = { ...material };
       this.material = material;
@@ -108,10 +111,10 @@ export default {
       doc.text(`Material intercambiado: ${material.nombre}`, 10, 40);
       doc.text(`Descripción: ${material.descripcion}`, 10, 50);
       doc.text(`Crédito en μilis: ${material.milis}`, 10, 60);
-      doc.text(`Unidad ofertante: ${material.dptoOferta}`, 10, 70);
+      doc.text(`Unidad ofertante: ${material.dptoOfertaN}`, 10, 70);
       doc.text('Responsable:', 10, 80);
       doc.text('Teléfono:', 10, 90);
-      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicion}`, 10, 100);
+      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicionN}`, 10, 100);
       doc.text('Responsable:', 10, 110);
       doc.text('Teléfono:', 10, 120);
 
@@ -174,6 +177,7 @@ export default {
       //this.material.dptoAdquisicion = this.dptoActualAPI
       this.material.categoria = this.material._links.categoria.href;
       this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
+      this.material.dptoAdquisicionN = this.dptoActual;
       // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
       this.material.dptoOferta = this.material._links.dptoOferta.href;
       delete this.material._links;
@@ -206,11 +210,12 @@ export default {
   async created() {
 
     //iniciamos la aplicación con rol gestor  
-
+    this.isLoading = true;
     console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
     await this.getMaterialPorId(this.$route.params.id);
-   // console.log("material string: ", JSON.stringify(this.materialActual))
+    // console.log("material string: ", JSON.stringify(this.materialActual))
     this.material = this.materialActual;
+    this.isLoading = false;
 
   }
 }
@@ -218,8 +223,10 @@ export default {
 
 <template>
   <Toast />
-   
-  <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
+  <div class="card flex justify-content-center" v-if="isLoading">
+    <ProgressSpinner />
+  </div>
+  <Card v-else :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
     <template #subtitle> {{ material.milis }} μ </template>
     <template #content>
@@ -236,12 +243,12 @@ export default {
           <div class="p-mb-2"><strong>NOC:</strong> {{ material.noc }}</div>
           <div class="p-mb-2"><strong>Número de serie:</strong> {{ material.numeroSerie }}</div>
           <div class="p-mb-2"><strong>Aplicación:</strong> {{ material.aplicacion }}</div>
-          <div class="p-mb-2"><strong>Departamento:</strong> {{ material.departamento }}</div> 
+          <div class="p-mb-2"><strong>Departamento oferta:</strong> {{ material.dptoOferta }}</div>
         </div>
         <div class="col-sm-4">
           <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->
-           <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
-           <!-- <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
+          <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
+          <!-- <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
             containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
             <template #item="slotProps">
               <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />
@@ -256,7 +263,7 @@ export default {
         </div>
         <div class="p-mb-2">
           <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart"
-           @click="adquirirMaterial(material)" />
+            @click="adquirirMaterial(material)" />
           <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
           <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
           <!-- <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
@@ -270,9 +277,9 @@ export default {
         </div>
       </div>
     </template>
+    <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
   </Card>
-  
-  <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" />
+
 
 
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
@@ -294,7 +301,7 @@ export default {
     </template>
   </Dialog>
 
-  <Dialog v-model:visible=" detallesAdqDialog " :style=" { width: '50vw' } " :header=" cabecera " :modal=" true "
+  <Dialog v-model:visible="detallesAdqDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
     class="p-fluid">
     Nombre del material: {{ this.material.nombre }}
     <Divider />
@@ -305,7 +312,7 @@ export default {
     Unidad ofertante {{ this.material.dptoOfertaN }}
     <Divider />
     <template #footer>
-      <Button label="OK" icon="pi pi-times" class="p-button-text" @click=" hideDialogDet " />
+      <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
     </template>
   </Dialog>
 </template>

@@ -11,11 +11,9 @@ import Categorias from '@/components/Categorias.vue'
 import ComponenteDummy from '@/components/ComponenteDummy.vue'
 import ComponenteInicio from '@/components/ComponenteInicio.vue'
 
-
 //Bootstrap
- import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/css/bootstrap.css'
  
-
 //Primevue
 //import 'primevue/resources/themes/lara-light-indigo/theme.css'
 import 'primeicons/primeicons.css'

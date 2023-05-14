@@ -40,7 +40,7 @@ export const departamentosStore = defineStore('departamentos', {
       //  console.log("RESPUESTA DE LA API", r); // Imprime la respuesta completa de la API
         //this.dptoActualAPI = r.data._links.self.href;
         this.dptoActualAPI = r.data;
-      //  console.log("DEPARTAMENTO ACTUAL RECUPERADO", this.dptoActualAPI);
+        //console.log("DEPARTAMENTO ACTUAL RECUPERADO", this.dptoActualAPI);
       });
       //return dptoActAPI
     },

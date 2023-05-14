@@ -46,7 +46,6 @@ function getEntidadPorId(nombre, id) {
 
 
 function getEntidadPorNombre(nombre, campo, valor) {
-  //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
   return llamadaAPI('get',null,`${host}api/${nombre}/${campo}/${valor}`)
 }
 
@@ -119,7 +118,7 @@ export function getDepartamentos() {
 }
 
 export function getDeptoPorSiglas(valor) {
-  return getEntidadPorNombre('departamentos', 'siglas', valor)
+  return getEntidadPorNombre('departamentos', 'siglas', valor || 'SIC');
 }
 
 
