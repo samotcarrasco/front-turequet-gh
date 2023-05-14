@@ -12,7 +12,13 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext';
 import { FilterMatchMode } from 'primevue/api';
+
+
 export default {
+  components: {
+     Button, DataTable, InputText, Column, Dialog,
+    Card, Button, MultiSelect, Tag
+  },
   provide: {
     tipoVista: undefined
   },
@@ -22,34 +28,93 @@ export default {
       deleteMaterialDialog: false,
       categoriasFiltro: [],
       categoriasSeleccionadas: [],
+      categoriasAgrupadas: [],
+      grupoSeleccionado: null,
+      // categoriaSeleccionada: null,
       visible: false,
-      filters: {}
+      filters: {},
+      material: {
+        nombre: '',
+        descripcion: '',
+        fechaAdquisicion: null,
+        fechaOferta: null,
+        categoria: '',
+        imagen: '',
+        estado: '',
+        milis: 0,
+        cantidad: 1,
+        dimensiones: '',
+        peso: '',
+        tipoMaterial: '',
+        inventariable: '',
+        noc: '',
+        numeroSerie: '',
+        bonificacion: 0
+      },
+      isInventariable: true,
+      idCategoria: undefined,
+      submitted: false,
+      cabecera: 'Crear material',
+      grupos: [],
+      minMilis: null,
+      maxMilis: null,
+      categoriaSeleccionada: null,
     }
   },
   mounted() {
+
     const modalEditCreate = () => {
       this.material = {}
       this.submitted = false
       this.materialDialog = true
       this.cabecera = "Alta de nuevo material"
     };
+
     const hideDialog = () => {
       this.materialDialog = false
       this.submitted = false
     };
+
     const saveMaterial = () => {
-     //pendiente implentar
+      console.log("entrando en la funcion saveMaterial")
+      this.submitted = true;
+
+      // if (this.formularioRellenado(this.categoria)) {
+      //   console.log("punto 1");
+      //   if (this.categoria.id) {
+      //     console.log("punto 2");
+      //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
+      //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
+      //     //llamad a metodo putcategoria(pendiente de desarrollo)
+      //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
+      //   } else {
+      //     console.log("punto 3");
+      //     // this.categoria.image = 'categoria-placeholder.svg';
+      //     //this.categoria.inventoryStatus = this.categoria.inventoryStatus ? this.categoria.inventoryStatus.value : 'INSTOCK';
+      //     //this.categorias.push(this.categoria);
+      //     console.log(this.categoria);
+      //     this.postCategoria(this.categoria).then(() => { this.getCategorias() });
+      //     toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'La categoría' + this.categoria.categoria + " se ha creado correctamente", life: 4000 });
+      //   }
+      //   this.categoriaDialog = false;
+      //   this.categoria = {};
+      // }
     };
+
     const editMaterial = (editMaterial) => {
       this.material = { ...editMaterial };
       console.log(this.categoria);
       this.materialDialog = true;
       this.cabecera = "Editar categoría"
+
     };
+
     this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
     this.saveMaterial = saveMaterial;
     this.editMaterial = editMaterial;
+
+
   },
   props: {
     tipoVista: {
@@ -69,10 +134,12 @@ export default {
     ...mapState(materialesStore, ['materiales']),
     // ...mapState(categoriasStore, ['categorias']),
     ...mapState(departamentosStore, ['dptoActual']),
+
     materialesDtpoActual() {
       //la función llamada en el return está declarada en el store
       return this.materialesDptoActual()
     },
+
     materialesFiltrados() {
       // console.log('materiales ', this.materiales)
       switch (this.tipoVista) {
@@ -92,36 +159,60 @@ export default {
               material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
               this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
             );
-        case "adquiridos":
+
+          case "intercambiados":
+          //asiganmos el valor "entregado" en los casos que corresponda
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => material.estado === "adquirido" && material.dptoOfertaN == this.dptoActual && this.dptoActual)
-            : this.materiales.filter((material) =>
+            ? this.materiales.filter((material) => material.estado === "adquirido"  &&
+              (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
+            : this.materiales.filter((material) => material.estado === "adquirido" &&
               material.estado === "adquirido" &&
-              material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.name === material.categoriaN)
+              (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual) &&
+              this.dptoActual &&
+              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
       }
     },
   },
+
   methods: {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
     // ...mapActions(categoriasStore, ['getCategorias']),
+
     initFilters() {
       this.filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       };
     },
-  
+
+    getSeverity(material) {
+      switch (material.data.estado) {
+        case 'adquirido':
+          return 'success';
+        case 'disponible':
+          return 'warning';
+        case 'ofertado':
+          return 'danger';
+        default:
+          return null;
+      }
+    }
+
   },
+
   async created() {
     this.initFilters();
+
     //await this.getCategorias();
     await this.getMateriales();
+
     this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
       .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
+
     console.log("Vista desde materiales:", this.tipoVista, this.materiales)
   }
+
 }
 </script>
 <template>
@@ -149,13 +240,7 @@ export default {
         </div>
       </template>
       <Column field="nombre" header="Nombre" :sortable="true"></Column>
-      <Column header="Status">
-        <template #body="material">
-          <Tag :value="material.data.estado" />
-        </template>
-      </Column>
-      <Column field="nombre" header="Nombre" :sortable="true"></Column>
-
+      <Column field="desripcion" header="Descripcion" :sortable="false"></Column>
       <Column header="imagen">
         <template #body="material">
           <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
@@ -165,6 +250,12 @@ export default {
       <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
       <!-- <Column field="grupo" header="Grupo" :sortable="true"></Column>-->
       <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
+      <Column header="Estado" :sortable="true">
+        <template #body="material">
+          <!-- <Tag :value="material.data.estado" :severity="getSeverity(material)" /> -->
+          {{ material.data.estado }}
+        </template>
+      </Column>
       <Column header="VER">
         <template #body="material">
           <router-link :to="{ name: 'material', params: { id: material.data.id } }"><i
@@ -190,7 +281,11 @@ export default {
         <Textarea id="descripcion" v-model="material.descripcion" required="true" rows="3" cols="20"
           :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
       </div>
-         <template #footer>
+      <!-- 
+        ......
+        -->
+
+      <template #footer>
         <!-- <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
             <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveCategoria" /> -->
       </template>
@@ -199,30 +294,64 @@ export default {
   </div>
 </template>
 
-<style scoped>
+
+<style >
 .img-small {
   width: 50px;
   height: auto;
 }
+
 .multiSelect {
   margin-right: 1vw;
 }
+
 .p-inputtext {
   margin-right: 1rem;
 }
+
 .justify-between {
   justify-content: space-between;
 }
+
 .p-button-rounded {
   margin-left: 4px;
 }
+
 .p-button.p-button-success,
 .p-button.p-button-warning {
   color: #fff;
   background: rgb(136, 158, 89);
   border: 0 none;
 }
+
 .pi {
   color: #4b5320;
+}
+
+.c-cantidad {
+  text-align: center;
+}
+
+.field.d-flex {
+  margin-bottom: 1rem;
+}
+
+.custom-field {
+  margin-right: 1rem;
+}
+
+.custom-field-switch {
+  display: flex;
+  justify-content: center;
+}
+
+.custom-input-switch {
+  margin-top: 2rem;
+  margin-right: 1rem;
+}
+
+.custom-label {
+  margin-top: 1.7rem;
+  margin-right: 1rem;
 }
 </style>

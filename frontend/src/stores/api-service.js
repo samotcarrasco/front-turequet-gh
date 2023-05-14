@@ -20,44 +20,6 @@ export function llamadaAPI(method, body, path) {
   return axios.request(config)
 }
 
-
-
-// function llamadaApiGET(path) {
-//   let config = {
-//     method: 'get',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {}
-//   }
-
-//   return axios.request(config)
-// }
-
-
-// function llamadaApiPOST(modeloJSON, path) {
-//   let config = {
-//     method: 'post',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {
-//     },
-//     data: modeloJSON
-//   };
-//   return axios.request(config);
-// }
-
-// function llamadaApiPUT(modeloJSON, path) {
-//   let config = {
-//     method: 'put',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {
-//     },
-//     data: modeloJSON
-//   };
-//   return axios.request(config);
-// }
-
 function llamadaApiPUTParams(path, params = {}) {
   let config = {
     method: 'put',
@@ -70,42 +32,21 @@ function llamadaApiPUTParams(path, params = {}) {
 }
 
 
-
-
-// function llamadaApiDELETE(path) {
-//   let config = {
-//     method: 'delete',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {
-//     },
-//   };
-//   return axios.request(config);
-// }
-
 // GETS
 export function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
-  //return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}.json`)
   return llamadaAPI('get',null,`${host}api/${nombre}`)
 }
 
 
 function getEntidadPorId(nombre, id) {
-  // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
   return llamadaAPI('get', null, `${host}api/${nombre}/${id}`)
 }
 
 
-// function getEntidadPorLink(nombre) {
-//   // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
-//   return llamadaAPI('get',null,`${host}api/${nombre}`)
-// }
-
 
 function getEntidadPorNombre(nombre, campo, valor) {
   //console.log("OBTENIDNDO EL DPTO POR SIGLAS")
-  // return llamadaApiGET(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${campo}/${valor}.json`)
   return llamadaAPI('get',null,`${host}api/${nombre}/${campo}/${valor}`)
 }
 
@@ -113,14 +54,12 @@ function getEntidadPorNombre(nombre, campo, valor) {
 
 //POST
 function postEntidad(modelo, nombre) {
-  // return llamadaApiPOST(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}.json` )
   return llamadaAPI('post', modelo, `${host}api/${nombre}`)
 }
 
 
 //PUT
 function putEntidad(modelo, id, nombre) {
-  //return llamadaApiPUT(modelo,`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/apit/${nombre}/${id}.json`, )
   return llamadaAPI('put',modelo, `${host}api/${nombre}/${id}`)
 }
 
@@ -132,12 +71,8 @@ function PUTAumentarCretido(nombre, id, creditos) {
 
 // DELETE
 function deleteEntidad(id, nombre) {
-  //return llamadaApiDELETE(`https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/api/${nombre}/${id}.json`, )
   return llamadaAPI('delete',null,`${host}api/${nombre}/${id}`)
 }
-
-
-
 
 
 //CATEGORÍAS
@@ -176,7 +111,6 @@ export function putMaterial(material) {
   console.log("llamando a put ", material, material.id)
   return putEntidad(material, material.id, 'materiales')
 }
-
 
 //DEPARTAMENTOS
 

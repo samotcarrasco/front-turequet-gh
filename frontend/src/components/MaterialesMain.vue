@@ -15,7 +15,7 @@ export default {
     return {
       disponibles: 'disponibles',
       ofertados: 'ofertados',
-      adquiridos: 'adquiridos'    
+      intercambiados: 'intercambiados',
     }
   },
 
@@ -38,8 +38,8 @@ export default {
       <TabPanel header="MIS MATERIALES OFERTADOS">
         <Materiales :tipoVista="ofertados" /> 
       </TabPanel>
-      <TabPanel header="MIS MATERIALES ADQUIRIDOS">
-         <Materiales :tipoVista="adquiridos" /> 
+      <TabPanel header="MATERIALES INTERCAMBIADOS">
+        <Materiales :tipoVista="intercambiados" />
       </TabPanel>
       <!-- <TabPanel header="CARRUSEL">
         <Carrusel :tipoVista="undefined" />

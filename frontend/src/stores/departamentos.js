@@ -4,11 +4,11 @@ import { getDepartamentos, getDeptoPorSiglas, putAumentarCretido } from './api-s
 
 export const departamentosStore = defineStore('departamentos', {
   state: () => ({
-    // departamentos: [],
+    departamentos: [],
     departamentosSiglas: [],
     dptoActual: undefined,
     dptoActualAPI: undefined,
-    rolActual: undefined
+    rolActual: undefined,
   }),
 
   actions: {
@@ -25,14 +25,12 @@ export const departamentosStore = defineStore('departamentos', {
     },
 
     async getDepartamentos() {
-      //la de dentro es la funcion importada
       await getDepartamentos().then(r => {
         this.departamentos = r.data._embedded.departamentos;
         this.departamentosSiglas = this.departamentos.map(dpto => {
           return { id: dpto.id, siglas: dpto.abreviatura };
         });
       });
-
     },
     
     async getDeptoActualAPI(departamento) {
@@ -52,7 +50,6 @@ export const departamentosStore = defineStore('departamentos', {
       console.log ("llamando a putaumentarcredito ", departamento, creditos)
       await putAumentarCretido(departamento,creditos)
     },
-
    
   }
 })

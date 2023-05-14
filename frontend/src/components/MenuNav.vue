@@ -34,7 +34,7 @@ export default {
     }
   },
   async created() {
-    //await this.getDepartamentos();
+    await this.getDepartamentos();
     //iniciamos la aplicación con rol gestor  
     // await this.getDeptoActualAPI();
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
