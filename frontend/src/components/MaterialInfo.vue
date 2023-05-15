@@ -91,8 +91,13 @@ export default {
 
       const logo = new Image();
       const logoACING = new Image();
-      logo.src = "src/assets/img/logos/logo.png";
-      logoACING.src = "src/assets/img/logos/logoACING.png";
+
+      //estas imagenes las hemos cargado en "public" por compatibilidad con netlifly
+      logo.src = "./logo.png";
+      logoACING.src = "./logoACING.png";
+      // logo.src = "./src/assets/img/logos/logo.png";
+      // logoACING.src = "./src/assets/img/logos/logoACING.png";
+      
       const logoWidth = 12;
       const logoHeight = 12;
       const logoACINGWidth = 12;
