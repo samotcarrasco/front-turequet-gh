@@ -1,6 +1,8 @@
 <script>
 import { departamentosStore } from '@/stores/departamentos';
 import { mapWritableState, mapState, mapActions } from 'pinia'
+import ProgressSpinner from 'primevue/progressspinner';
+
 export default {
   computed: {
     ...mapState(departamentosStore, ['dptoActual']),
@@ -9,9 +11,13 @@ export default {
     ...mapState(departamentosStore, ['departamentosSiglas']),
     ...mapState(departamentosStore, ['dptoActualAPI'])
   },
+  components: {
+    ProgressSpinner
+  },
   data() {
     return {
-      roles: ['Unidad', 'Gestor']
+      roles: ['Unidad', 'Gestor'],
+      loading: true 
     }
   },
   methods: {
@@ -22,6 +28,7 @@ export default {
       const storeDepto = departamentosStore();
       storeDepto.cambiarDpto(event.target.value)
     },
+
     cambiarRol(event) {
       const storeDepto = departamentosStore();
       storeDepto.cambiarRol(event.target.value)
@@ -29,16 +36,22 @@ export default {
         this.$router.push({ name: 'categorias' });
       } else {
         this.$router.push({ name: 'materiales' });
-        //this.getDepartamentos();
+        this.getDepartamentos();
         this.getDeptoActualAPI();
       }
     }
   },
   async created() {
+
+    this.loading = true;
+
     await this.getDepartamentos();
     console.log("long dptos siglas:" + this.departamentosSiglas.length)
     //iniciamos la aplicación con rol gestor  
     await this.getDeptoActualAPI();
+
+    this.loading = false;
+
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
     //iniciamos la aplicación con rol gestor  
@@ -69,18 +82,19 @@ export default {
             <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
           </li>
         </ul>
-        <ul class="navbar-nav me-5">
+        <div class="card flex justify-content-center" v-if="loading">
+          <ProgressSpinner class="small-spinner"/>
+        </div>
+        <ul v-else class="navbar-nav me-5">
           <li v-if="departamentosSiglas.length > 0
             && $route.name !== 'material'
-            && rolActual != 'Gestor'
-            && rolActual != null">
+            && rolActual == 'Unidad'">
             <!-- se puede quitar el evento @Change, porque el store es writable-->
             <select class="form-select mr-2" v-model="dptoActual" @change="cambiarDpto">
               <option v-for="dep in departamentosSiglas" :key="dep.id" :value="dep.siglas">{{ dep.siglas }}</option>
             </select>
           </li>
           <li>
-
             <select class="form-select mr-2" v-model="rolActual" @change="cambiarRol">
               <option v-for="(rol, index) in roles" :key="index" :value="rol">{{ rol }}</option>
             </select>
@@ -103,5 +117,10 @@ export default {
   color: white;
   align-self: center;
   margin-right: 2vw
+}
+
+.small-spinner {
+  width: 45px; /* Ajusta el ancho del contenedor */
+  height: 45px; /* Ajusta la altura del contenedor */
 }
 </style>

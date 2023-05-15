@@ -14,6 +14,8 @@ import InputText from 'primevue/inputtext';
 //import Textarea from 'primevue/textarea';
 import { FilterMatchMode } from 'primevue/api';
 import ProgressSpinner from 'primevue/progressspinner';
+import Skeleton from 'primevue/skeleton';
+
 
 
 
@@ -221,13 +223,15 @@ export default {
 }
 </script>
 <template>
-  <!-- <div class="card flex justify-content-center" v-if="isLoading">
-    <ProgressSpinner />
-  </div> -->
-  <div class="materiales-container">
-
+    <!-- <div v-if="isLoading" class="card flex justify-content-center" style="margin-top: 50rem;">
+          <ProgressSpinner />
+         </div> -->
+   <div class="materiales-container"> 
+      <!-- <div v-if="isLoading" class="card flex justify-content-center" style="margin-top: 50rem;"> 
+        <ProgressSpinner />
+        </div>  -->
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
-      :filters="filters"
+      :filters="filters" :loading="loading"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       :rowsPerPageOptions="[5, 10, 25]"
       currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} materiales" responsiveLayout="scroll">
@@ -247,8 +251,21 @@ export default {
           </div>
         </div>
       </template>
-      <Column field="nombre" header="Nombre" :sortable="true"></Column>
-      <Column field="descripcion" header="Descripcion" :sortable="false"></Column>
+      <template #loading> Loading customers data. Please wait. </template>
+      <Column field="nombre" header="Nombre" :sortable="true">
+        <template #loading>
+                    <div class="flex align-items-center" :style="{ height: '17px', 'flex-grow': '1', overflow: 'hidden' }">
+                        <Skeleton width="30%" height="1rem" />
+                    </div>
+                </template>
+              </Column>
+      <Column field="descripcion" header="Descripcion" :sortable="false">
+        <template #loading>
+                    <div class="flex align-items-center" :style="{ height: '17px', 'flex-grow': '1', overflow: 'hidden' }">
+                        <Skeleton width="30%" height="1rem" />
+                    </div>
+                </template>
+              </Column>
       <Column header="imagen">
         <template #body="material">
           <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
@@ -276,7 +293,9 @@ export default {
       <!-- <template #footer> Total: {{ materialesFiltrados ? materialesFiltrados.length : 0 }} </template> -->
     </DataTable>
 
-
+    <!-- <div v-if="isLoading" class="card flex justify-content-center" style="margin-top: 2rem;">
+          <ProgressSpinner />
+        </div> -->
 
     <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
       <div class="field">

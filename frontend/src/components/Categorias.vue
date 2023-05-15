@@ -66,7 +66,7 @@ export default {
           console.log("punto 2");
           //llamad a metodo putcategoria(pendiente de desarrollo)
           this.putCategoria(this.categoria).then(() => { this.getCategorias() });
-          toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
+          toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: this.categoria.categoria, life: 3000 });
         } else {
           console.log("punto 3");
           // this.categoria.image = 'categoria-placeholder.svg';
@@ -74,7 +74,7 @@ export default {
           //this.categorias.push(this.categoria);
           console.log(this.categoria);
           this.postCategoria(this.categoria).then(() => { this.getCategorias() });
-          toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'La categoría' + this.categoria.categoria + " se ha creado correctamente", life: 4000 });
+          toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.categoria.categoria, life: 4000 });
         }
         this.categoriaDialog = false;
         this.categoria = {};
@@ -99,9 +99,9 @@ export default {
     const borrarCategoria = () => {
       //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
       this.deleteCategoriaDialog = false;
-      console.log("antes de borrar");
+      //console.log("antes de borrar");
       this.deleteCategoria(this.categoria).then(() => { this.getCategorias() });
-      toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria Eliminada', life: 3000 });
+      toast.add({ severity: 'success', summary: 'Categoría eliminada',  detail: this.categoria.categoria, life: 3000 });
 
     };
 
@@ -160,10 +160,10 @@ export default {
   },
   async created() {
     this.initFilters()
-    this.isLoading = true;
+    this.isLoading = true
     await this.getCategorias()
 
-    this.isLoading = false;
+    this.isLoading = false
 
     //console.log("categorias desde el Componente: " + this.categorias)
     // this.categorias.forEach(categoria => {

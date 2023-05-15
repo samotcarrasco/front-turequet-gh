@@ -190,7 +190,7 @@ export default {
       ]).then(() => {
         this.getMateriales();
         console.log("Actualizando credito de unidades implicadas");
-        toast.add({ severity: 'success', summary: 'OK', detail: 'Adquisición de material finalizada', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Adquisición realizada', detail: this.material.nombre, life: 3000 });
       }).catch((error) => {
         console.error('Error al actualizar material:', error);
       });
@@ -267,7 +267,7 @@ export default {
           <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
           <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
           <!-- <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
-          <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info"
+          <Button v-if="materialAdquirido(material)" label="Ver detalles intercambio" class="p-button-info"
             @click="mostrarDetallesAdq(material)" />
           <!-- <router-link :to="{ name: 'materiales' }  />"> -->
           <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
