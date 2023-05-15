@@ -8,10 +8,12 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button';
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 export default {
   components: {
-    InputText, Button, Accordion, AccordionTab, Dialog, Dropdown
+    InputText, Button, Accordion, AccordionTab, Dialog, Dropdown, ProgressSpinner
   },
 
   data() {
@@ -36,7 +38,8 @@ export default {
         telefono: '',
         latitud: '',
         longigud: '',
-        direccion: ''
+        direccion: '',
+        isLoading: true,
 
       }
     };
@@ -51,8 +54,8 @@ export default {
     const map = new google.maps.Map(document.getElementById("map"));
     map.removeListener('click', this.handleMapClick);
 
-    // const mapModal = new google.maps.Map(document.getElementById("mapModal"));
-    const mapModal = new google.maps.Map(this.$refs.mapModalRef);
+    const mapModal = new google.maps.Map(document.getElementById("mapModal"));
+    //const mapModal = new google.maps.Map(this.$refs.mapModalRef);
     mapModal.removeListener('click', this.handleMapClick);
   },
 
@@ -70,6 +73,7 @@ export default {
     };
 
     const onModalShow = () => {
+      this.showUserLocationOnTheMap(this.latitude, this.longitude);
       this.showUserLocationOnTheMapModal(this.latitude, this.longitude);
     };
 
@@ -103,15 +107,8 @@ export default {
     };
 
 
-
-
     new google.maps.places.Autocomplete(
       document.getElementById("direccionModal")
-      // {
-      //   bounds: new google.maps.LatLngBounds(
-      //     new google.maps.LatLng(40.4165,-3.70256)
-      //   )
-      // }
     )
 
     this.modalCreate = modalCreate;
@@ -120,41 +117,14 @@ export default {
     this.onModalShow = onModalShow;
     // this.editDpto = editDpto;
 
-
-    //   const showUserLocationOnTheMapModal = (lat, long) => {
-    //   let mapModal = new google.maps.Map(document.getElementById("mapModal"), {
-    //     zoom: 15,
-    //     center: new google.maps.LatLng(lat, long),
-    //     mapTypeId: google.maps.MapTypeId.ROADMAP
-    //   });
-
-    //   const marker = new google.maps.Marker({
-    //     position: new google.maps.LatLng(lat, long),
-    //     map: mapModal
-    //   });
-
-    //   const infoWindow = new google.maps.InfoWindow({
-    //     content: "Ubicación actual"
-    //   });
-
-    //   marker.addListener("click", () => {
-    //     infoWindow.open(mapModal, marker);
-    //   });
-    // };
-
-
-    // this.showUserLocationOnTheMapModal = showUserLocationOnTheMapModal;
-
-    //this.showUnidadesOnTheMap();
-
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
     ...mapActions(departamentosStore, ['getEmpleos']),
 
-    mostrarMapaModal(){
-      this.showUserLocationOnTheMapModal(latitude, longitude);
-    },
+    // mostrarMapaModal(){
+    //   this.showUserLocationOnTheMapModal(latitude, longitude);
+    // },
 
     obtenerCoordenadas() {
       if (navigator.geolocation) {
@@ -162,8 +132,16 @@ export default {
           const { latitude, longitude } = position.coords;
           this.getAddressFrom(latitude, longitude);
 
-          this.showUserLocationOnTheMap(latitude, longitude);
-          //this.showUserLocationOnTheMapModal(latitude, longitude);
+          this.showUserLocationOnTheMap("map", latitude, longitude);
+          this.showUserLocationOnTheMap("mapModal", latitude, longitude);
+
+          // const markerOptions = {
+          //   position: { lat: latitude, lng: longitude },
+          //   map: mapa, // Reemplaza "mapa" con la variable que contiene tu mapa
+          //   title: "Mi ubicación"
+          // };
+          // const marker = new google.maps.Marker(markerOptions);
+
 
         }, error => {
           this.error = error;
@@ -192,8 +170,8 @@ export default {
         });
     },
 
-    showUserLocationOnTheMap(lat, long) {
-      let map = new google.maps.Map(document.getElementById("map"), {
+    showUserLocationOnTheMap(idMapa, lat, long) {
+      let map = new google.maps.Map(document.getElementById(idMapa), {
         zoom: 15,
         center: new google.maps.LatLng(lat, long),
         mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -202,25 +180,9 @@ export default {
       map.addListener('click', this.handleMapClick);
     },
 
-    showUserLocationOnTheMapModal(lat, long) {
-      const mapModalElement = this.$refs.mapModalRef;
-      const mapModal = new google.maps.Map(mapModalElement, {
-        zoom: 15,
-        center: new google.maps.LatLng(lat, long),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      });
 
-
-      mapModal.addListener('click', this.handleMapClick);
-
-      //   // marker.addListener("click", () => {
-      //   //     infoWindow.open(mapModal, marker);
-      //   //   });
-    },
-
-
-    async showUnidadesOnTheMap() {
-      const map = new google.maps.Map(document.getElementById("map"), {
+    async showUnidadesOnTheMap(idMapa) {
+      const map = new google.maps.Map(document.getElementById(idMapa), {
         zoom: 10,
         center: new google.maps.LatLng(40.4165, -3.70256),
         mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -244,14 +206,16 @@ export default {
       });
     },
 
+
     handleMapClick(event) {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();
       console.log(`Maps clickeado:   ${lat}, ${lng}`);
       // Actualizar los datos correspondientes en tu componente
       this.latLong = `${lat}, ${lng}`;
-      this.address = ''; // Limpiar la dirección ya que las coordenadas pueden no tener una dirección asociada
+      //this.address = ''; // Limpiar la dirección ya que las coordenadas pueden no tener una dirección asociada
 
+      this.address = this.getAddressFrom(`${lat}, ${lng}`);
       // Llamar a cualquier otra función o método que necesites
       // ...
     },
@@ -266,9 +230,16 @@ export default {
     },
   },
   async created() {
+    this.isLoading = true
     await this.getDepartamentos()
-    await this.showUnidadesOnTheMap()
 
+    this.obtenerCoordenadas();
+    this.isLoading = false
+
+    await this.showUnidadesOnTheMap("map")
+    //await this.showUnidadesOnTheMap("mapModal")
+    //await this.showUserLocationOnTheMapModal()
+    // this.mostrarMapaModal()
     await this.getEmpleos()
     // this.empleos.forEach(element => {
     //   console.log("leyendo empleoss" + element)
@@ -280,24 +251,29 @@ export default {
 <template>
   <div class="container">
     <section class="left-section">
-      <Button label="Crear nuevo" class="boton-nuevo" icon="pi pi-plus" @click="modalCreate" />
-      <div class="card">
-        <Accordion :multiple="true" :activeIndex="[0]">
-          <AccordionTab v-for="departamento in departamentos" :header="departamento.abreviatura" :key="departamento.id">
-            <p>
-              Email: {{ departamento.email }}<br>
-              Crédito: {{ departamento.credito }}
-              Coordenadas: {{ departamento.latitud }},{{ departamento.longitud }}
-            </p>
-          </AccordionTab>
-        </Accordion>
+      <div class="card flex justify-content-center" v-if="isLoading">
+        <ProgressSpinner />
+      </div>
+      <div v-else>
+        <Button label="Crear nuevo" class="boton-nuevo" icon="pi pi-plus" @click="modalCreate" />
+        <div class="card">
+          <Accordion :multiple="true" :activeIndex="[0]">
+            <AccordionTab v-for="departamento in departamentos" :header="departamento.abreviatura" :key="departamento.id">
+              <p>
+                Email: {{ departamento.email }}<br>
+                Crédito: {{ departamento.credito }}
+                Coordenadas: {{ departamento.latitud }},{{ departamento.longitud }}
+              </p>
+            </AccordionTab>
+          </Accordion>
+        </div>
       </div>
     </section>
     <section class="right-section">
       <div>
         <InputText id="direccion" v-model.trim="address" required="true" autofocus />
         <InputText id="LatLong" v-model.trim="latLong" disabled />
-        <Button label="Mi localizacion" @click="obtenerCoordenadas" />
+        <!-- <Button label="Posicionar unidades" @click="obtenerCoordenadas" /> -->
       </div>
       <section id="map">
       </section>
@@ -350,7 +326,7 @@ export default {
         <InputText id="LatLongModal" v-model.trim="latLong" disabled />
       </div>
       <div class="field col custom-field">
-        <Button label="Mi localizacion" @click="mostrarMapaModal" />
+        <Button label="Mostrar mapa" @click="obtenerCoordenadas" />
       </div>
     </div>
     <div id="mapModal" ref="mapModalRef">
@@ -379,6 +355,12 @@ export default {
 }
 
 #map {
+  width: 100%;
+  height: 400px;
+  /* Ajusta la altura según tus necesidades */
+}
+
+#mapModal {
   width: 100%;
   height: 400px;
   /* Ajusta la altura según tus necesidades */
