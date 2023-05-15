@@ -232,11 +232,11 @@ export default {
   async created() {
     this.isLoading = true
     await this.getDepartamentos()
-
-    this.obtenerCoordenadas();
-    this.isLoading = false
-
     await this.showUnidadesOnTheMap("map")
+   
+    this.obtenerCoordenadas();
+   
+    this.isLoading = false
     //await this.showUnidadesOnTheMap("mapModal")
     //await this.showUserLocationOnTheMapModal()
     // this.mostrarMapaModal()
@@ -273,7 +273,7 @@ export default {
       <div>
         <InputText id="direccion" v-model.trim="address" required="true" autofocus />
         <InputText id="LatLong" v-model.trim="latLong" disabled />
-        <!-- <Button label="Posicionar unidades" @click="obtenerCoordenadas" /> -->
+         <!-- <Button label="Posicionar unidades" click="obtenerCoordenadas" />  -->
       </div>
       <section id="map">
       </section>
