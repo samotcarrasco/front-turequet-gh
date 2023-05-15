@@ -21,5 +21,5 @@ Con la finalidad de que las Unidades se vean motivadas a ofertar material, y no 
 6. **URLs del proyecto:** https://git.institutomilitar.com/VICENTEEC/truequet
 7. **Despliegue en Internet:**
 
-    * API: pendiente.
-    * Web: pendiente.
+    * API: https://truequet-carrascodim.b4a.run/
+    * Web: https://truequet.netlify.app/#/
