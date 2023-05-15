@@ -82,7 +82,8 @@ export default {
             <router-link class="nav-link" :to="{ name: 'estadisticas' }">Estadísticas</router-link>
           </li>
         </ul>
-        <div class="card flex justify-content-center" v-if="loading">
+      </div>
+      <div class="card flex justify-content-center" v-if="loading">
           <ProgressSpinner class="small-spinner"/>
         </div>
         <ul v-else class="navbar-nav me-5">
@@ -99,9 +100,7 @@ export default {
               <option v-for="(rol, index) in roles" :key="index" :value="rol">{{ rol }}</option>
             </select>
           </li>
-
         </ul>
-      </div>
     </div>
   </nav>
 </template>
