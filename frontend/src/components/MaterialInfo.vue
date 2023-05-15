@@ -91,8 +91,8 @@ export default {
 
       const logo = new Image();
       const logoACING = new Image();
-      logo.src = '/src/assets/img/logos/logo.png';
-      logoACING.src = '/src/assets/img/logos/logoACING.png';
+      logo.src = "../assets/img/logos/logo.png";
+      logoACING.src = "/src/assets/img/logos/logoACING.png";
       const logoWidth = 12;
       const logoHeight = 12;
       const logoACINGWidth = 12;
