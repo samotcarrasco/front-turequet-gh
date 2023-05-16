@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getDepartamentos, getDeptoPorSiglas, putAumentarCretido, getEmpleos } from './api-service'
+import { getDepartamentos, postDepartamento, getDeptoPorSiglas, putAumentarCretido, getEmpleos } from './api-service'
 
 
 export const departamentosStore = defineStore('departamentos', {
@@ -48,6 +48,10 @@ export const departamentosStore = defineStore('departamentos', {
       //return dptoActAPI
     },
 
+    async postDepartamento(dpto) {
+      //la de dentro es la funcion importada
+      await postDepartamento(dpto);
+    },
 
     async putAumentarCretido(departamento,creditos) {
       console.log ("llamando a putaumentarcredito ", departamento, creditos)

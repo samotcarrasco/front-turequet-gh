@@ -1,4 +1,7 @@
 <script>
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
+
 import { departamentosStore } from '@/stores/departamentos';
 import { mapState, mapActions } from 'pinia'
 import InputText from 'primevue/inputtext';
@@ -13,7 +16,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 
 export default {
   components: {
-    InputText, Button, Accordion, AccordionTab, Dialog, Dropdown, ProgressSpinner
+    Toast, InputText, Button, Accordion, AccordionTab, Dialog, Dropdown, ProgressSpinner
   },
 
   data() {
@@ -22,13 +25,11 @@ export default {
       address: "",
       latLong: "",
       direccionModal: "",
-      LatLongModal: "",
       error: "",
-      latitude: "",
-      longitude: "",
       dptoDialog: null,
       modalCreate: null,
       departamento: {
+        id: undefined,
         nombre: '',
         abreviatura: '',
         acuartelamiento: '',
@@ -37,11 +38,10 @@ export default {
         responsableNombre: '',
         telefono: '',
         latitud: '',
-        longigud: '',
+        longitud: '', // Corregir el nombre de la propiedad aquí
         direccion: '',
-        isLoading: true,
-
-      }
+      },
+      isLoading: true,
     };
   },
 
@@ -50,32 +50,47 @@ export default {
     ...mapState(departamentosStore, ['empleos']),
   },
 
-  beforeUnmount() {
-    const map = new google.maps.Map(document.getElementById("map"));
-    map.removeListener('click', this.handleMapClick);
+  // beforeUnmount() {
+  //   // const map = new google.maps.Map(document.getElementById("map"));
+  //   // map.removeListener('click', this.handleMapClick);
 
-    const mapModal = new google.maps.Map(document.getElementById("mapModal"));
-    //const mapModal = new google.maps.Map(this.$refs.mapModalRef);
-    mapModal.removeListener('click', this.handleMapClick);
-  },
+  //   const mapModal = new google.maps.Map(document.getElementById("mapModal"));
+  //   //const mapModal = new google.maps.Map(this.$refs.mapModalRef);
+  //   mapModal.removeListener('click', this.handleMapClick);
+  // },
 
   mounted() {
     //   window.addEventListener('load', () => {
-    //     this.showUserLocationOnTheMap(this.latitude, this.longitude);
+    //     this.mostrarUbicacion("map",this.latitude, this.longitude);
     //   });
+
+    const toast = useToast();
 
     const modalCreate = () => {
       this.departamento = {}
       this.submitted = false
       this.dptoDialog = true
       this.cabecera = "Alta de nuevo departamento"
-      this.showUserLocationOnTheMapModal(this.latitude, this.longitude);
+      //this.mostrarUbicacion("map", this.latitude, this.longitude);
+      //this.mostrarUbicacion("mapModal", this.latitude, this.longitude);
+      this.mostrarYCentrarMapa("mapModal");
     };
 
-    const onModalShow = () => {
-      this.showUserLocationOnTheMap(this.latitude, this.longitude);
-      this.showUserLocationOnTheMapModal(this.latitude, this.longitude);
-    };
+
+
+
+    // const onModalShow = () => {
+    //   const autocomplete = new google.maps.places.Autocomplete(
+    //     document.getElementById("direccionModal")
+    //   );
+
+    //   autocomplete.addListener("place_changed", () => {
+    //     const place = autocomplete.getPlace();
+    //     this.address = place.formatted_address;
+    //     this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
+    //   });
+    //   //this.mostrarYCentrarMapa("mapModal");
+    // };
 
     const hideDialog = () => {
       this.dptoDialog = false
@@ -83,65 +98,67 @@ export default {
     };
 
     const saveDpto = () => {
-      console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.departamento))
+      this.departamento.acuartelamiento = 'ACING';
+      const [latitud, longitud] = this.latLong.split(",");
+      this.departamento.latitud = latitud;
+      this.departamento.longitud = longitud;
+      this.departamento.direccion = this.address;
+      console.log("entrando en la funcion saveDpto con el material", JSON.stringify(this.departamento))
 
       this.submitted = true;
 
       if (this.formularioRellenado(this.departamento)) {
-        //if (this.deparamento.id) {
-        //     console.log("punto 2");
-        //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
-        //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
-        //     //llamad a metodo putcategoria(pendiente de desarrollo)
-        //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
-        // } else {
-        //   console.log("punto 3");
+        if (this.departamento.id) {
+          //     console.log("punto 2");
+          //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
+          // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
+          //llamad a metodo putcategoria(pendiente de desarrollo)
+          //   toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
+        } else {
+          console.log("Entrando en saveDpto con dpto: ", JSON.stringify(this.departamento));
 
 
-        //this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() });
-        toast.add({ severity: 'success', summary: 'Deparamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 });
-        //}
+         // this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() });
+          toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 });
+        }
         this.dptoDialog = false;
         this.departamento = {};
       }
     };
 
 
-    new google.maps.places.Autocomplete(
-      document.getElementById("direccionModal")
-    )
+    const autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById("direccion")
+    );
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      this.address = place.formatted_address;
+      this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
+    });
+
 
     this.modalCreate = modalCreate;
     this.hideDialog = hideDialog;
     this.saveDpto = saveDpto;
-    this.onModalShow = onModalShow;
+    //this.onModalShow = onModalShow;
     // this.editDpto = editDpto;
 
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
+    ...mapActions(departamentosStore, ['postDepartamento']),
     ...mapActions(departamentosStore, ['getEmpleos']),
 
-    // mostrarMapaModal(){
-    //   this.showUserLocationOnTheMapModal(latitude, longitude);
-    // },
 
-    obtenerCoordenadas() {
+
+    mostrarYCentrarMapa(idMapa) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
           const { latitude, longitude } = position.coords;
           this.getAddressFrom(latitude, longitude);
 
-          this.showUserLocationOnTheMap("map", latitude, longitude);
-          this.showUserLocationOnTheMap("mapModal", latitude, longitude);
-
-          // const markerOptions = {
-          //   position: { lat: latitude, lng: longitude },
-          //   map: mapa, // Reemplaza "mapa" con la variable que contiene tu mapa
-          //   title: "Mi ubicación"
-          // };
-          // const marker = new google.maps.Marker(markerOptions);
-
+          this.mostrarUbicacion(idMapa, latitude, longitude);
 
         }, error => {
           this.error = error;
@@ -158,10 +175,8 @@ export default {
             this.error = response.data.error_message;
             console.log(response.data.error_message);
           } else {
-            this.address = response.data.results[0].formatted_address;
-            this.latLong = `${lat}, ${long}`;
-            this.laitude = lat;
-            this.longitude = long;
+            //this.address = response.data.results[0].formatted_address;
+            //this.latLong = `${lat}, ${long}`;
           }
         })
         .catch(error => {
@@ -170,40 +185,46 @@ export default {
         });
     },
 
-    showUserLocationOnTheMap(idMapa, lat, long) {
+    mostrarUbicacion(idMapa, lat, long) {
       let map = new google.maps.Map(document.getElementById(idMapa), {
         zoom: 15,
         center: new google.maps.LatLng(lat, long),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
 
-      map.addListener('click', this.handleMapClick);
-    },
+      if (idMapa == "map") {
+        this.departamentos.forEach(dpto => {
+          console.log("obteniendo coordenadas........." + dpto.latitud, dpto.longitud)
+          const marker = new google.maps.Marker({
+            position: new google.maps.LatLng(dpto.latitud, dpto.longitud),
+            map: map
+          });
 
+          const infoWindow = new google.maps.InfoWindow({
+            //content: `Departamento: ${dpto.abreviatura} - ${dpto.credito} μ`
+            content: `${dpto.abreviatura} (${dpto.acuartelamiento}) - ${dpto.credito} μ`
+          });
 
-    async showUnidadesOnTheMap(idMapa) {
-      const map = new google.maps.Map(document.getElementById(idMapa), {
-        zoom: 10,
-        center: new google.maps.LatLng(40.4165, -3.70256),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      });
-
-      this.departamentos.forEach(dpto => {
-        console.log("obteniendo coordenadas........." + dpto.latitud, dpto.longitud)
-        const marker = new google.maps.Marker({
-          position: new google.maps.LatLng(dpto.latitud, dpto.longitud),
-          map: map
+          marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+          });
         });
+      }
 
-        const infoWindow = new google.maps.InfoWindow({
-          //content: `Departamento: ${dpto.abreviatura} - ${dpto.credito} μ`
-          content: `${dpto.abreviatura} (${dpto.acuartelamiento}) - ${dpto.credito} μ`
-        });
 
-        marker.addListener("click", () => {
-          infoWindow.open(map, marker);
+      if (idMapa == "mapModal") {
+        map.addListener('click', this.handleMapClick);
+
+        const autocomplete = new google.maps.places.Autocomplete(
+          document.getElementById("direccionModal")
+        );
+
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          this.address = place.formatted_address;
+          this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
         });
-      });
+      }
     },
 
 
@@ -211,13 +232,21 @@ export default {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();
       console.log(`Maps clickeado:   ${lat}, ${lng}`);
-      // Actualizar los datos correspondientes en tu componente
-      this.latLong = `${lat}, ${lng}`;
-      //this.address = ''; // Limpiar la dirección ya que las coordenadas pueden no tener una dirección asociada
 
-      this.address = this.getAddressFrom(`${lat}, ${lng}`);
-      // Llamar a cualquier otra función o método que necesites
-      // ...
+      const geocoder = new google.maps.Geocoder();
+      const latlng = new google.maps.LatLng(lat, lng);
+
+      geocoder.geocode({ location: latlng }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results[0]) {
+          const formattedAddress = results[0].formatted_address;
+          this.address = formattedAddress;
+        } else {
+          console.log('No se pudo obtener la dirección correspondiente a las coordenadas.');
+        }
+      });
+
+      this.latLong = `${lat}, ${lng}`;
+
     },
 
     formularioRellenado(dep) {
@@ -230,20 +259,17 @@ export default {
     },
   },
   async created() {
-    this.isLoading = true
-    await this.getDepartamentos()
-    await this.showUnidadesOnTheMap("map")
-   
-    this.obtenerCoordenadas();
-   
     this.isLoading = false
-    //await this.showUnidadesOnTheMap("mapModal")
-    //await this.showUserLocationOnTheMapModal()
-    // this.mostrarMapaModal()
+
+    await this.getDepartamentos()
+
+    this.mostrarYCentrarMapa("map");
+
+    //this.isLoading = false
+
+
     await this.getEmpleos()
-    // this.empleos.forEach(element => {
-    //   console.log("leyendo empleoss" + element)
-    // });
+
   }
 }
 </script>
@@ -251,6 +277,7 @@ export default {
 <template>
   <div class="container">
     <section class="left-section">
+      <Toast />
       <div class="card flex justify-content-center" v-if="isLoading">
         <ProgressSpinner />
       </div>
@@ -270,11 +297,12 @@ export default {
       </div>
     </section>
     <section class="right-section">
-      <div>
+      <InputText id="direccion" v-model.trim="address" required="true" autofocus />
+      <!-- <div>
         <InputText id="direccion" v-model.trim="address" required="true" autofocus />
         <InputText id="LatLong" v-model.trim="latLong" disabled />
-         <!-- <Button label="Posicionar unidades" click="obtenerCoordenadas" />  -->
-      </div>
+        <Button label="Posicionar unidades" click="obtenerCoordenadas" /> 
+      </div> -->
       <section id="map">
       </section>
     </section>
@@ -326,13 +354,16 @@ export default {
         <InputText id="LatLongModal" v-model.trim="latLong" disabled />
       </div>
       <div class="field col custom-field">
-        <Button label="Mostrar mapa" @click="obtenerCoordenadas" />
+        <Button label="Mostrar mapa" @click="mostrarYCentrarMapa('mapModal')" />
       </div>
     </div>
     <div id="mapModal" ref="mapModalRef">
 
     </div>
-
+    <template #footer>
+      <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
+      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveDpto" />
+    </template>
 
   </Dialog>
 </template>
@@ -357,6 +388,7 @@ export default {
 #map {
   width: 100%;
   height: 400px;
+  margin-top: 4vw;
   /* Ajusta la altura según tus necesidades */
 }
 

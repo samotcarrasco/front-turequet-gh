@@ -22,42 +22,6 @@ export function llamadaAPI(method, body, path) {
 
 
 
-// function llamadaApiGET(path) {
-//   let config = {
-//     method: 'get',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {}
-//   }
-
-//   return axios.request(config)
-// }
-
-
-// function llamadaApiPOST(modeloJSON, path) {
-//   let config = {
-//     method: 'post',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {
-//     },
-//     data: modeloJSON
-//   };
-//   return axios.request(config);
-// }
-
-// function llamadaApiPUT(modeloJSON, path) {
-//   let config = {
-//     method: 'put',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {
-//     },
-//     data: modeloJSON
-//   };
-//   return axios.request(config);
-// }
-
 function llamadaApiPUTParams(path, params = {}) {
   let config = {
     method: 'put',
@@ -183,6 +147,10 @@ export function getDepartamentos() {
 
 export function getDeptoPorSiglas(valor) {
   return getEntidadPorNombre('departamentos', 'siglas', valor)
+}
+
+export function postDepartamento(dpto) {
+  return postEntidad(dpto, 'departamentos')
 }
 
 
