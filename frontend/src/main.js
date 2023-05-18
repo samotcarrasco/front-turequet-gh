@@ -32,7 +32,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 //import { faFutbolBall, faMobile, faSquareFull, faUser, faBoxesStacked } from '@fortawesome/free-solid-svg-icons'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { faUser ,faCoins} from '@fortawesome/free-solid-svg-icons'
 
 //pinia
 import { createPinia } from 'pinia'
@@ -49,6 +49,7 @@ const routes = [
    },
   { path: '/categorias', component: Categorias, name: 'categorias' },
   { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
+  { path: '/dummy', component: ComponenteDummy, name: 'asdf' },
   { path: '/unidades', component: Departamentos, name: 'unidades' }
 
 ]
@@ -62,6 +63,8 @@ const pinia = createPinia()
 
 
 library.add(faUser)
+library.add(faCoins)
+
 // library.add(faBoxesStacked)
 
 const app = createApp(App)

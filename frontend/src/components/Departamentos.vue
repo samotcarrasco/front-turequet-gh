@@ -339,7 +339,7 @@ export default {
               <b><p>
 
                 Email: {{ departamento.email }}<br>
-                Crédito: {{ departamento.credito }}  &mu;ilis<br>
+                <i class="fa-solid fa-coins"></i> {{ departamento.credito }}  &mu;ilis<br>
                 Responsable: {{ departamento.responsableEmpleo }} {{ departamento.responsableNombre }}
 
                 <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
