@@ -167,3 +167,9 @@ export function putDepartamento(departamento) {
   console.log("llamando a put ", departamento, departamento.id)
   return putEntidad(departamento, departamento.id, 'departamentos')
 }
+
+
+export function deleteDepartamento(departamento) {
+  console.log("llamando a delete ", departamento, departamento.id)
+  return deleteEntidad(departamento.id, 'departamentos')
+}

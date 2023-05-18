@@ -29,6 +29,7 @@ export default {
       dptoDialog: null,
       modalCreate: null,
       submitted: false,
+      deleteDptoDialog: false,
       departamento: {
         id: undefined,
         nombre: '',
@@ -39,6 +40,7 @@ export default {
         responsableNombre: '',
         telefono: '',
         latitud: '',
+        numMateriales: '',
         longitud: '', // Corregir el nombre de la propiedad aquí
         direccion: '',
       },
@@ -119,22 +121,39 @@ export default {
       this.departamento = { ...editDpto };
       console.log(this.departamento);
       this.dptoDialog = true;
-      this.cabecera = "Editar departmento"
+      this.cabecera = "Editar departamento"
 
     };
 
+    const confirmDeleteDpto = (dpto) => {
+      this.departamento = dpto;
+      this.deleteDptoDialog = true;
+    };
+
+    const borrarDpto = () => {
+      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
+      this.deleteDptoDialog = false;
+      //console.log("antes de borrar");
+      this.deleteDpto(this.departamento).then(() => { this.getDepartamentos() });
+      toast.add({ severity: 'success', summary: 'Departamento eliminado', detail: this.departamento.nombre, life: 3000 });
+
+    };
     this.modalCreate = modalCreate;
     this.hideDialog = hideDialog;
     this.saveDpto = saveDpto;
     //this.onModalShow = onModalShow;
     this.editDpto = editDpto;
+    this.confirmDeleteDpto = confirmDeleteDpto;
+    this.borrarDpto = borrarDpto;
 
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
     ...mapActions(departamentosStore, ['postDepartamento']),
     ...mapActions(departamentosStore, ['putDepartamento']),
+    ...mapActions(departamentosStore, ['deleteDpto']),
     ...mapActions(departamentosStore, ['getEmpleos']),
+
 
 
 
@@ -317,13 +336,17 @@ export default {
         <div class="card">
           <Accordion :multiple="true" :activeIndex="[0]">
             <AccordionTab v-for="departamento in departamentos" :header="departamento.abreviatura" :key="departamento.id">
-              <p>
+              <b><p>
+
                 Email: {{ departamento.email }}<br>
-                Crédito: {{ departamento.credito }}
-                Coordenadas: {{ departamento.latitud }},{{ departamento.longitud }}
+                Crédito: {{ departamento.credito }}  &mu;ilis<br>
+                Responsable: {{ departamento.responsableEmpleo }} {{ departamento.responsableNombre }}
+
                 <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                   @click="editDpto(departamento)" />
-              </p>
+                  <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" :disabled="departamento.numMateriales > 0"
+                   @click="confirmDeleteDpto(departamento)" />
+              </p></b>
             </AccordionTab>
           </Accordion>
         </div>
@@ -398,19 +421,26 @@ export default {
       </div>
       <div class="field col custom-field">
         <Button class="boton-mostrar" label="Mostrar mapa" @click="mostrarYCentrarMapa('mapModal')" />
-        <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                :disabled="cat.data.numMateriales > 0" @click="confirmDeleteDpto(cat.data)" />
-           -->
       </div>
     </div>
     <div id="mapModal" ref="mapModalRef">
-
     </div>
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
       <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveDpto" />
     </template>
+  </Dialog>
 
+  <Dialog v-model:visible="deleteDptoDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+    <div class="flex align-items-center justify-content-center">
+      <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+      <span v-if="departamento"> ¿Está seguro que desea eliminar el departamento <b>{{ departamento.nombre
+      }}</b>?</span>
+    </div>
+    <template #footer>
+      <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDptoDialog = false" />
+      <Button label="Si" icon="pi pi-check" class="p-button-text" @click="borrarDpto" />
+    </template>
   </Dialog>
 </template>
 
