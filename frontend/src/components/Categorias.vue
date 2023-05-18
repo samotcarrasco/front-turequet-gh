@@ -96,7 +96,7 @@ export default {
       this.deleteCategoriaDialog = false;
       //console.log("antes de borrar");
       this.deleteCategoria(this.categoria).then(() => { this.getCategorias() });
-      toast.add({ severity: 'success', summary: 'Categoría eliminada',  detail: this.categoria.categoria, life: 3000 });
+      toast.add({ severity: 'success', summary: 'Categoría eliminada', detail: this.categoria.categoria, life: 3000 });
 
     };
 
@@ -210,7 +210,7 @@ export default {
 
         <Dialog v-model:visible="categoriaDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
           class="p-fluid">
-            <div class="field">
+          <div class="field">
             <label for="name">Nombre de la categoría</label>
             <InputText id="name" v-model.trim="categoria.categoria" required="true" autofocus
               :class="{ 'p-invalid': submitted && !categoria.categoria }" />
@@ -226,14 +226,9 @@ export default {
             <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()"
               :class="{ 'p-invalid': submitted && !categoria.grupo }" placeholder="Seleccione grupo">
               <template #value="grupo">
-                <div v-if="grupo.value">
-                  <span :class="'categoria-badge status-' + grupo.value">{{
-                    grupo.value
-                  }}</span>
-                </div>
-                <div v-else>
-                  <span :class="'categoria-badge status-' + grupo.value">{{
-                    grupo.value }}</span>
+                <div>
+                  <span v-if="!grupo.value" class="categoria-placeholder">Seleccione</span>
+                  <span v-else :class="'categoria-badge status-' + grupo.value">{{ grupo.value }}</span>
                 </div>
               </template>
             </Dropdown>

@@ -57,6 +57,7 @@ export default {
         fechaOferta: null,
         categoria: '',
         imagen: '',
+        imgReducida: '',
         estado: '',
         milis: 0,
         cantidad: 1,
@@ -97,6 +98,28 @@ export default {
     };
 
     const saveMaterial = () => {
+
+
+      const image = new Image();
+      image.src = this.material.imagen;
+
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        canvas.width = 80;
+        canvas.height = 80;
+
+        context.drawImage(image, 0, 0, newWidth, newHeight);
+
+        const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
+
+        console.log("imagen reducida", reducedImage);
+        this.material.imgReducida = reducedImage;
+      };
+
+
+
       //this.material.categoria
       //console.log("CATEG", this.material)
       this.material.categoria = host + "api/categorias/" + this.idCategoria;
@@ -124,22 +147,22 @@ export default {
       this.submitted = true;
 
       if (this.formularioRellenado(this.material)) {
-      //if (this.material.id) {
-      //     console.log("punto 2");
-      //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
-      //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
-      //     //llamad a metodo putcategoria(pendiente de desarrollo)
-      //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
-      // } else {
-      //   console.log("punto 3");
+        //if (this.material.id) {
+        //     console.log("punto 2");
+        //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
+        //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
+        //     //llamad a metodo putcategoria(pendiente de desarrollo)
+        //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
+        // } else {
+        //   console.log("punto 3");
 
 
-      this.postMaterial(this.material).then(() => { this.getMateriales() });
-      toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.nombre + " se ha creado correctamente", life: 4000 });
-      //}
-      this.materialDialog = false;
-      this.material = {};
-       }
+        //this.postMaterial(this.material).then(() => { this.getMateriales() });
+        toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.nombre + " se ha creado correctamente", life: 4000 });
+        //}
+        this.materialDialog = false;
+        this.material = {};
+      }
     };
 
     const editMaterial = (editMaterial) => {
@@ -370,7 +393,7 @@ export default {
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       {{ console.log('Mostrando icono') }}
     </div> -->
-    
+
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -395,20 +418,17 @@ export default {
             </MultiSelect>
           </div>
           <div class="col-4 text-right">
-            <Button v-if="this.tipoVista == 'ofertados'" label="Crear nuevo" icon="pi pi-plus"
-              @click="modalEditCreate" />
+            <Button v-if="this.tipoVista == 'ofertados'" label="Crear nuevo" icon="pi pi-plus" @click="modalEditCreate" />
           </div>
         </div>
       </template>
 
-     <Column field="nombre" header="Nombre" :sortable="true"></Column>
+      <Column field="nombre" header="Nombre" :sortable="true"></Column>
 
       <Column header="imagen">
         <template #body="material">
-          <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
-          <!-- <img :src="'data:image/png;base64,' + material.data.imagen" :alt="material.data.imagen"
-            class="w-6rem shadow-2 border-round img-small" /> -->
           <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
+          <!-- <img :src="material.data.imgReducida" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
         </template>
       </Column>
       <Column field="descripcion" header="Descripción" :sortable="false"></Column>
@@ -454,13 +474,14 @@ export default {
     </div>
     <div class="field">
       <!-- <input type="file" @change="cargarImagen" accept="image/*"> -->
-       <!-- <FileUpload @upload="cargarImagen($event)" url="null" :multiple="false" accept="image/*" :maxFileSize="1000000">
+      <!-- <FileUpload @upload="cargarImagen($event)" url="null" :multiple="false" accept="image/*" :maxFileSize="1000000">
         <template #empty>
           <p>Seleccione o arrastre aquí la imagen y pulse en Upload</p>
         </template>
-      </FileUpload>  -->  
-      <FileUpload @select="cargarImagen($event)" :showUploadButton="true" accept="image/*"  chooseLabel="Seleccionar" cancel-label="Cancelar">
-            <!-- <img :src="material.imagen" v-if="imagen" alt="Imagen cargada correctamente"> -->
+      </FileUpload>  -->
+      <FileUpload @select="cargarImagen($event)" :showUploadButton="true" accept="image/*" chooseLabel="Seleccionar"
+        cancel-label="Cancelar">
+        <!-- <img :src="material.imagen" v-if="imagen" alt="Imagen cargada correctamente"> -->
         <template #empty>
           <p>Seleccione o arrastre aquí la imagen</p>
         </template>
@@ -482,8 +503,8 @@ export default {
       <div class="field col custom-field">
         <label for="milis">Milis: </label>
         <InputNumber id="milis" v-model="material.milis" required="true"
-          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis ) }" :required="true"
-          :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
+          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis) }"
+          :required="true" :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
       </div>
     </div>
     <div class="field d-flex mt-2">
@@ -513,13 +534,11 @@ export default {
       </div>
       <div v-if="isInventariable" class="field col custom-field">
         <label for="noc">NOC: </label>
-        <InputText id="noc" v-model="material.noc"
-          :required="false" />
+        <InputText id="noc" v-model="material.noc" :required="false" />
       </div>
       <div v-if="isInventariable" class="field col custom-field">
         <label for="numSerie">Número de Serie: </label>
-        <InputText id="numSerie" v-model="material.numSerie"
-          :required="false" />
+        <InputText id="numSerie" v-model="material.numSerie" :required="false" />
       </div>
       <div v-if="!isInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>

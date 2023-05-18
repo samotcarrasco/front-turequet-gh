@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getDepartamentos, postDepartamento, getDeptoPorSiglas, putAumentarCretido, getEmpleos } from './api-service'
+import { getDepartamentos, putDepartamento, postDepartamento, getDeptoPorSiglas, putAumentarCretido, getEmpleos } from './api-service'
 
 
 export const departamentosStore = defineStore('departamentos', {
@@ -35,15 +35,15 @@ export const departamentosStore = defineStore('departamentos', {
       });
 
     },
-    
+
     async getDeptoActualAPI(departamento) {
       //console.log("DENTRODEL ASYNC getDeptoActualAPI"+ departamento)
       //la de dentro es la funcion importada
       await getDeptoPorSiglas(departamento).then(r => {
-      //  console.log("RESPUESTA DE LA API", r); // Imprime la respuesta completa de la API
+        //  console.log("RESPUESTA DE LA API", r); // Imprime la respuesta completa de la API
         //this.dptoActualAPI = r.data._links.self.href;
         this.dptoActualAPI = r.data;
-      //  console.log("DEPARTAMENTO ACTUAL RECUPERADO", this.dptoActualAPI);
+        //  console.log("DEPARTAMENTO ACTUAL RECUPERADO", this.dptoActualAPI);
       });
       //return dptoActAPI
     },
@@ -53,18 +53,24 @@ export const departamentosStore = defineStore('departamentos', {
       await postDepartamento(dpto);
     },
 
-    async putAumentarCretido(departamento,creditos) {
-      console.log ("llamando a putaumentarcredito ", departamento, creditos)
-      await putAumentarCretido(departamento,creditos)
+
+    async putDepartamento(dpto) {
+      //la de dentro es la funcion importada
+      await putDepartamento(dpto);
+    },
+
+    async putAumentarCretido(departamento, creditos) {
+      console.log("llamando a putaumentarcredito ", departamento, creditos)
+      await putAumentarCretido(departamento, creditos)
     },
 
     async getEmpleos() {
-      await getEmpleos().then (r => {
+      await getEmpleos().then(r => {
         console.log("eleyendo empleo", r)
-        this.empleos =  r.data;
+        this.empleos = r.data;
       });
-    },  
+    },
 
-   
+
   }
 })
