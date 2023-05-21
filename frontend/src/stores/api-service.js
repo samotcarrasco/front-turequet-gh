@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-export const host = "https://truequet-carrascodim.b4a.run/"
-//export const host = "http://localhost:8080/"
+//export const host = "https://truequet-carrascodim.b4a.run/"
+export const host = "http://localhost:8080/"
 
 //Llamada a la API genérica, parametrizada con method, body y path
 export function llamadaAPI(method, body, path) {
@@ -127,6 +127,11 @@ export function getMateriales() {
 
 export function getMaterialPorId(id) {
   return getEntidadPorId('materiales', id)
+}
+
+export function deleteMaterial(material) {
+  console.log("llamando a delete ", material, material.id)
+  return deleteEntidad(material.id, 'materiales')
 }
 
 export function putMaterial(material) {

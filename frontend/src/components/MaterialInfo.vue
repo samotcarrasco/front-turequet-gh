@@ -16,6 +16,8 @@ export default {
     return {
       material: {},
       submitted: false,
+      deleteMaterialDialog: false,
+      confirmDeleteMaterial: false,
       adquirirDialog: false,
       detallesAdqDialog: false,
       cabecera: ""
@@ -44,7 +46,9 @@ export default {
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['putMaterial']),
+    ...mapActions(materialesStore, ['deleteMaterial']),
     ...mapActions(departamentosStore, ['putAumentarCretido']),
+    
 
     eliminarMaterial() {
       // Lógica para eliminar el material
@@ -71,59 +75,66 @@ export default {
     },
 
     adquirirMaterial(material) {
-      this.material = { ...material };
-      console.log(this.material);
-      this.adquirirDialog = true;
-      this.cabecera = "Adquirir material";
+      this.material = { ...material }
+      console.log(this.material)
+      this.adquirirDialog = true
+      this.cabecera = "Adquirir material"
     },
 
     mostrarDetallesAdq(material) {
-      this.materal = { ...material };
-      this.detallesAdqDialog = true;
+      //console.log("entrando en delete material")
+      this.material = { ...material }
+      this.detallesAdqDialog = true
       this.cabecera = "Detalles de la adquisición"
+    },
+
+    confirmDeleteMaterial(material) {
+      this.material = { ...material }
+      console.log("entrando en delete material")
+      this.material = material
+      this.deleteMaterialDialog = true
     },
 
 
     generarPDF(material) {
-      const doc = new jsPDF();
+      const doc = new jsPDF()
 
-      const logo = new Image();
-      const logoACING = new Image();
-      logo.src = '/src/assets/img/logos/logo.png';
-      logoACING.src = '/src/assets/img/logos/logoACING.png';
-      const logoWidth = 12;
-      const logoHeight = 12;
-      const logoACINGWidth = 12;
-      const logoACINGHeight = 18;
+      const logo = new Image()
+      const logoACING = new Image()
+      logo.src = '/src/assets/img/logos/logo.png'
+      logoACING.src = '/src/assets/img/logos/logoACING.png'
+      const logoWidth = 12
+      const logoHeight = 12
+      const logoACINGWidth = 12
+      const logoACINGHeight = 18
 
-
-      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
-      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
-      doc.setFontSize(16);
-      doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center');
-      doc.setFontSize(14);
-      doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center');
-      doc.setFontSize(12);
+      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight)
+      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight)
+      doc.setFontSize(16)
+      doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center')
+      doc.setFontSize(14)
+      doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center')
+      doc.setFontSize(12)
       // línea horizontal
-      doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30);
-      doc.text(`Material intercambiado: ${material.nombre}`, 10, 40);
-      doc.text(`Descripción: ${material.descripcion}`, 10, 50);
-      doc.text(`Crédito en μilis: ${material.milis}`, 10, 60);
-      doc.text(`Unidad ofertante: ${material.dptoOferta}`, 10, 70);
-      doc.text('Responsable:', 10, 80);
-      doc.text('Teléfono:', 10, 90);
-      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicion}`, 10, 100);
-      doc.text('Responsable:', 10, 110);
-      doc.text('Teléfono:', 10, 120);
+      doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30)
+      doc.text(`Material intercambiado: ${material.nombre}`, 10, 40)
+      doc.text(`Descripción: ${material.descripcion}`, 10, 50)
+      doc.text(`Crédito en μilis: ${material.milis}`, 10, 60)
+      doc.text(`Unidad ofertante: ${material.dptoOferta}`, 10, 70)
+      doc.text('Responsable:', 10, 80)
+      doc.text('Teléfono:', 10, 90)
+      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicion}`, 10, 100)
+      doc.text('Responsable:', 10, 110)
+      doc.text('Teléfono:', 10, 120)
 
       // línea horizontal
-      doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130);
+      doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130)
 
-      doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140);
-      doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150);
+      doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140)
+      doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150)
 
-      doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200);
-      doc.save(`intercambio-material${material.nombre}.pdf`);
+      doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200)
+      doc.save(`intercambio-material${material.nombre}.pdf`)
 
     },
 
@@ -164,6 +175,15 @@ export default {
       this.submitted = false;
     };
 
+    const borrarMaterial = () => {
+      this.deleteMaterialDialog = false;
+      //console.log("antes de borrar");
+      //this.deleteMaterial(this.materialActual).then(() => { this.getMateriales() });
+      //toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.materaialActual.nombre, life: 3000 });
+
+    };
+
+   
 
     const saveMaterial = () => {
       this.submitted = true;
@@ -199,6 +219,9 @@ export default {
     this.hideDialog = hideDialog;
     this.hideDialogDet = hideDialogDet;
     this.saveMaterial = saveMaterial;
+    this.confirmDeleteMaterial = confirmDeleteMaterial;
+    this.borrarMaterial = borrarMaterial;
+
 
 
   },
@@ -261,10 +284,9 @@ export default {
           <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart"
            @click="adquirirMaterial(material)" />
           <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
-          <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
+          <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteMaterial(material)"/>
           <!-- <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
-          <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info"
-            @click="mostrarDetallesAdq(material)" />
+          <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info" @click="mostrarDetallesAdq(material)" />
           <!-- <router-link :to="{ name: 'materiales' }  />"> -->
           <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
           <!-- </router-link> -->
@@ -312,6 +334,18 @@ export default {
       <Button label="OK" icon="pi pi-times" class="p-button-text" @click=" hideDialogDet " />
     </template>
   </Dialog>
+
+  <Dialog v-model:visible="deleteMaterialDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+          <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+            <span>¿Está seguro que desea eliminar el material <b>{{ this.material.nombre }}</b>? 
+            </span>
+          </div>
+          <template #footer>
+            <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteMaterialDialog = false" />
+            <Button label="Si" icon="pi pi-check" class="p-button-text" @click="borrarMaterial" />
+          </template>
+        </Dialog>
 </template>
 
 <style scoped>

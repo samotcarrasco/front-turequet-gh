@@ -100,23 +100,23 @@ export default {
     const saveMaterial = () => {
 
 
-      const image = new Image();
-      image.src = this.material.imagen;
+      // const image = new Image();
+      // image.src = this.material.imagen;
 
-      image.onload = () => {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
+      // image.onload = () => {
+      //     const canvas = document.createElement('canvas');
+      //     const context = canvas.getContext('2d');
 
-        canvas.width = 80;
-        canvas.height = 80;
+      //     canvas.width = 80;
+      //     canvas.height = 80;
 
-        context.drawImage(image, 0, 0, newWidth, newHeight);
+      //     context.drawImage(image, 0, 0, newWidth, newHeight);
 
-        const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
+      //     const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
 
-        console.log("imagen reducida", reducedImage);
-        this.material.imgReducida = reducedImage;
-      };
+      //     console.log("imagen reducida", reducedImage);
+      //     this.material.imgReducida = reducedImage;
+      //  };
 
 
 
@@ -127,6 +127,7 @@ export default {
       this.material.fechaOferta = new Date();
       console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
       console.log("DPTO API" + this.dptoActualAPI._links.self.href)
+      console.log("IMAGEN REDUCIDA" + this.material.imgReducida)
 
       this.material.dptoOferta = this.dptoActualAPI._links.self.href
 
@@ -157,8 +158,8 @@ export default {
         //   console.log("punto 3");
 
 
-        //this.postMaterial(this.material).then(() => { this.getMateriales() });
-        toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.material.nombre + " se ha creado correctamente", life: 4000 });
+        this.postMaterial(this.material).then(() => { this.getMateriales() });
+        toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre + " se ha creado correctamente", life: 4000 });
         //}
         this.materialDialog = false;
         this.material = {};
@@ -285,7 +286,25 @@ export default {
       let reader = new FileReader();
       reader.onload = () => {
         this.material.imagen = reader.result;
-        console.log("resultado", this.material.imagen);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        const newWidth = 80; // Nueva anchura deseada
+        const newHeight = 80; // Nueva altura deseada
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+
+        const img = new Image();
+        img.onload = () => {
+          context.drawImage(img, 0, 0, newWidth, newHeight);
+
+          const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
+
+          console.log("imagen reducida", reducedImage);
+          this.material.imgReducida = reducedImage;
+        };
+        img.src = this.material.imagen;
       };
       reader.readAsDataURL(file);
     },
@@ -306,7 +325,7 @@ export default {
         //console.log("URL LINK " + m._links.categoria.href)
         llamadaAPI('get', null, m._links.categoria.href).then(r => {
           m.categoria = r.data;
-          console.log("ASDFASDF" + m.categoria)
+          //console.log("ASDFASDF" + m.categoria)
         })
       })
 
@@ -427,8 +446,9 @@ export default {
 
       <Column header="imagen">
         <template #body="material">
-          <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" />
-          <!-- <img :src="material.data.imgReducida" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
+          <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
+          <img :src="material.data.imgReducida" :alt="material.data.imagen"
+            class="w-6rem shadow-2 border-round img-small" />
         </template>
       </Column>
       <Column field="descripcion" header="Descripción" :sortable="false"></Column>
