@@ -4,18 +4,7 @@ import { mapWritableState, mapState, mapActions } from 'pinia'
 import ProgressSpinner from 'primevue/progressspinner';
 
 export default {
-  computed: {
-    ...mapState(departamentosStore, ['dptoActual']),
-    ...mapState(departamentosStore, ['rolActual']),
-    ...mapState(departamentosStore, ['departamentos']),
-    ...mapState(departamentosStore, ['departamentosSiglas']),
-    ...mapState(departamentosStore, ['dptoActualAPI']),
-
-    getMilisUnidad(){
-       // return this.dptoActualAPI.credito ? this.dptoActualAPI.credito : 0
-       return null;
-      }
-  },
+ 
   components: {
     ProgressSpinner
   },
@@ -25,15 +14,29 @@ export default {
       loading: true 
     }
   },
+  computed: {
+    ...mapState(departamentosStore, ['dptoActual']),
+    ...mapState(departamentosStore, ['rolActual']),
+    ...mapState(departamentosStore, ['departamentos']),
+    ...mapState(departamentosStore, ['departamentosSiglas']),
+    ...mapState(departamentosStore, ['dptoActualAPI']),
+    ...mapState(departamentosStore, ['milisMenu']),
+
+
+    getMilisUnidad(){
+       return this.milisMenu
+    }
+  },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
+    ...mapActions(departamentosStore, ['getBonificacion']),
     ...mapActions(departamentosStore, ['getDeptoActualAPI']),
 
     cambiarDpto(event) {
       const storeDepto = departamentosStore();
       storeDepto.cambiarDpto(event.target.value);
       console.log("milis", this.getMilisUnidad)
-
+      //this.getBonificacion(this.dptoActualAPI.id);
     },
 
     cambiarRol(event) {
@@ -46,7 +49,9 @@ export default {
         this.getDepartamentos();
         this.getDeptoActualAPI();
       }
-    }
+    },
+
+   
   },
   async created() {
 
@@ -110,6 +115,9 @@ export default {
               <option v-for="(rol, index) in roles" :key="index" :value="rol">{{ rol }}</option>
             </select>
           </li>
+          <div v-if="rolActual == 'Unidad'" class="milis-menu">
+          {{ getMilisUnidad }} {{ milisMenu }} μ
+        </div>
         </ul>
     </div>
   </nav>
@@ -136,5 +144,11 @@ export default {
 .small-spinner {
   width: 45px; /* Ajusta el ancho del contenedor */
   height: 45px; /* Ajusta la altura del contenedor */
+}
+
+.milis-menu {
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
 }
 </style>

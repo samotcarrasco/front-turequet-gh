@@ -9,7 +9,7 @@ import MultiSelect from 'primevue/multiselect'
 import { departamentosStore } from '@/stores/departamentos'
 import { materialesStore } from '@/stores/materiales'
 import { categoriasStore } from '@/stores/categorias'
-import { mapState, mapActions } from 'pinia'
+import { mapState, mapWritableState, mapActions } from 'pinia'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Calendar from 'primevue/calendar'
@@ -67,7 +67,7 @@ export default {
         inventariable: '',
         noc: '',
         numeroSerie: '',
-        bonificacion: 0
+        bonificacion: undefined,
       },
       isInventariable: true,
       idCategoria: undefined,
@@ -122,9 +122,11 @@ export default {
 
       //this.material.categoria
       //console.log("CATEG", this.material)
-      this.material.categoria = host + "api/categorias/" + this.idCategoria;
-      this.material.estado = 0;
-      this.material.fechaOferta = new Date();
+      this.material.categoria = host + "api/categorias/" + this.idCategoria
+      this.material.estado = 0
+      this.material.fechaOferta = new Date()
+     
+      
       console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
       console.log("DPTO API" + this.dptoActualAPI._links.self.href)
       console.log("IMAGEN REDUCIDA" + this.material.imgReducida)
@@ -137,9 +139,13 @@ export default {
       switch (this.isInventariable) {
         case true:
           this.material.tipoMaterial = "Inventariable";
+          this.material.bonificacion = 0;
           break;
         case false:
           this.material.tipoMaterial = "noInventariable";
+          this.material.bonificacion = this.bonificacion;
+          //incrementamos el credito en milis visibles en el menú
+          this.
           break;
       }
 
@@ -159,10 +165,20 @@ export default {
 
 
         this.postMaterial(this.material).then(() => { this.getMateriales() });
-        toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre + " se ha creado correctamente", life: 4000 });
-        //}
+
+        
+        toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 });
+        if (this.material.bonificacion) {
+           toast.add({ severity: 'info', summary: 'Bonificación obtenida', detail: this.material.bonificacion + " μilis", life: 3050 });
+        }
+
+        //this.milisMenu = this.milisMenu + this.material.bonificacion;ç
+        console.log("llamando a actualizar milis menu")
+        this.actualizarMilisMenu(this.material.bonificacion)
+      
         this.materialDialog = false;
         this.material = {};
+        
       }
     };
 
@@ -190,6 +206,8 @@ export default {
     ...mapState(categoriasStore, ['categorias']),
     ...mapState(departamentosStore, ['dptoActual']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
+    ...mapState(departamentosStore, ['bonificacion']),
+    ...mapState(departamentosStore, ['milisMenu']),
 
 
 
@@ -247,7 +265,7 @@ export default {
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const year = today.getFullYear();
       return `${day}/${month}/${year}`;
-    }
+    },
 
   },
 
@@ -256,8 +274,8 @@ export default {
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['postMaterial']),
     ...mapActions(categoriasStore, ['getCategorias']),
-
-
+    ...mapActions(departamentosStore, ['actualizarMilisMenu']),
+   
 
     initFilters() {
       this.filters = {
@@ -373,7 +391,9 @@ export default {
       if (this.material.cantidad > 1) {
         this.material.cantidad--;
       }
-    }
+    },
+
+   
 
 
 
@@ -386,10 +406,14 @@ export default {
 
     await this.getMateriales();
 
+
+    
+
+console.log("DPTO ACTUAL API" , JSON.stringify(this.dptoActualAPI));
+
     this.asignarCategoriaMaterial();
 
     this.inicializarSelectorCategorias();
-
 
     // // Resultado final: categorías agrupadas por grupo
     //console.log("categorias agrupadas", this.categoriasAgrupadas);
@@ -483,8 +507,8 @@ export default {
           :class="{ 'p-invalid': submitted && !material.nombre }" />
       </div>
       <div class="field col custom-field">
-        <label for="name">Fecha oferta:</label>
-        <InputText id="name" v-model.trim="fechaFormateada" disabled />
+        <label for="fecha">Fecha oferta:</label>
+        <InputText id="fecha" v-model.trim="fechaFormateada" disabled />
       </div>
     </div>
     <div class="field">
@@ -562,7 +586,8 @@ export default {
       </div>
       <div v-if="!isInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>
-        <InputText id="bonificacion" v-model="material.bonificacion" :required="false" />
+         <InputText id="bonificacion" v-model.trim="bonificacion" disabled /> 
+        <!-- <InputText id="bonificacion" v-model="material.bonificacion" :required="false" readonly /> -->
       </div>
       <div v-if="!isInventariable" class="field col custom-field">
         <label for="null"> </label>

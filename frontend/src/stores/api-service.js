@@ -35,18 +35,6 @@ function llamadaApiPUTParams(path, params = {}) {
 
 
 
-
-// function llamadaApiDELETE(path) {
-//   let config = {
-//     method: 'delete',
-//     maxBodyLength: Infinity,
-//     url: path,
-//     headers: {
-//     },
-//   };
-//   return axios.request(config);
-// }
-
 // GETS
 export function getEntidades(nombre) {
   console.log("get all de la entidad", nombre)
@@ -177,4 +165,12 @@ export function putDepartamento(departamento) {
 export function deleteDepartamento(departamento) {
   console.log("llamando a delete ", departamento, departamento.id)
   return deleteEntidad(departamento.id, 'departamentos')
+}
+
+
+
+//método personalizado
+export function getBonificacion(id) {
+  // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
+  return llamadaAPI('get', null, `${host}api/departamentos/${id}/calcularBonificacion`)
 }
