@@ -65,7 +65,7 @@ export default {
       this.dptoDialog = true
       this.cabecera = "Alta de nuevo departamento"
       //this.mostrarUbicacion("mapModal", this.latitude, this.longitude);
-      //this.mostrarYCentrarMapa("mapModal");
+      this.mostrarYCentrarMapa("mapModal");
     };
 
 
@@ -419,9 +419,19 @@ export default {
         <label for="name">Coordenadas</label>
         <InputText id="LatLongModal" v-model.trim="latLong" disabled />
       </div>
-      <div class="field col custom-field">
+      <label for="empleo">Acuartelamiento: </label>
+        <Dropdown v-model="departamento.responsableEmpleo" :options="empleos" placeholder="Seleccione un empleo"
+          :class="{ 'p-invalid': submitted && !departamento.responsableEmpleo }">
+          <template #value="empleo">
+            <div>
+              <span v-if="!empleo.value" class="departamento-placeholder">Seleccione</span>
+              <span v-else :class="'departamento-badge status-' + empleo.value">{{ empleo.value }}</span>
+            </div>
+          </template>
+        </Dropdown>
+              <!-- <div class="field col custom-field">
         <Button class="boton-mostrar" label="Mostrar mapa" @click="mostrarYCentrarMapa('mapModal')" />
-      </div>
+      </div> -->
     </div>
     <div id="mapModal" ref="mapModalRef">
     </div>

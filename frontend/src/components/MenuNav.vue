@@ -20,12 +20,10 @@ export default {
     ...mapState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['departamentosSiglas']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
-    ...mapState(departamentosStore, ['milisMenu']),
+//    ...mapState(departamentosStore, ['milisMenu']),
+       //writable para que sea reactiva
+    ...mapWritableState(departamentosStore, ['milisMenu']),
 
-
-    getMilisUnidad(){
-       return this.milisMenu
-    }
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
@@ -97,6 +95,9 @@ export default {
           </li>
         </ul>
       </div>
+      <div v-if="rolActual == 'Unidad' && milisMenu" class="milis-menu">
+          {{ milisMenu }} μ
+        </div>
       <div class="card flex justify-content-center" v-if="loading">
           <ProgressSpinner class="small-spinner"/>
         </div>
@@ -115,9 +116,6 @@ export default {
               <option v-for="(rol, index) in roles" :key="index" :value="rol">{{ rol }}</option>
             </select>
           </li>
-          <div v-if="rolActual == 'Unidad'" class="milis-menu">
-          {{ getMilisUnidad }} {{ milisMenu }} μ
-        </div>
         </ul>
     </div>
   </nav>
@@ -135,20 +133,18 @@ export default {
   align-self: center;
   margin-right: 2vw
 }
-.milisMenu {
-  color:aquamarine;
-  margin-top: 7px;
-  margin-right: 8px;
-}
-
 .small-spinner {
   width: 45px; /* Ajusta el ancho del contenedor */
   height: 45px; /* Ajusta la altura del contenedor */
 }
 
 .milis-menu {
-  background-color: white;
-  padding: 10px;
-  border-radius: 4px;
+  background-color: #e6f1e8; /* Fondo verde militar claro */
+  background-color: rgb(174, 190, 140);
+  padding: 6px;
+  border-radius: 8px;
+  margin-right: 4px;
+  border: 4px solid  #4b5320;
+  font-weight: bold;
 }
 </style>
