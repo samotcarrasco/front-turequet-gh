@@ -253,10 +253,10 @@ export default {
           </template>
         </Dialog>
 
-        <Dialog v-model:visible="deleteCategoriaDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteCategoriaDialog" :style="{ width: '450px' }" header="Confirmación de borrado de categoría" :modal="true">
           <div class="flex align-items-center justify-content-center">
             <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-            <span v-if="categoria">¿Está seguro que desea eliminar la categoría? <b>{{ categoria.name
+            <span v-if="categoria">¿Está seguro que desea eliminar la categoría <b>{{ categoria.categoria
             }}</b>?</span>
           </div>
           <template #footer>

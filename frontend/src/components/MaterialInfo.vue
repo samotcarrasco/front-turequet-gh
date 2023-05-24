@@ -18,8 +18,6 @@ export default {
     return {
       material: {},
       submitted: false,
-      deleteMaterialDialog: false,
-      confirmDeleteMaterial: false,
       adquirirDialog: false,
       detallesAdqDialog: false,
       cabecera: "",
@@ -39,9 +37,7 @@ export default {
     ...mapState(materialesStore, ['materialActual']),
     ...mapState(departamentosStore, ['dptoActual']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
-    ...mapState(departamentosStore, ['milisMenu']),
 
-    
     // material() {
     //   // return this.participantes.find(p => p.id == this.$route.params.id)
     //   return this.getMaterialPorId(this.$route.params.id)
@@ -51,9 +47,7 @@ export default {
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['putMaterial']),
-    ...mapActions(materialesStore, ['deleteMaterial']),
     ...mapActions(departamentosStore, ['putAumentarCretido']),
-    
 
     eliminarMaterial() {
       // Lógica para eliminar el material
@@ -67,82 +61,76 @@ export default {
       // console.log("estado", material.estado)
       //console.log("material actual", JSON.stringify(this.materialActual))
 
-      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) 
-              && material.estado == "adquirido"
- 
-   },
+      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) && material.estado == "pendiente"
+    },
     materialOfertado(material) {
       return material.dptoOfertaN == this.dptoActual && material.estado == "disponible"
     },
-    
     materialDisponible(material) {
       return material.dptoOfertaN !== this.dptoActual && material.estado == "disponible"
     },
 
-    // obtenerCategoria(material) {
-    // },
 
     adquirirMaterial(material) {
-      this.material = { ...material }
-      console.log(this.material)
-      this.adquirirDialog = true
-      this.cabecera = "Adquirir material"
+      //this.material = { ...material };
+      this.material = material;
+      console.log(this.material);
+      this.adquirirDialog = true;
+      this.cabecera = "Adquirir material";
     },
 
     mostrarDetallesAdq(material) {
-      //console.log("entrando en delete material")
-      this.material = { ...material }
-      this.detallesAdqDialog = true
+      this.materal = { ...material };
+      this.detallesAdqDialog = true;
       this.cabecera = "Detalles de la adquisición"
-    },
-
-    confirmDeleteMaterial(material) {
-      this.material = { ...material }
-      console.log("entrando en delete material")
-      this.material = material
-      this.deleteMaterialDialog = true
     },
 
 
     generarPDF(material) {
-      const doc = new jsPDF()
+      const doc = new jsPDF();
 
-      const logo = new Image()
-      const logoACING = new Image()
-      logo.src = '/src/assets/img/logos/logo.png'
-      logoACING.src = '/src/assets/img/logos/logoACING.png'
-      const logoWidth = 12
-      const logoHeight = 12
-      const logoACINGWidth = 12
-      const logoACINGHeight = 18
+      const logo = new Image();
+      const logoACING = new Image();
 
-      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight)
-      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight)
-      doc.setFontSize(16)
-      doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center')
-      doc.setFontSize(14)
-      doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center')
-      doc.setFontSize(12)
+      //estas imagenes las hemos cargado en "public" por compatibilidad con netlifly
+      logo.src = "./logo.png";
+      logoACING.src = "./logoACING.png";
+      // logo.src = "./src/assets/img/logos/logo.png";
+      // logoACING.src = "./src/assets/img/logos/logoACING.png";
+      
+      const logoWidth = 12;
+      const logoHeight = 12;
+      const logoACINGWidth = 12;
+      const logoACINGHeight = 18;
+
+
+      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
+      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
+      doc.setFontSize(16);
+      doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center');
+      doc.setFontSize(14);
+      doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center');
+      doc.setFontSize(12);
       // línea horizontal
-      doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30)
-      doc.text(`Material intercambiado: ${material.nombre}`, 10, 40)
-      doc.text(`Descripción: ${material.descripcion}`, 10, 50)
-      doc.text(`Crédito en μilis: ${material.milis}`, 10, 60)
-      doc.text(`Unidad ofertante: ${material.dptoOferta}`, 10, 70)
-      doc.text('Responsable:', 10, 80)
-      doc.text('Teléfono:', 10, 90)
-      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicion}`, 10, 100)
-      doc.text('Responsable:', 10, 110)
-      doc.text('Teléfono:', 10, 120)
+      doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30);
+      doc.text(`Material intercambiado: ${material.nombre}`, 10, 40);
+      doc.text(`Descripción: ${material.descripcion}`, 10, 50);
+      doc.text(`Crédito en μilis: ${material.milis}`, 10, 60);
+      doc.text(`Unidad ofertante: ${material.dptoOfertaN}`, 10, 70);
+      doc.text('Responsable:', 10, 80);
+      doc.text('Teléfono:', 10, 90);
+      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicionN}`, 10, 100);
+      doc.text('Responsable:', 10, 110);
+      doc.text('Teléfono:', 10, 120);
 
       // línea horizontal
-      doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130)
+      doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130);
 
-      doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140)
-      doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150)
+      doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140);
+      doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150);
 
-      doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200)
-      doc.save(`intercambio-material${material.nombre}.pdf`)
+      doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200);
+      doc.save(`intercambio-material${material.nombre}.pdf`);
 
     },
 
@@ -183,15 +171,6 @@ export default {
       this.submitted = false;
     };
 
-    const borrarMaterial = () => {
-      this.deleteMaterialDialog = false;
-      //console.log("antes de borrar");
-      //this.deleteMaterial(this.materialActual).then(() => { this.getMateriales() });
-      //toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.materaialActual.nombre, life: 3000 });
-
-    };
-
-   
 
     const saveMaterial = () => {
       this.submitted = true;
@@ -199,10 +178,11 @@ export default {
       this.generarPDF(this.material);
       //console.log("actualizando material: " +  JSON.stringify(this.material))
       //actualizamos el material con la info correspondiente
-      this.material.estado = "adquirido"
+      this.material.estado = "pendiente"
       //this.material.dptoAdquisicion = this.dptoActualAPI
       this.material.categoria = this.material._links.categoria.href;
       this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
+      this.material.dptoAdquisicionN = this.dptoActual;
       // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
       this.material.dptoOferta = this.material._links.dptoOferta.href;
       delete this.material._links;
@@ -211,12 +191,11 @@ export default {
       Promise.all([
         this.putMaterial(this.material, this.material.id),
         this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis),
-        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)//
-        //this.actualizarMilisMenu(this.material.milis)
+        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)
       ]).then(() => {
         this.getMateriales();
         console.log("Actualizando credito de unidades implicadas");
-        toast.add({ severity: 'success', summary: 'OK', detail: 'Adquisición de material finalizada', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Adquisición realizada', detail: this.material.nombre, life: 3000 });
       }).catch((error) => {
         console.error('Error al actualizar material:', error);
       });
@@ -228,9 +207,6 @@ export default {
     this.hideDialog = hideDialog;
     this.hideDialogDet = hideDialogDet;
     this.saveMaterial = saveMaterial;
-    //this.confirmDeleteMaterial = confirmDeleteMaterial;
-    this.borrarMaterial = borrarMaterial;
-
 
 
   },
@@ -239,14 +215,12 @@ export default {
   async created() {
 
     //iniciamos la aplicación con rol gestor  
-
     this.isLoading = true;
     console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
     await this.getMaterialPorId(this.$route.params.id);
     // console.log("material string: ", JSON.stringify(this.materialActual))
     this.material = this.materialActual;
     this.isLoading = false;
-
 
   }
 }
@@ -257,7 +231,7 @@ export default {
   <div class="card flex justify-content-center" v-if="isLoading">
     <ProgressSpinner />
   </div>
-   <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
+  <Card v-else :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
     <template #subtitle> {{ material.milis }} μ </template>
     <template #content>
@@ -265,22 +239,21 @@ export default {
         <div class="col-sm-4">
           <div class="p-mb-2"><strong>Descripción:</strong> {{ material.descripcion }}</div>
           <div class="p-mb-2"><strong>Categoría:</strong> {{ material.categoriaN }}</div>
-          <!-- <div class="p-mb-2"><strong>Grupo:</strong> {{ material.grupo }}</div> -->
+          <div class="p-mb-2"><strong>Grupo:</strong> {{ material.grupo }}</div>
           <div class="p-mb-2"><strong>Peso:</strong> {{ material.peso }} kg</div>
           <div class="p-mb-2"><strong>Dimensiones:</strong> {{ material.dimensiones }}</div>
           <div class="p-mb-2"><strong>Estado:</strong> {{ material.estado }}</div>
           <div class="p-mb-2"><strong>Fecha de adquisición:</strong> {{ material.fechaAdquisicion }}</div>
-          <!-- <div class="p-mb-2"><strong>Inventariable:</strong> {{ material.inventariable }}</div>
-          <div class="p-mb-2"><strong>Número de orden de compra:</strong> {{ material.noc }}</div>
+          <div class="p-mb-2"><strong>Inventariable:</strong> {{ material.inventariable }}</div>
+          <div class="p-mb-2"><strong>NOC:</strong> {{ material.noc }}</div>
           <div class="p-mb-2"><strong>Número de serie:</strong> {{ material.numeroSerie }}</div>
           <div class="p-mb-2"><strong>Aplicación:</strong> {{ material.aplicacion }}</div>
-          <div class="p-mb-2"><strong>Departamento:</strong> {{ material.departamento }}</div> -->
-
+          <div class="p-mb-2"><strong>Departamento oferta:</strong> {{ material.dptoOferta }}</div>
         </div>
         <div class="col-sm-4">
           <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->
-           <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
-           <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
+          <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
+          <!-- <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
             containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
             <template #item="slotProps">
               <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />
@@ -288,18 +261,19 @@ export default {
             <template #thumbnail="slotProps">
               <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
             </template>
-          </Galleria>
+          </Galleria> -->
 
 
           <!-- <Button label="Show" icon="pi pi-external-link" @click="displayBasic = true" /> -->
         </div>
         <div class="p-mb-2">
           <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart"
-           @click="adquirirMaterial(material)" />
-          <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
-          <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteMaterial(material)"/>
-          <!-- <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
-          <Button v-if="materialAdquirido(material)" label="Ver detalles de adquisición" class="p-button-info" @click="mostrarDetallesAdq(material)" />
+            @click="adquirirMaterial(material)" />
+          <!-- <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
+          <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
+          <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
+          <Button v-if="materialAdquirido(material)" label="Ver detalles intercambio" class="p-button-info" 
+            @click="mostrarDetallesAdq(material)" />
           <!-- <router-link :to="{ name: 'materiales' }  />"> -->
           <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
           <!-- </router-link> -->
@@ -308,10 +282,9 @@ export default {
         </div>
       </div>
     </template>
+    <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
   </Card>
-  
-  <!-- <p @click="goBack">asasdf</p>
-  <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
+
 
 
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
@@ -333,7 +306,7 @@ export default {
     </template>
   </Dialog>
 
-  <Dialog v-model:visible=" detallesAdqDialog " :style=" { width: '50vw' } " :header=" cabecera " :modal=" true "
+  <Dialog v-model:visible="detallesAdqDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
     class="p-fluid">
     Nombre del material: {{ this.material.nombre }}
     <Divider />
@@ -344,21 +317,9 @@ export default {
     Unidad ofertante {{ this.material.dptoOfertaN }}
     <Divider />
     <template #footer>
-      <Button label="OK" icon="pi pi-times" class="p-button-text" @click=" hideDialogDet " />
+      <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
     </template>
   </Dialog>
-
-  <Dialog v-model:visible="deleteMaterialDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-          <div class="flex align-items-center justify-content-center">
-            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-            <span>¿Está seguro que desea eliminar el material <b>{{ this.material.nombre }}</b>? 
-            </span>
-          </div>
-          <template #footer>
-            <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteMaterialDialog = false" />
-            <Button label="Si" icon="pi pi-check" class="p-button-text" @click="borrarMaterial" />
-          </template>
-        </Dialog>
 </template>
 
 <style scoped>

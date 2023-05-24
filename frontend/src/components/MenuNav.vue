@@ -33,7 +33,7 @@ export default {
     cambiarDpto(event) {
       const storeDepto = departamentosStore();
       storeDepto.cambiarDpto(event.target.value);
-      console.log("milis", this.getMilisUnidad)
+      console.log("milis", this.milisMenu)
       //this.getBonificacion(this.dptoActualAPI.id);
     },
 

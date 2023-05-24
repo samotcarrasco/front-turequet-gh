@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { getDepartamentos, putDepartamento, deleteDepartamento, postDepartamento, getDeptoPorSiglas, 
-  putAumentarCretido, getEmpleos, getBonificacion } from './api-service'
+  putAumentarCretido, getEmpleos, getBonificacion, getMaterialPorId } from './api-service'
 
 
 export const departamentosStore = defineStore('departamentos', {
@@ -65,6 +65,11 @@ export const departamentosStore = defineStore('departamentos', {
     async postDepartamento(dpto) {
       //la de dentro es la funcion importada
       await postDepartamento(dpto);
+    },
+
+    async getMaterialPorId(id) {
+      //la de dentro es la funcion importada
+      await getMaterialPorId(id);
     },
 
 

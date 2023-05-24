@@ -18,7 +18,8 @@ export default {
     return {
       disponibles: 'disponibles',
       ofertados: 'ofertados',
-      intercambiados: 'intercambiados',
+      pendientes: 'pendientes',
+      entregados: 'entregados',
       valorReactivo: 0
     }
   },
@@ -45,20 +46,17 @@ export default {
   <!-- <div class="tab-view-container"> -->
   <TabView>
     <TabPanel header="MATERIALES DISPONIBLES"> 
-        <!-- <template #header>
-          <span>MATERIALES DISPONIBLES <b style="background-color: #bec092;">({{this.valorReactivo}})</b></span>
-      </template> -->
-    <Materiales :tipoVista="disponibles" />
+     <Materiales :tipoVista="disponibles" />
     </TabPanel>
     <TabPanel header="MIS MATERIALES OFERTADOS">
       <Materiales :tipoVista="ofertados" />
     </TabPanel>
-    <TabPanel header="MATERIALES INTERCAMBIADOS">
-      <Materiales :tipoVista="intercambiados" />
+    <TabPanel header="PENDIENTES DE ENTREGA">
+      <Materiales :tipoVista="pendientes" />
     </TabPanel>
-    <!-- <TabPanel header="CARRUSEL">
-        <Carrusel :tipoVista="undefined" />
-      </TabPanel> -->
+    <TabPanel header="ENGREGADOS/RECIBIDOS">
+      <Materiales :tipoVista="entregados" />
+    </TabPanel> 
 
   </TabView>
   <!-- </div> -->

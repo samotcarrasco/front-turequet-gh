@@ -16,11 +16,12 @@ import Calendar from 'primevue/calendar'
 import Textarea from 'primevue/textarea'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
-import InputText from 'primevue/inputtext';
-import InputSwitch from 'primevue/inputswitch';
+import Toolbar from 'primevue/toolbar'
+import InputText from 'primevue/inputtext'
+import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
-import { FilterMatchMode } from 'primevue/api';
-import { llamadaAPI, host } from '@/stores/api-service';
+import { FilterMatchMode } from 'primevue/api'
+import { llamadaAPI, host } from '@/stores/api-service'
 
 
 
@@ -28,7 +29,7 @@ import { llamadaAPI, host } from '@/stores/api-service';
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
-    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch
+    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch//, Toolbar
   },
   provide: {
     tipoVista: undefined
@@ -42,6 +43,7 @@ export default {
   data() {
     return {
       materialDialog: false,
+      asignarFechaDialog: false,
       deleteMaterialDialog: false,
       categoriasFiltro: [],
       categoriasSeleccionadas: [],
@@ -94,6 +96,7 @@ export default {
 
     const hideDialog = () => {
       this.materialDialog = false
+      this.asignarFechaDialog = false
       this.submitted = false
     };
 
@@ -125,8 +128,8 @@ export default {
       this.material.categoria = host + "api/categorias/" + this.idCategoria
       this.material.estado = 0
       this.material.fechaOferta = new Date()
-     
-      
+
+
       console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
       console.log("DPTO API" + this.dptoActualAPI._links.self.href)
       console.log("IMAGEN REDUCIDA" + this.material.imgReducida)
@@ -146,7 +149,7 @@ export default {
           this.material.bonificacion = this.bonificacion;
           //incrementamos el credito en milis visibles en el menú
           this.
-          break;
+            break;
       }
 
       console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
@@ -154,39 +157,69 @@ export default {
       this.submitted = true;
 
       if (this.formularioRellenado(this.material)) {
-        //if (this.material.id) {
-        //     console.log("punto 2");
-        //     //  this.categoria.inventoryStatus = this.categoria.inventoryStatus.value ? this.categoria.inventoryStatus.value : this.categoria.inventoryStatus;
-        //     // this.categorias[this.findIndexById(this.categoria.id)] = this.categoria;
-        //     //llamad a metodo putcategoria(pendiente de desarrollo)
-        //     toast.add({ severity: 'success', summary: 'Successful', detail: 'Categoria actualizada', life: 3000 });
-        // } else {
-        //   console.log("punto 3");
+        if (this.material.id) {
+          console.log("punto 2");
+          //llamad a metodo putMAterial(pendiente de desarrollo)
+          this.putMaterial(this.material).then(() => { this.getMateriales() });
+          toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 });
+        } else {
+          console.log("punto 3");
 
+          this.postMaterial(this.material).then(() => { this.getMateriales() });
+          toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 });
 
-        this.postMaterial(this.material).then(() => { this.getMateriales() });
+        }
 
-        
-        toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 });
         if (this.material.bonificacion) {
-           toast.add({ severity: 'info', summary: 'Bonificación obtenida', detail: this.material.bonificacion + " μilis", life: 3050 });
+          toast.add({ severity: 'info', summary: 'Bonificación obtenida', detail: this.material.bonificacion + " μilis", life: 3050 });
         }
 
         //this.milisMenu = this.milisMenu + this.material.bonificacion;ç
         console.log("llamando a actualizar milis menu")
         this.actualizarMilisMenu(this.material.bonificacion)
-      
+
         this.materialDialog = false;
         this.material = {};
-        
+
       }
     };
 
-    const editMaterial = (editMaterial) => {
-      this.material = { ...editMaterial };
-      console.log(this.categoria);
-      this.materialDialog = true;
-      this.cabecera = "Editar material"
+
+    const patchFechaMaterial = () => {
+
+
+      // this.material.categoria = host + "api/categorias/" + this.idCategoria
+      // this.material.estado = 0
+      // this.material.fechaOferta = new Date()
+
+   //   this.material.dptoOferta = this.dptoActualAPI._links.self.href
+
+     // this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
+
+
+     // console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
+
+      this.submitted = true;
+
+      //if (this.formularioRellenado(this.material)) {
+      
+       //   this.putMaterial(this.material).then(() => { this.getMateriales() });
+          toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 });
+        
+      //}
+    };
+
+
+    const confirmDeleteMaterial = (material) => {
+      this.material = material;
+      this.deleteMaterialDialog = true;
+    };
+
+    const borrarMaterial = () => {
+      this.deleteMaterialDialog = false;
+      //console.log("antes de borrar");
+      this.deleteMaterial(this.material).then(() => { this.getMateriales() });
+      toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.material.nombre, life: 3000 });
 
     };
 
@@ -194,7 +227,11 @@ export default {
     this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
     this.saveMaterial = saveMaterial;
-    this.editMaterial = editMaterial;
+    this.patchFechaMaterial = patchFechaMaterial;
+    //this.editMaterial = editMaterial;
+    this.confirmDeleteMaterial = confirmDeleteMaterial;
+    this.borrarMaterial = borrarMaterial;
+
 
     //  //Agrupar categorías por grupo
 
@@ -208,11 +245,15 @@ export default {
     ...mapState(departamentosStore, ['dptoActualAPI']),
     ...mapState(departamentosStore, ['bonificacion']),
     ...mapState(departamentosStore, ['milisMenu']),
+    ...mapState(materialesStore, ['materialActual']),
+
 
 
 
     materialesFiltrados() {
-      // console.log('materiales ', this.materiales)
+      //this.asignarPendientes();
+      //this.asignarEntregados();
+
       switch (this.tipoVista) {
         case "ofertados":
           return this.categoriasSeleccionadas.length === 0
@@ -230,14 +271,28 @@ export default {
               this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
             );
 
-        case "intercambiados":
+        case "pendientes":
           //asiganmos el valor "entregado" en los casos que corresponda
+          this.asignarPendientes();
+          return this.categoriasSeleccionadas.length === 0
+            ? this.materiales.filter((material) => (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
+              (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
+            : this.materiales.filter((material) => (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
+              (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
+              (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual) &&
+              this.dptoActual &&
+              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
+            );
+
+        case "entregados":
+          //asiganmos el valor "entregado" en los casos que corresponda
+
           this.asignarEntregados();
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => (material.estado === "adquirido" || material.estado === "entregado") &&
+            ? this.materiales.filter((material) => (material.estado === "recepcionado" || material.estado === "entregado") &&
               (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
-            : this.materiales.filter((material) => (material.estado === "adquirido" || material.estado === "entregado") &&
-              (material.estado === "adquirido" || material.estado === "entregado") &&
+            : this.materiales.filter((material) => (material.estado === "recepcionado" || material.estado === "entregado") &&
+              (material.estado === "recepcionado" || material.estado === "entregado") &&
               (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual) &&
               this.dptoActual &&
               this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
@@ -272,10 +327,35 @@ export default {
   methods: {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
+    ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['postMaterial']),
+    ...mapActions(materialesStore, ['putMaterial']),
+    ...mapActions(materialesStore, ['deleteMaterial']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(departamentosStore, ['actualizarMilisMenu']),
-   
+
+
+    async editMaterial(id) {
+      //this.material = { ...editMaterial };
+      await this.getMaterialPorId(id);
+      console.log("entrando en editar material con el material.....");
+      console.log(this.materialActual);
+      this.material = this.materialActual
+      this.materialDialog = true;
+      this.cabecera = "Editar material";
+    },
+
+
+    async asignarFechaEntrega(id) {
+      await this.getMaterialPorId(id);
+      console.log("entrando en asignar fecha al material.....");
+      console.log(this.materialActual);
+      this.material = this.materialActual
+      this.asignarFechaDialog = true;
+      this.cabecera = "Confirme la fecha de entrega/recepción";
+    },
+
+
 
     initFilters() {
       this.filters = {
@@ -285,14 +365,19 @@ export default {
 
     getSeverity(material) {
       switch (material.data.estado) {
-        case 'adquirido':
+        case 'pendiente entrega':
+          return 'warning';
+        case 'pendiente recepcion':
           return 'success';
         case 'disponible':
           return 'warning';
         case 'ofertado':
           return 'danger';
         case 'entregado':
-          return 'info';
+          return 'warning';
+        case 'recepcionado':
+          return 'success';
+
         default:
           return null;
       }
@@ -327,13 +412,30 @@ export default {
       reader.readAsDataURL(file);
     },
 
-    asignarEntregados() {
-      // Actualizar el estado a "adquirido" en los materiales entregados y de la unidad actual
+    asignarPendientes() {
+      // Actualizar el estado a "pendiente entrega/rececpcion" en los materiales pendientes y de la unidad actual
       this.materiales.forEach(material => {
-        if (material.estado === "adquirido" && material.dptoOfertaN === this.dptoActual) {
+        //  console.log("material ", material.id, material.estado)
+        // if (material.estado ==  "pendiente" || material.estado ==  "pendiente entrega" || material.estado ==  "pendiente rececpcion"  ){
+        //       console.log("el material " , material.id, " esta en estado ", 
+        //       material.estado, " dpto of,", material.dptoOfertaN, "dpto Adq", material.dptoAdquisicionN ," actual",this.dptoActual)
+        // }
+        if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
+          //   console.log("   el material " , material.id, " esta en estado pendiente entrega  para el dpeto",this.dptoActual)
+          material.estado = "pendiente entrega"
+        } else if (material.estado === "pendiente" || material.estado == "pendiente entrega" && material.dptoAdquisicionN === this.dptoActual) {
+          //  console.log("   el material " , material.id, " esta en estado pendiente repecion  para el dpeto",this.dptoActual)
+          material.estado = "pendiente recepcion"
+        }
+      });
+    },
+
+    asignarEntregados() {
+      this.materiales.forEach(material => {
+        if ((material.estado === "entregado" || material.estado === "recepcionado") && material.dptoOfertaN === this.dptoActual) {
           material.estado = "entregado"
         } else if (material.estado === "entregado" && material.dptoAdquisicionN === this.dptoActual) {
-          material.estado = "adquirido"
+          material.estado = "recepcionado"
         }
       });
     },
@@ -393,7 +495,7 @@ export default {
       }
     },
 
-   
+
 
 
 
@@ -407,11 +509,11 @@ export default {
     await this.getMateriales();
 
 
-    
 
-console.log("DPTO ACTUAL API" , JSON.stringify(this.dptoActualAPI));
 
-    this.asignarCategoriaMaterial();
+    console.log("DPTO ACTUAL API", JSON.stringify(this.dptoActualAPI));
+
+    //this.asignarCategoriaMaterial();
 
     this.inicializarSelectorCategorias();
 
@@ -479,19 +581,43 @@ console.log("DPTO ACTUAL API" , JSON.stringify(this.dptoActualAPI));
       <Column field="milis" header="μilis" :sortable="true"> </Column>
       <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
       <!-- <Column field="grupo" header="Grupo" :sortable="true"></Column>-->
-      <Column header="Estado" :sortable="true">
+      <Column v-if="tipoVista === 'pendientes'" header="Estado" :sortable="true">
+        <template #body="material">
+          <Tag :value="material.data.estado" :severity="getSeverity(material)"
+            @click="asignarFechaEntrega(material.data.id)" @mouseover="changeCursor" style="cursor: pointer" />
+        </template>
+      </Column>
+      <Column v-else header="Estado" :sortable="true">
         <template #body="material">
           <Tag :value="material.data.estado" :severity="getSeverity(material)" />
         </template>
       </Column>
 
+
       <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
-      <Column header="VER">
+
+      <Column v-if="this.tipoVista == 'ofertados'" headerStyle="min-width:10rem;">
         <template #body="material">
-          <router-link :to="{ name: 'material', params: { id: material.data.id } }"><i
-              class="pi pi-info-circle" /></router-link>
-          <!-- <router-link :to="{ name: 'material', params: { id: material.data.id }, query: { tipoVista: tipoVista } }"><i class="pi pi-info-circle"/></router-link>   
-         -->
+          <Toolbar class="p-p-0 p-mb-2">
+            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+              @click="editMaterial(material.data.id)" />
+
+            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning p-mr-2"
+              @click="confirmDeleteMaterial(material.data)" />
+
+            <router-link :to="{ name: 'material', params: { id: material.data.id } }">
+              <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs" />
+            </router-link>
+          </Toolbar>
+        </template>
+      </Column>
+
+      <Column v-else header="+INFO">
+        <template #body="material">
+          <router-link :to="{ name: 'material', params: { id: material.data.id } }">
+            <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs mt-2" />
+          </router-link>
+
         </template>
       </Column>
 
@@ -581,12 +707,12 @@ console.log("DPTO ACTUAL API" , JSON.stringify(this.dptoActualAPI));
         <InputText id="noc" v-model="material.noc" :required="false" />
       </div>
       <div v-if="isInventariable" class="field col custom-field">
-        <label for="numSerie">Número de Serie: </label>
-        <InputText id="numSerie" v-model="material.numSerie" :required="false" />
+        <label for="numeroSerie">Número de Serie: </label>
+        <InputText id="numSerie" v-model="material.numeroSerie" :required="false" />
       </div>
       <div v-if="!isInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>
-         <InputText id="bonificacion" v-model.trim="bonificacion" disabled /> 
+        <InputText id="bonificacion" v-model.trim="bonificacion" disabled />
         <!-- <InputText id="bonificacion" v-model="material.bonificacion" :required="false" readonly /> -->
       </div>
       <div v-if="!isInventariable" class="field col custom-field">
@@ -595,15 +721,42 @@ console.log("DPTO ACTUAL API" , JSON.stringify(this.dptoActualAPI));
 
     </div>
 
-
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
       <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveMaterial" />
     </template>
   </Dialog>
+
+
+  <Dialog v-model:visible="asignarFechaDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
+    class="p-fluid">
+    <div class="field col custom-field">
+      <label for="fecha">Seleccione la fecha de entrega:</label>
+      <Calendar v-model="date" />
+    </div>
+    <template #footer>
+      <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
+      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="patchFechaMaterial" />
+    </template>
+  </Dialog>
+
+
+
+  <Dialog v-model:visible="deleteMaterialDialog" :style="{ width: '450px' }" header="Confirmación de borrado de material"
+    :modal="true">
+    <div class="flex align-items-center justify-content-center">
+      <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+      <span v-if="material">¿Está seguro que desea eliminar el material <b>{{ material.nombre
+      }}</b>?</span>
+    </div>
+    <template #footer>
+      <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteMaterialDialog = false" />
+      <Button label="Si" icon="pi pi-check" class="p-button-text" @click="borrarMaterial" />
+    </template>
+  </Dialog>
 </template>
 
-<style >
+<style scoped   >
 .img-small {
   width: 50px;
   height: auto;
@@ -622,11 +775,12 @@ console.log("DPTO ACTUAL API" , JSON.stringify(this.dptoActualAPI));
 }
 
 .p-button-rounded {
-  margin-left: 4px;
+  margin: 4px;
 }
 
 .p-button.p-button-success,
-.p-button.p-button-warning {
+.p-button.p-button-warning,
+.p-button.p-button-info {
   color: #fff;
   background: rgb(136, 158, 89);
   border: 0 none;
