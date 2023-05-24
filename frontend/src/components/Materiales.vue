@@ -186,7 +186,7 @@ export default {
       this.material = { ...editMaterial };
       console.log(this.categoria);
       this.materialDialog = true;
-      this.cabecera = "Editar categoría"
+      this.cabecera = "Editar material"
 
     };
 

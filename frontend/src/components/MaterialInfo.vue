@@ -10,6 +10,8 @@ import Button from 'primevue/button';
 import Galleria from 'primevue/galleria';
 import Dialog from 'primevue/dialog';
 import Divider from 'primevue/divider'
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 export default {
   data() {
@@ -20,7 +22,8 @@ export default {
       confirmDeleteMaterial: false,
       adquirirDialog: false,
       detallesAdqDialog: false,
-      cabecera: ""
+      cabecera: "",
+      isLoading: true,
     }
   },
   props: {
@@ -29,14 +32,16 @@ export default {
     //   required: true
     // }
   },
-  components: { Toast, Card, Button, Galleria, Dialog, Divider },
+  components: { Toast, Card, Button, Galleria, Dialog, Divider, ProgressSpinner },
 
   computed: {
     ...mapState(materialesStore, ['materiales']),
     ...mapState(materialesStore, ['materialActual']),
     ...mapState(departamentosStore, ['dptoActual']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
+    ...mapState(departamentosStore, ['milisMenu']),
 
+    
     // material() {
     //   // return this.participantes.find(p => p.id == this.$route.params.id)
     //   return this.getMaterialPorId(this.$route.params.id)
@@ -62,8 +67,10 @@ export default {
       // console.log("estado", material.estado)
       //console.log("material actual", JSON.stringify(this.materialActual))
 
-      return material.dptoAdquisicionN == this.dptoActual && material.estado == "adquirido"
-    },
+      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) 
+              && material.estado == "adquirido"
+ 
+   },
     materialOfertado(material) {
       return material.dptoOfertaN == this.dptoActual && material.estado == "disponible"
     },
@@ -71,8 +78,8 @@ export default {
       return material.dptoOfertaN !== this.dptoActual && material.estado == "disponible"
     },
 
-    obtenerCategoria(material) {
-    },
+    // obtenerCategoria(material) {
+    // },
 
     adquirirMaterial(material) {
       this.material = { ...material }
@@ -203,7 +210,8 @@ export default {
       Promise.all([
         this.putMaterial(this.material, this.material.id),
         this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis),
-        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)
+        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)//
+        //this.actualizarMilisMenu(this.material.milis)
       ]).then(() => {
         this.getMateriales();
         console.log("Actualizando credito de unidades implicadas");
@@ -219,7 +227,7 @@ export default {
     this.hideDialog = hideDialog;
     this.hideDialogDet = hideDialogDet;
     this.saveMaterial = saveMaterial;
-    this.confirmDeleteMaterial = confirmDeleteMaterial;
+    //this.confirmDeleteMaterial = confirmDeleteMaterial;
     this.borrarMaterial = borrarMaterial;
 
 
@@ -231,10 +239,13 @@ export default {
 
     //iniciamos la aplicación con rol gestor  
 
+    this.isLoading = true;
     console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
     await this.getMaterialPorId(this.$route.params.id);
-    console.log("material string: ", JSON.stringify(this.materialActual))
+    // console.log("material string: ", JSON.stringify(this.materialActual))
     this.material = this.materialActual;
+    this.isLoading = false;
+
 
   }
 }
@@ -242,9 +253,10 @@ export default {
 
 <template>
   <Toast />
-   
-  <p @click="goBack">asasdf</p>
-  <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
+  <div class="card flex justify-content-center" v-if="isLoading">
+    <ProgressSpinner />
+  </div>
+   <Card :style="{ backgroundColor: '#dfe0d6' }" class="p-col-4">
     <template #title> {{ material.nombre }} </template>
     <template #subtitle> {{ material.milis }} μ </template>
     <template #content>
@@ -297,8 +309,8 @@ export default {
     </template>
   </Card>
   
-  <p @click="goBack">asasdf</p>
-  <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" />
+  <!-- <p @click="goBack">asasdf</p>
+  <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
 
 
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
