@@ -185,7 +185,7 @@ export default {
     };
 
 
-    const patchFechaMaterial = () => {
+    const patchFechaEntrega = () => {
 
 
       // this.material.categoria = host + "api/categorias/" + this.idCategoria
@@ -227,7 +227,7 @@ export default {
     this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
     this.saveMaterial = saveMaterial;
-    this.patchFechaMaterial = patchFechaMaterial;
+    this.patchFechaEntrega = patchFechaEntrega;
     //this.editMaterial = editMaterial;
     this.confirmDeleteMaterial = confirmDeleteMaterial;
     this.borrarMaterial = borrarMaterial;
@@ -736,7 +736,7 @@ export default {
     </div>
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="patchFechaMaterial" />
+      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="patchFechaEntrega" />
     </template>
   </Dialog>
 
