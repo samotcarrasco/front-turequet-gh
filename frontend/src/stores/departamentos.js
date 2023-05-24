@@ -51,7 +51,6 @@ export const departamentosStore = defineStore('departamentos', {
         this.milisMenu = r.data.credito;
         // console.log("DATOS EN BRUTO", r.data)
         // console.log("DATOS", r.data.credito)
-        this.milisMenu = r.data.credito;
        // console.log("DEPARTAMENTO ACTUAL RECUPERADO", r.data.credito);
       });
 
