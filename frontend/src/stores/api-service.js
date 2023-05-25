@@ -70,6 +70,11 @@ function putEntidad(modelo, id, nombre) {
   return llamadaAPI('put',modelo, `${host}api/${nombre}/${id}`)
 }
 
+//PATCH
+function patchEntidad(modelo, entidad, id, nombre) {
+  return llamadaAPI('patch',modelo, `${host}api/${entidad}/${id}/${nombre}`)
+}
+
 
 function PUTAumentarCretido(nombre, id, creditos) {
   console.log("llamando a put de departamento:" + id + " milis" + creditos)
@@ -131,6 +136,11 @@ export function postMaterial(material) {
   return postEntidad(material, 'materiales')
 }
 
+
+
+export function patchFechaEntrega(modeloFecha, idMaterial) {
+  return patchEntidad(modeloFecha, 'materiales', idMaterial, 'fechaentrega')
+}
 
 //DEPARTAMENTOS
 

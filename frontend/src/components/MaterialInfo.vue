@@ -61,7 +61,8 @@ export default {
       // console.log("estado", material.estado)
       //console.log("material actual", JSON.stringify(this.materialActual))
 
-      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) && material.estado == "pendiente"
+      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) 
+             && (material.estado == "entregado" || material.estado=="recepcionado")
     },
     materialOfertado(material) {
       return material.dptoOfertaN == this.dptoActual && material.estado == "disponible"
@@ -220,6 +221,7 @@ export default {
     await this.getMaterialPorId(this.$route.params.id);
     // console.log("material string: ", JSON.stringify(this.materialActual))
     this.material = this.materialActual;
+    console.log(JSON.stringify(this.material))
     this.isLoading = false;
 
   }
@@ -237,18 +239,17 @@ export default {
     <template #content>
       <div class="row">
         <div class="col-sm-4">
+          <div class="p-mb-2"><strong>Departamento oferta:</strong> {{ material.dptoOfertaN }}</div>
           <div class="p-mb-2"><strong>Descripción:</strong> {{ material.descripcion }}</div>
           <div class="p-mb-2"><strong>Categoría:</strong> {{ material.categoriaN }}</div>
-          <div class="p-mb-2"><strong>Grupo:</strong> {{ material.grupo }}</div>
+          <div class="p-mb-2"><strong>Grupo:</strong> {{ material.grupoN }}</div>
           <div class="p-mb-2"><strong>Peso:</strong> {{ material.peso }} kg</div>
           <div class="p-mb-2"><strong>Dimensiones:</strong> {{ material.dimensiones }}</div>
-          <div class="p-mb-2"><strong>Estado:</strong> {{ material.estado }}</div>
           <div class="p-mb-2"><strong>Fecha de adquisición:</strong> {{ material.fechaAdquisicion }}</div>
-          <div class="p-mb-2"><strong>Inventariable:</strong> {{ material.inventariable }}</div>
-          <div class="p-mb-2"><strong>NOC:</strong> {{ material.noc }}</div>
-          <div class="p-mb-2"><strong>Número de serie:</strong> {{ material.numeroSerie }}</div>
-          <div class="p-mb-2"><strong>Aplicación:</strong> {{ material.aplicacion }}</div>
-          <div class="p-mb-2"><strong>Departamento oferta:</strong> {{ material.dptoOferta }}</div>
+          <div class="p-mb-2"><strong>Tipo de material:</strong> {{ material.tipoMaterial }}</div>
+          <div v-if="material.tipoMaterial == 'Inventariable'" class="p-mb-2"><strong>NOC:</strong> {{ material.noc }}</div>
+          <div v-if="material.tipoMaterial == 'Inventariable'" class="p-mb-2"><strong>Número de serie:</strong> {{ material.numeroSerie }}</div>
+          
         </div>
         <div class="col-sm-4">
           <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->

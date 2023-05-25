@@ -42,6 +42,7 @@ export default {
   },
   data() {
     return {
+      fechaCalendario: undefined,
       materialDialog: false,
       asignarFechaDialog: false,
       deleteMaterialDialog: false,
@@ -185,7 +186,7 @@ export default {
     };
 
 
-    const patchFechaEntrega = () => {
+    const patchFechaEntregaModal = () => {
 
 
       // this.material.categoria = host + "api/categorias/" + this.idCategoria
@@ -197,13 +198,14 @@ export default {
      // this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
 
 
-     // console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
+     const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario });
+     console.log("entrando en la funcion patchFechaEntregaModal con el modelo", modeloFecha);
 
       this.submitted = true;
 
       //if (this.formularioRellenado(this.material)) {
       
-       //   this.putMaterial(this.material).then(() => { this.getMateriales() });
+          this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { this.getMateriales() });
           toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 });
         
       //}
@@ -227,7 +229,7 @@ export default {
     this.modalEditCreate = modalEditCreate;
     this.hideDialog = hideDialog;
     this.saveMaterial = saveMaterial;
-    this.patchFechaEntrega = patchFechaEntrega;
+    this.patchFechaEntregaModal = patchFechaEntregaModal;
     //this.editMaterial = editMaterial;
     this.confirmDeleteMaterial = confirmDeleteMaterial;
     this.borrarMaterial = borrarMaterial;
@@ -330,6 +332,7 @@ export default {
     ...mapActions(materialesStore, ['getMaterialPorId']),
     ...mapActions(materialesStore, ['postMaterial']),
     ...mapActions(materialesStore, ['putMaterial']),
+    ...mapActions(materialesStore, ['patchFechaEntrega']),
     ...mapActions(materialesStore, ['deleteMaterial']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(departamentosStore, ['actualizarMilisMenu']),
@@ -732,11 +735,11 @@ export default {
     class="p-fluid">
     <div class="field col custom-field">
       <label for="fecha">Seleccione la fecha de entrega:</label>
-      <Calendar v-model="date" />
+      <Calendar v-model="fechaCalendario" />
     </div>
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="patchFechaEntrega" />
+      <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="patchFechaEntregaModal" />
     </template>
   </Dialog>
 
