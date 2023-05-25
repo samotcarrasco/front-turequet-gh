@@ -72,7 +72,7 @@ export default {
         numeroSerie: '',
         bonificacion: undefined,
       },
-      esInventariable: true,
+      esInventariable: false,
       idCategoria: undefined,
       submitted: false,
       cabecera: 'Crear material',
@@ -103,27 +103,6 @@ export default {
 
     const saveMaterial = () => {
 
-
-      // const image = new Image();
-      // image.src = this.material.imagen;
-
-      // image.onload = () => {
-      //     const canvas = document.createElement('canvas');
-      //     const context = canvas.getContext('2d');
-
-      //     canvas.width = 80;
-      //     canvas.height = 80;
-
-      //     context.drawImage(image, 0, 0, newWidth, newHeight);
-
-      //     const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
-
-      //     console.log("imagen reducida", reducedImage);
-      //     this.material.imgReducida = reducedImage;
-      //  };
-
-
-
       //this.material.categoria
       //console.log("CATEG", this.material)
       this.material.categoria = host + "api/categorias/" + this.idCategoria
@@ -133,14 +112,14 @@ export default {
 
       console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
       console.log("DPTO API" + this.dptoActualAPI._links.self.href)
-      console.log("IMAGEN REDUCIDA" + this.material.imgReducida)
+     // console.log("IMAGEN REDUCIDA" + this.material.imgReducida)
 
       this.material.dptoOferta = this.dptoActualAPI._links.self.href
 
       this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null || this.material.cantidad === undefined
-                            ? 1 : this.material.cantidad;
-      
-      
+        ? 1 : this.material.cantidad;
+
+      console.log("ESSS INVENTARIABLEEEEE" , this.esInventariable)
       switch (this.esInventariable) {
         case true:
           this.material.tipoMaterial = "Inventariable";
@@ -149,9 +128,7 @@ export default {
         case false:
           this.material.tipoMaterial = "noInventariable";
           this.material.bonificacion = this.bonificacion;
-          //incrementamos el credito en milis visibles en el menú
-          this.
-            break;
+          break;
       }
 
       console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
@@ -161,7 +138,6 @@ export default {
       if (this.formularioRellenado(this.material)) {
         if (this.material.id) {
           console.log("punto 2");
-          //llamad a metodo putMAterial(pendiente de desarrollo)
           this.putMaterial(this.material).then(() => { this.getMateriales() });
           toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 });
         } else {
@@ -194,21 +170,21 @@ export default {
       // this.material.estado = 0
       // this.material.fechaOferta = new Date()
 
-   //   this.material.dptoOferta = this.dptoActualAPI._links.self.href
+      //   this.material.dptoOferta = this.dptoActualAPI._links.self.href
 
-     // this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
+      // this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
 
 
-     const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario });
-     console.log("entrando en la funcion patchFechaEntregaModal con el modelo", modeloFecha);
+      const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario });
+      console.log("entrando en la funcion patchFechaEntregaModal con el modelo", modeloFecha);
 
       this.submitted = true;
 
       //if (this.formularioRellenado(this.material)) {
-      
-          this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { this.getMateriales() });
-          toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 });
-        
+
+      this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { this.getMateriales() });
+      toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 });
+
       //}
     };
 
@@ -252,8 +228,16 @@ export default {
 
 
     isInventariable() {
-      this.esInventariable =  this.material.tipoMaterial == 'Inventariable' ? true : false
-      return this.esInventariable;
+      switch (this.material.tipoMaterial) {
+        case "Inventariable":
+          this.esInventariable = true;
+          return true;
+        case "noInventariable":
+          this.esInventariable = false;
+          return false;
+        default:
+          return this.esInventariable;
+      }
     },
 
 
@@ -308,30 +292,36 @@ export default {
     },
 
     getMilisDeCategoria() {
+      let categoria = undefined;
       if (this.categoriaSeleccionada) {
-        const categoria = this.categorias.find(c => c.categoria === this.categoriaSeleccionada.value);
-        if (categoria) {
-          this.minMilis = categoria.minMilis;
-          this.maxMilis = categoria.maxMilis;
-          this.idCategoria = categoria.id;
-        }
-      } else {
+        categoria = this.categorias.find(c => c.categoria === this.categoriaSeleccionada.value);
+      } else if (this.material){
+        categoria = this.categorias.find(c => c.categoria === this.material.categoriaN);
+      }
+      if (categoria != undefined) {
+        console.log ("HAY EQUIPO", categoria.minMilis,categoria.maxMilis ),
+        this.minMilis = categoria.minMilis;
+        this.maxMilis = categoria.maxMilis;
+        this.idCategoria = categoria.id;
+      }
+      else {
+        console.log ("NO HAY EQUIPO" ),
         this.minMilis = null;
         this.maxMilis = null;
       }
-    },
-
-    fechaFormateada() {
-      const today = new Date();
-      const day = String(today.getDate()).padStart(2, '0');
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const year = today.getFullYear();
-      return `${day}/${month}/${year}`;
-    },
-
   },
 
-  methods: {
+  fechaFormateada() {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}/${month}/${year}`;
+  },
+
+},
+
+methods: {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
@@ -344,197 +334,190 @@ export default {
 
 
     async editMaterial(id) {
-      //this.material = { ...editMaterial };
-      await this.getMaterialPorId(id);
-      console.log("entrando en editar material con el material.....");
-      console.log(this.materialActual);
-      this.material = this.materialActual
-      this.materialDialog = true;
-      this.cabecera = "Editar material";
-    },
+    //this.material = { ...editMaterial };
+    await this.getMaterialPorId(id);
+    console.log("entrando en editar material con el material.....");
+    console.log(this.materialActual);
+    this.material = this.materialActual
+    this.materialDialog = true;
+    this.cabecera = "Editar material";
+  },
 
 
     async asignarFechaEntrega(id) {
-      await this.getMaterialPorId(id);
-      console.log("entrando en asignar fecha al material.....");
-      console.log(this.materialActual);
-      this.material = this.materialActual
-      this.asignarFechaDialog = true;
-      this.cabecera = "Confirme la fecha de entrega/recepción";
-    },
+    await this.getMaterialPorId(id);
+    console.log("entrando en asignar fecha al material.....");
+    console.log(this.materialActual);
+    this.material = this.materialActual
+    this.asignarFechaDialog = true;
+    this.cabecera = "Confirme la fecha de entrega/recepción";
+  },
 
 
 
-    initFilters() {
-      this.filters = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  initFilters() {
+    this.filters = {
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    };
+  },
+
+  getSeverity(material) {
+    switch (material.data.estado) {
+      case 'pendiente entrega':
+        return 'warning';
+      case 'pendiente recepcion':
+        return 'success';
+      case 'disponible':
+        return 'warning';
+      case 'ofertado':
+        return 'danger';
+      case 'entregado':
+        return 'warning';
+      case 'recepcionado':
+        return 'success';
+
+      default:
+        return null;
+    }
+  },
+
+  cargarImagen(e) {
+    console.log("subiendo fichero...");
+    let file = e.files[0];
+    let reader = new FileReader();
+    reader.onload = () => {
+      this.material.imagen = reader.result;
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      const newWidth = 80; // Nueva anchura deseada
+      const newHeight = 80; // Nueva altura deseada
+
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      const img = new Image();
+      img.onload = () => {
+        context.drawImage(img, 0, 0, newWidth, newHeight);
+
+        const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
+
+        //console.log("imagen reducida", reducedImage);
+        this.material.imgReducida = reducedImage;
       };
-    },
+      img.src = this.material.imagen;
+    };
+    reader.readAsDataURL(file);
+  },
 
-    getSeverity(material) {
-      switch (material.data.estado) {
-        case 'pendiente entrega':
-          return 'warning';
-        case 'pendiente recepcion':
-          return 'success';
-        case 'disponible':
-          return 'warning';
-        case 'ofertado':
-          return 'danger';
-        case 'entregado':
-          return 'warning';
-        case 'recepcionado':
-          return 'success';
-
-        default:
-          return null;
+  asignarPendientes() {
+    // Actualizar el estado a "pendiente entrega/rececpcion" en los materiales pendientes y de la unidad actual
+    this.materiales.forEach(material => {
+      //  console.log("material ", material.id, material.estado)
+      // if (material.estado ==  "pendiente" || material.estado ==  "pendiente entrega" || material.estado ==  "pendiente rececpcion"  ){
+      //       console.log("el material " , material.id, " esta en estado ", 
+      //       material.estado, " dpto of,", material.dptoOfertaN, "dpto Adq", material.dptoAdquisicionN ," actual",this.dptoActual)
+      // }
+      if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
+        //   console.log("   el material " , material.id, " esta en estado pendiente entrega  para el dpeto",this.dptoActual)
+        material.estado = "pendiente entrega"
+      } else if (material.estado === "pendiente" || material.estado == "pendiente entrega" && material.dptoAdquisicionN === this.dptoActual) {
+        //  console.log("   el material " , material.id, " esta en estado pendiente repecion  para el dpeto",this.dptoActual)
+        material.estado = "pendiente recepcion"
       }
-    },
+    });
+  },
 
-    cargarImagen(e) {
-      console.log("subiendo fichero...");
-      let file = e.files[0];
-      let reader = new FileReader();
-      reader.onload = () => {
-        this.material.imagen = reader.result;
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
+  asignarEntregados() {
+    this.materiales.forEach(material => {
+      if ((material.estado === "entregado" || material.estado === "recepcionado") && material.dptoOfertaN === this.dptoActual) {
+        material.estado = "entregado"
+      } else if (material.estado === "entregado" && material.dptoAdquisicionN === this.dptoActual) {
+        material.estado = "recepcionado"
+      }
+    });
+  },
 
-        const newWidth = 80; // Nueva anchura deseada
-        const newHeight = 80; // Nueva altura deseada
-
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-
-        const img = new Image();
-        img.onload = () => {
-          context.drawImage(img, 0, 0, newWidth, newHeight);
-
-          const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
-
-          console.log("imagen reducida", reducedImage);
-          this.material.imgReducida = reducedImage;
-        };
-        img.src = this.material.imagen;
-      };
-      reader.readAsDataURL(file);
-    },
-
-    asignarPendientes() {
-      // Actualizar el estado a "pendiente entrega/rececpcion" en los materiales pendientes y de la unidad actual
-      this.materiales.forEach(material => {
-        //  console.log("material ", material.id, material.estado)
-        // if (material.estado ==  "pendiente" || material.estado ==  "pendiente entrega" || material.estado ==  "pendiente rececpcion"  ){
-        //       console.log("el material " , material.id, " esta en estado ", 
-        //       material.estado, " dpto of,", material.dptoOfertaN, "dpto Adq", material.dptoAdquisicionN ," actual",this.dptoActual)
-        // }
-        if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
-          //   console.log("   el material " , material.id, " esta en estado pendiente entrega  para el dpeto",this.dptoActual)
-          material.estado = "pendiente entrega"
-        } else if (material.estado === "pendiente" || material.estado == "pendiente entrega" && material.dptoAdquisicionN === this.dptoActual) {
-          //  console.log("   el material " , material.id, " esta en estado pendiente repecion  para el dpeto",this.dptoActual)
-          material.estado = "pendiente recepcion"
-        }
-      });
-    },
-
-    asignarEntregados() {
-      this.materiales.forEach(material => {
-        if ((material.estado === "entregado" || material.estado === "recepcionado") && material.dptoOfertaN === this.dptoActual) {
-          material.estado = "entregado"
-        } else if (material.estado === "entregado" && material.dptoAdquisicionN === this.dptoActual) {
-          material.estado = "recepcionado"
-        }
-      });
-    },
-
-    asignarCategoriaMaterial() {
-      this.materiales.forEach(m => {
-        //console.log("URL LINK " + m._links.categoria.href)
-        llamadaAPI('get', null, m._links.categoria.href).then(r => {
-          m.categoria = r.data;
-          //console.log("ASDFASDF" + m.categoria)
-        })
+  asignarCategoriaMaterial() {
+    this.materiales.forEach(m => {
+      //console.log("URL LINK " + m._links.categoria.href)
+      llamadaAPI('get', null, m._links.categoria.href).then(r => {
+        m.categoria = r.data;
+        //console.log("ASDFASDF" + m.categoria)
       })
-
-    },
-
-    inicializarSelectorCategorias() {
-      this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
-        let grupo = grupos.find(g => g.label === categoria.grupo);
-        if (!grupo) {
-          // Si no existe, crear un nuevo grupo
-          grupo = {
-            label: categoria.grupo,
-            code: categoria.grupo,
-            items: []
-          };
-          console.log("leido grupo", grupo)
-          grupos.push(grupo);
-        }
-        //grupos.push(grupo);
-        // Agregar la categoría al grupo
-        grupo.items.push({ label: categoria.categoria, value: categoria.categoria });
-        return grupos;
-      }, []);
-      this.grupos = this.categoriasAgrupadas.map(grupo => grupo.label);
-    },
-
-    actualizarCategorias() {
-      const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado);
-      this.categoriasSeleccionadas = grupo ? grupo.items : [];
-    },
-
-    formularioRellenado(mat) {
-      return (mat.nombre &&
-        mat.descripcion &&
-        mat.milis >= this.minMilis &&
-        mat.milis <= this.maxMilis
-        && mat.milis > 0)
-    },
-
-    incrementarCantidad() {
-      this.material.cantidad++;
-    },
-
-    decrementarCantidad() {
-      if (this.material.cantidad > 1) {
-        this.material.cantidad--;
-      }
-    },
-
-
-
-
+    })
 
   },
 
+  inicializarSelectorCategorias() {
+    this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
+      let grupo = grupos.find(g => g.label === categoria.grupo);
+      if (!grupo) {
+        // Si no existe, crear un nuevo grupo
+        grupo = {
+          label: categoria.grupo,
+          code: categoria.grupo,
+          items: []
+        };
+        console.log("leido grupo", grupo)
+        grupos.push(grupo);
+      }
+      //grupos.push(grupo);
+      // Agregar la categoría al grupo
+      grupo.items.push({ label: categoria.categoria, value: categoria.categoria });
+      return grupos;
+    }, []);
+    this.grupos = this.categoriasAgrupadas.map(grupo => grupo.label);
+  },
+
+  actualizarCategorias() {
+    const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado || grupo.label === this.material.grupoN);
+    this.material.categoriaN = undefined;
+    this.categoriasSeleccionadas = grupo ? grupo.items : [];
+  },
+
+  formularioRellenado(mat) {
+    console.log("validando  ",this.minMilis," ",this.maxMilis," ",this.material.milis)
+    console.log (mat.nombre && mat.descripcion && mat.milis >= this.minMilis
+            && mat.milis <= this.maxMilis && mat.milis > 0  && mat.categoria && mat.imagen)
+    return (mat.nombre && mat.descripcion && mat.milis >= this.minMilis
+            && mat.milis <= this.maxMilis && mat.milis > 0  && mat.categoria && mat.imagen)
+  },
+
+  incrementarCantidad() {
+    this.material.cantidad++;
+  },
+
+  decrementarCantidad() {
+    if (this.material.cantidad > 1) {
+      this.material.cantidad--;
+    }
+  },
+
+},
+
   async created() {
-    this.initFilters();
+  this.initFilters();
 
-    await this.getCategorias();
+  await this.getCategorias();
+  await this.getMateriales();
 
-    await this.getMateriales();
+  console.log("DPTO ACTUAL API", JSON.stringify(this.dptoActualAPI));
 
+  //this.asignarCategoriaMaterial();
 
+  this.inicializarSelectorCategorias();
 
+  // // Resultado final: categorías agrupadas por grupo
+  //console.log("categorias agrupadas", this.categoriasAgrupadas);
 
-    console.log("DPTO ACTUAL API", JSON.stringify(this.dptoActualAPI));
-
-    //this.asignarCategoriaMaterial();
-
-    this.inicializarSelectorCategorias();
-
-    // // Resultado final: categorías agrupadas por grupo
-    //console.log("categorias agrupadas", this.categoriasAgrupadas);
-
-    // this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
-    //   .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
-    //  this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
-    // .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
+  // this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
+  //   .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
+  //  this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
+  // .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
 
 
-  }
+}
 
 }
 </script>
@@ -652,31 +635,36 @@ export default {
     </div>
     <div class="field">
       <FileUpload @select="cargarImagen($event)" :showUploadButton="true" accept="image/*" chooseLabel="Seleccionar"
-        cancel-label="Cancelar">
+        cancel-label="Cancelar" required="true">
         <template #empty>
-          <img :src="material.imagen" v-if="material.imagen" style="max-width: 200px; max-height: 200px;"/>
-          <p v-else>Seleccione o arrastre aquí la imagen</p>
+          <img :src="material.imagen" v-if="material.imagen" style="max-width: 200px; max-height: 200px;"
+            required="true" />
+          <p v-else>Seleccione o arrastre aquí la imagen </p>
         </template>
       </FileUpload>
-      
+
 
     </div>
 
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="grupo">Grupo: </label>
-        <Dropdown v-model="grupoSeleccionado" :options="grupos" placeholder="Seleccione un grupo"
-          @change="actualizarCategorias" />
+        <Dropdown v-if="material.id" v-model="material.grupoN" :options="grupos" :placeholder="material.grupoN"
+          @change="actualizarCategorias" required="true" />
+        <Dropdown v-else v-model="grupoSeleccionado" :options="grupos" placeholder="Seleccione un grupo"
+          @change="actualizarCategorias" required="true" />
       </div>
       <div class="field col custom-field">
         <label for="categoria">Categoría: </label>
-        <Dropdown v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
-          placeholder="Seleccione una categoría" @change="getMilisDeCategoria" />
+        <Dropdown v-if="material.id" v-model="material.categoriaN" :options="categoriasSeleccionadas" optionLabel="label"
+          :placeholder="material.categoriaN" @change="getMilisDeCategoria" required="true" />
+        <Dropdown v-else v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
+          placeholder="Seleccione una categoría" @change="getMilisDeCategoria" required="true" />
       </div>
       <div class="field col custom-field">
         <label for="milis">Milis: </label>
         <InputNumber id="milis" v-model="material.milis" required="true"
-          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis) }"
+          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis)}"
           :required="true" :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
       </div>
     </div>
@@ -703,25 +691,25 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field-switch">
         <label for="inventariable" class="custom-label">Inventariable: </label>
-        <InputSwitch v-if="material.id" :value="isInventariable" class="custom-input-switch" />
+        <InputSwitch v-if="material.id" v-model="isInventariable" class="custom-input-switch" />
         <InputSwitch v-else v-model="esInventariable" class="custom-input-switch" />
       </div>
-      <div v-if="esInventariable" class="field col custom-field">
+      <div v-if="esInventariable || isInventariable" class="field col custom-field">
         <label for="noc">NOC: </label>
         <InputText id="noc" v-model="material.noc" :required="false" />
       </div>
-      <div v-if="esInventariable" class="field col custom-field">
+      <div v-if="esInventariable || isInventariable" class="field col custom-field">
         <label for="numeroSerie">Número de Serie: </label>
         <InputText id="numSerie" v-model="material.numeroSerie" :required="false" />
       </div>
-      <div v-if="!esInventariable" class="field col custom-field">
+      <div v-if="!esInventariable || !isInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>
         <InputText id="bonificacion" v-model.trim="bonificacion" disabled />
         <!-- <InputText id="bonificacion" v-model="material.bonificacion" :required="false" readonly /> -->
       </div>
-      <div v-if="!esInventariable" class="field col custom-field">
+      <!-- <div v-if="!esInventariable || !isInventariable" class="field col custom-field">
         <label for="null"> </label>
-      </div>
+      </div> -->
 
     </div>
 
