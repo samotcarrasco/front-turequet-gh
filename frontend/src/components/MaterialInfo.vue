@@ -191,8 +191,8 @@ export default {
       //console.log("actualizando material: " +  JSON.stringify(this.material))
       Promise.all([
         this.putMaterial(this.material, this.material.id),
-        this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis),
-        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis)
+        this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis*this.material.cantidad),
+        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis*this.material.cantidad)
       ]).then(() => {
         this.getMateriales();
         console.log("Actualizando credito de unidades implicadas");

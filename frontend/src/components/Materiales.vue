@@ -137,9 +137,10 @@ export default {
 
       this.material.dptoOferta = this.dptoActualAPI._links.self.href
 
-      this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
-
-
+      this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null || this.material.cantidad === undefined
+                            ? 1 : this.material.cantidad;
+      
+      
       switch (this.isInventariable) {
         case true:
           this.material.tipoMaterial = "Inventariable";
@@ -250,6 +251,10 @@ export default {
     ...mapState(materialesStore, ['materialActual']),
 
 
+    // esInventariable() {
+    //   this.isInventariable = this.material.tipoMaterial === 'Inventariable' ? true : false
+    //   return this.material.tipoMaterial === 'Inventariable'
+    // },
 
 
     materialesFiltrados() {
@@ -646,19 +651,14 @@ export default {
         :class="{ 'p-invalid': submitted && !material.descripcion }" :required="true" />
     </div>
     <div class="field">
-      <!-- <input type="file" @change="cargarImagen" accept="image/*"> -->
-      <!-- <FileUpload @upload="cargarImagen($event)" url="null" :multiple="false" accept="image/*" :maxFileSize="1000000">
-        <template #empty>
-          <p>Seleccione o arrastre aquí la imagen y pulse en Upload</p>
-        </template>
-      </FileUpload>  -->
       <FileUpload @select="cargarImagen($event)" :showUploadButton="true" accept="image/*" chooseLabel="Seleccionar"
         cancel-label="Cancelar">
-        <!-- <img :src="material.imagen" v-if="imagen" alt="Imagen cargada correctamente"> -->
         <template #empty>
-          <p>Seleccione o arrastre aquí la imagen</p>
+          <img :src="material.imagen" v-if="material.imagen" style="max-width: 200px; max-height: 200px;"/>
+          <p v-else>Seleccione o arrastre aquí la imagen</p>
         </template>
       </FileUpload>
+      
 
     </div>
 
@@ -703,7 +703,8 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field-switch">
         <label for="inventariable" class="custom-label">Inventariable: </label>
-        <InputSwitch v-model="isInventariable" class="custom-input-switch" />
+        <InputSwitch v-if="material.id" :value="isInventariable" @input="esInventariable = $event" class="custom-input-switch" />
+        <InputSwitch v-else v-model="isInventariable" class="custom-input-switch" />
       </div>
       <div v-if="isInventariable" class="field col custom-field">
         <label for="noc">NOC: </label>
