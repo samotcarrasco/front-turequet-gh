@@ -72,7 +72,7 @@ export default {
         numeroSerie: '',
         bonificacion: undefined,
       },
-      isInventariable: true,
+      esInventariable: true,
       idCategoria: undefined,
       submitted: false,
       cabecera: 'Crear material',
@@ -141,7 +141,7 @@ export default {
                             ? 1 : this.material.cantidad;
       
       
-      switch (this.isInventariable) {
+      switch (this.esInventariable) {
         case true:
           this.material.tipoMaterial = "Inventariable";
           this.material.bonificacion = 0;
@@ -251,10 +251,10 @@ export default {
     ...mapState(materialesStore, ['materialActual']),
 
 
-    // esInventariable() {
-    //   this.isInventariable = this.material.tipoMaterial === 'Inventariable' ? true : false
-    //   return this.material.tipoMaterial === 'Inventariable'
-    // },
+    isInventariable() {
+      this.esInventariable =  this.material.tipoMaterial == 'Inventariable' ? true : false
+      return this.esInventariable;
+    },
 
 
     materialesFiltrados() {
@@ -703,23 +703,23 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field-switch">
         <label for="inventariable" class="custom-label">Inventariable: </label>
-        <InputSwitch v-if="material.id" :value="isInventariable" @input="esInventariable = $event" class="custom-input-switch" />
-        <InputSwitch v-else v-model="isInventariable" class="custom-input-switch" />
+        <InputSwitch v-if="material.id" :value="isInventariable" class="custom-input-switch" />
+        <InputSwitch v-else v-model="esInventariable" class="custom-input-switch" />
       </div>
-      <div v-if="isInventariable" class="field col custom-field">
+      <div v-if="esInventariable" class="field col custom-field">
         <label for="noc">NOC: </label>
         <InputText id="noc" v-model="material.noc" :required="false" />
       </div>
-      <div v-if="isInventariable" class="field col custom-field">
+      <div v-if="esInventariable" class="field col custom-field">
         <label for="numeroSerie">Número de Serie: </label>
         <InputText id="numSerie" v-model="material.numeroSerie" :required="false" />
       </div>
-      <div v-if="!isInventariable" class="field col custom-field">
+      <div v-if="!esInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>
         <InputText id="bonificacion" v-model.trim="bonificacion" disabled />
         <!-- <InputText id="bonificacion" v-model="material.bonificacion" :required="false" readonly /> -->
       </div>
-      <div v-if="!isInventariable" class="field col custom-field">
+      <div v-if="!esInventariable" class="field col custom-field">
         <label for="null"> </label>
       </div>
 
