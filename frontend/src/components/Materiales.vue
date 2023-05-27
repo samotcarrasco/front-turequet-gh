@@ -31,9 +31,9 @@ export default {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
     Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch//, Toolbar
   },
-  provide: {
-    tipoVista: undefined
-  },
+  // provide: {
+  //   tipoVista: undefined
+  // },
   props: {
     tipoVista: {
       type: String,
@@ -810,6 +810,14 @@ export default {
 
 .custom-label {
   margin-top: 1.7rem;
+  margin-right: 1rem;
+}
+
+.field.d-flex {
+  margin-bottom: 1rem;
+}
+
+.custom-field {
   margin-right: 1rem;
 }
 </style>

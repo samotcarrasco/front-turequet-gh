@@ -11,7 +11,10 @@ import Categorias from '@/components/Categorias.vue'
 import Estadisticas from '@/components/Estadisticas.vue'
 import ComponenteDummy from '@/components/ComponenteDummy.vue'
 import ComponenteInicio from '@/components/ComponenteInicio.vue'
-import Departamentos from '@/components/Departamentos.vue'
+import Unidades from '@/components/UnidadesMain.vue'
+
+import Acuartelamientos2 from '@/components/Acuartelamientos2.vue'
+import Departamentos2 from '@/components/Departamentos2.vue'
 
 
 //Bootstrap
@@ -50,7 +53,9 @@ const routes = [
   { path: '/categorias', component: Categorias, name: 'categorias' },
   { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
   { path: '/dummy', component: ComponenteDummy, name: 'asdf' },
-  { path: '/unidades', component: Departamentos, name: 'unidades' }
+  { path: '/unidades', component: Unidades, name: 'unidades' },
+  { path: '/dep2', component: Departamentos2, name: 'dep2' },
+  { path: '/acu2', component: Acuartelamientos2, name: 'acu2' }
 
 ]
 

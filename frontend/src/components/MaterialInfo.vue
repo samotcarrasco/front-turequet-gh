@@ -289,16 +289,16 @@ export default {
 
 
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
-    Nombre del material: {{ this.material.nombre }}
+  <div>
+    <p><span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span></p>
     <Divider />
-    Fecha de la operación: {{ new Date().toLocaleDateString('es-ES') }}
+    <p><span class="dialog-label">Fecha de la operación:</span> <span class="dialog-value">{{ new Date().toLocaleDateString('es-ES') }}</span></p>
     <Divider />
-    Milis {{ this.material.milis }}
+    <p><span class="dialog-label">μilis:</span> <span class="dialog-value">{{ material.milis }}</span></p>
     <Divider />
-    Credito actual 200 milis
+    <p><span class="dialog-label">Unidad ofertante:</span> <span class="dialog-value">{{ material.dptoOfertaN }}</span></p>
     <Divider />
-    Unidad ofertante {{ this.material.dptoOfertaN }}
-    <Divider />
+  </div>
 
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -307,20 +307,24 @@ export default {
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="detallesAdqDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
-    class="p-fluid">
-    Nombre del material: {{ this.material.nombre }}
+  <Dialog v-model:visible="detallesAdqDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
+  <div>
+    <span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span>
     <Divider />
-    Fecha de la operación:{{ this.material.fechaAdquisicion }}
+    <span class="dialog-label">Fecha de la operación:</span> <span class="dialog-value">{{ material.fechaAdquisicion }}</span>
     <Divider />
-    Milis: {{ this.material.milis }}
+    <span class="dialog-label">Milis:</span> <span class="dialog-value">{{ material.milis }}</span>
     <Divider />
-    Unidad ofertante {{ this.material.dptoOfertaN }}
+    <span class="dialog-label">Unidad ofertante:</span> <span class="dialog-value">{{ material.dptoOfertaN }}</span>
     <Divider />
-    <template #footer>
-      <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
-    </template>
-  </Dialog>
+    <Divider />
+    <span class="dialog-label">Fecha de entrega/recepción:</span> <span class="dialog-value">{{ material.fechaEntregaFisica }}</span>
+    <Divider />
+  </div>
+  <template #footer>
+    <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
+  </template>
+</Dialog>
 </template>
 
 <style scoped>
@@ -331,5 +335,14 @@ export default {
 .p-card-content {
   margin: 0;
   padding: 0;
+}
+
+.dialog-label {
+  font-weight: bold;
+  font-size: 1.2em; 
+}
+
+.dialog-value {
+  font-size: 1.2em; 
 }
 </style>

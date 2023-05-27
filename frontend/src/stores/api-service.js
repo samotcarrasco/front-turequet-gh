@@ -184,3 +184,47 @@ export function getBonificacion(id) {
   // console.log("get ENTIDAD", nombre, " id ", id, `${host}api/${nombre}/${id}`)
   return llamadaAPI('get', null, `${host}api/departamentos/${id}/calcularBonificacion`)
 }
+
+
+
+
+
+
+// ACUARTELAMIENTOS
+
+
+//DEPARTAMENTOS
+
+export function getAcuartelamientos() {
+  console.log("llamando a get acuartelamientos")
+  return getEntidades('acuartelamientos')
+}
+
+export function getAcuartPorSiglas(valor) {
+  return getEntidadPorNombre('acuartelamientos', 'siglas', valor)
+}
+
+export function postAcuartelamiento(acuart) {
+  return postEntidad(acuart, 'acuartelamientos')
+}
+
+export function putAcuartelamiento(acuart) {
+  console.log("llamando a put", acuart, acuart.id)
+  return putEntidad(acuart, acuart.id, 'acuartelamientos')
+}
+
+export function getBases() {
+  return getEntidades('acuartelamientos/siglas')
+}
+
+export function getAcuartelamiento(acuart) {
+  console.log("llamando a put ", acuart, acuart.id)
+  return putEntidad(acuart, acuart.id, 'acuartelamientos')
+}
+
+
+export function deleteAcuartelamiento(acuart) {
+  console.log("llamando a delete ", acuart, acuart.id)
+  return deleteEntidad(acuart.id, 'acuartelamientos')
+}
+
