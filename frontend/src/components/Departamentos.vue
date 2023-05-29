@@ -54,43 +54,28 @@ export default {
     ...mapWritableState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['empleos']),
     ...mapState(departamentosStore, ['bases']),
+
+
+    departamentosFiltrados() {
+
+      if (this.filtroAcuartelamiento) {
+        console.log("hay acuartelamiento", this.filtroAcuartelamiento);
+
+        const departamentosCopy = this.departamentos;
+        return departamentosCopy.filter(departamento => {
+          return this.filtroAcuartelamiento === departamento.acuartelamientoN;
+        });
+        //console.log(this.departamentos);
+      } else {
+        return this.getDepartamentos();
+      }
+    },
   },
 
 
-  departamentosFiltrados() {
-    console.log("22222222222222222222222222222222222222222222222222222222222222222222222222222222222")
-
-    this.filtrarDepartamentos();
-
-    return this.departamentos;
-
-
-    //  const kk = this.acuartelamientoFiltro.trim();
-    //   return this.departamentos.filter((dep) => 
-    //                dep.acuartelamientoN === kk);
-
-
-    //     // //await this.getDepartamentos(); 
-    //      console.log("entrando el filtrar dptos");
-    //      console.log("this.departamentos = ", this.departamentos)
-    //      if (this.filtroAcuartelamiento) {
-    //        console.log("hay acuartelamiento", this.filtroAcuartelamiento);
-    //        this.departamentos = this.departamentos.filter(departamento => {
-    //          const acuartelamientoDepartamento = departamento.acuartelamientoN;
-    //          const acuartelamientoFiltro = this.filtroAcuartelamiento;
-    //          console.log(acuartelamientoDepartamento, "-", acuartelamientoFiltro);
-    //          return acuartelamientoDepartamento === acuartelamientoFiltro;
-    //        });
-    //        //console.log(this.departamentos);
-    //      } else {
-    //        return this.getDepartamentos(); 
-    //      }
-  },
 
   mounted() {
     const toast = useToast();
-
-
 
     const modalCreate = () => {
       this.departamento = {}
@@ -207,19 +192,21 @@ export default {
     // },
 
     filtrarDepartamentos() {
-      this.getDepartamentos();
+      // this.getDepartamentos();
+
       console.log("Filtrando por acuartelamiento:", this.filtroAcuartelamiento.trim());
 
-      const acuartelamientoFiltrado = this.filtroAcuartelamiento.trim();
-      console.log("-"+acuartelamientoFiltrado+"-");
 
-      if (acuartelamientoFiltrado) {
+
+      if (this.filtroAcuartelamiento) {
+        console.log("-" + this.filtroAcuartelamiento + "-");
         this.departamentos = this.departamentos.filter(departamento => {
-          const acuartelamientoDepartamento = departamento.acuartelamientoN.trim();
-          return acuartelamientoDepartamento === acuartelamientoFiltrado;
+          return departamento.acuartelamientoN === this.filtroAcuartelamiento;
         });
       }
-      console.log("dptssssss filtrados:", this.departamentos)
+
+      this.getDepartamentos();
+     // console.log("dptssssss filtrados:", this.departamentosCopy)
     },
 
 
@@ -267,6 +254,9 @@ export default {
       });
 
       if (idMapa == "map") {
+        // const dptos = this.departamentosFiltrados;        
+        // console.log("ddddddddddppptttooosss",dptos)
+
         this.departamentos.forEach(dpto => {
           console.log("obteniendo coordenadas........." + dpto.latitud, dpto.longitud)
           const marker = new google.maps.Marker({
@@ -380,7 +370,6 @@ export default {
     this.isLoading = true
     await this.getDepartamentos()
 
-
     this.mostrarYCentrarMapa("map");
 
     //this.isLoading = false
@@ -411,7 +400,7 @@ export default {
         </div>
         <div class="card">
           <Accordion :multiple="true" :activeIndex="[0]">
-            <AccordionTab v-for="departamento in departamentos" :header="departamento.abreviatura"
+            <AccordionTab v-for="departamento in departamentosFiltrados" :header="departamento.abreviatura"
               :key="departamento.id">
               <b>
                 <p>
