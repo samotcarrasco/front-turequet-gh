@@ -60,13 +60,13 @@ export default {
       this.submitted = true;
 
       if (this.formularioRellenado(this.categoria)) {
-        console.log("punto 1");
+      //  console.log("punto 1");
         if (this.categoria.id) {
-          console.log("punto 2");
+      //    console.log("punto 2");
           this.putCategoria(this.categoria).then(() => { this.getCategorias() });
           toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: this.categoria.categoria, life: 3000 });
         } else {
-          console.log("punto 3");
+     //     console.log("punto 3");
           console.log(this.categoria);
           this.postCategoria(this.categoria).then(() => { this.getCategorias() });
           toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.categoria.categoria, life: 4000 });

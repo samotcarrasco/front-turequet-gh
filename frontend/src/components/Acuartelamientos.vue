@@ -9,9 +9,11 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button';
-import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
 import ProgressSpinner from 'primevue/progressspinner';
+
+
+
 
 
 export default {
@@ -29,20 +31,7 @@ export default {
       modalCreate: null,
       submitted: false,
       deleteAcuartDialog: false,
-      acuartelamiento: {
-        // id: undefined,
-        // nombre: '',
-        // abreviatura: '',
-        // acuartelamiento: '',
-        // email: '',
-        // responsableEmpleo: '',
-        // responsableNombre: '',
-        // telefono: '',
-        // latitud: '',
-        // numMateriales: '',
-        // longitud: '', // Corregir el nombre de la propiedad aquí
-        // direccion: '',
-      },
+      acuartelamiento: {},
       isLoading: true,
     };
   },
@@ -61,7 +50,6 @@ export default {
       this.submitted = false
       this.acuartDialog = true
       this.cabecera = "Alta de nuevo acuartelamiento"
-      //this.mostrarUbicacion("mapModal", this.latitude, this.longitude);
     };
 
 
@@ -74,20 +62,19 @@ export default {
     const saveAcuart = () => {
       this.submitted = true;
 
-       this.acuartelamiento.direccion = this.address;
+
+
+      this.acuartelamiento.direccion = this.address;
       // console.log(this.acuartelamiento.nombre);
       //console.log("id" + this.acuartelamiento.id + this.formularioRellenado(this.acuartelamiento))
       // console.log("entrando en la funcion saveAcuart con el material", JSON.stringify(this.acuartelamiento))
 
       if (this.formularioRellenado(this.acuartelamiento)) {
         if (this.acuartelamiento.id) {
-          console.log("1111111")
           this.putAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
-          console.log("2222")
           toast.add({ severity: 'success', summary: 'Acuartelamiento actualizado', detail: this.acuartelamiento.nombre, life: 3000 })
-          console.log("3333")
         } else {
-          console.log("Entrando en saveAcuart con acuart: ", JSON.stringify(this.acuartelamiento))
+          //  console.log("Entrando en saveAcuart con acuart: ", JSON.stringify(this.acuartelamiento))
           this.postAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
           toast.add({ severity: 'success', summary: 'Acuartelamiento creado', detail: this.acuartelamiento.nombre + " se ha creado correctamente", life: 4000 })
         }
@@ -121,7 +108,6 @@ export default {
     this.modalCreate = modalCreate;
     this.hideDialog = hideDialog;
     this.saveAcuart = saveAcuart;
-    //this.onModalShow = onModalShow;
     this.editAcuart = editAcuart;
     this.confirmDeleteAcuart = confirmDeleteAcuart;
     this.borrarAcuart = borrarAcuart;
@@ -134,13 +120,14 @@ export default {
     ...mapActions(acuartelamientosStore, ['deleteAcuartelamiento']),
     ...mapActions(acuartelamientosStore, ['getEmpleos']),
 
-    formularioRellenado(dep) {
-      console.log(dep.abreviatura && dep.nombre);
+    
+
+    formularioRellenado(acu) {
       //lo hacemos así porque no entiendo por qué no lo evalua como booleano
       //por ejemplo, comos e hace en Categrias.vue
-      if (dep.nombre == '' || dep.abreviatura == '' ||
-        dep.email == '' || dep.responsableNombre == '' ||
-        dep.responsableEmpleo == '' || dep.telefono == '') {
+      if (!acu.nombre || !acu.abreviatura ||
+        !acu.email || !acu.responsableNombre ||
+        !acu.responsableEmpleo || !acu.telefono) {
         return false
       } else {
         return true
@@ -154,7 +141,6 @@ export default {
     //this.isLoading = false
 
     await this.getEmpleos()
-    console.log("cargando mapa...........")
     this.isLoading = false
 
   }
@@ -172,26 +158,28 @@ export default {
         <Button label="Crear nuevo" class="boton-nuevo" icon="pi pi-plus" @click="modalCreate" />
         <div class="card">
           <Accordion :multiple="true" :activeIndex="[0]">
-            <AccordionTab v-for="acuartelamiento in acuartelamientos" :header="acuartelamiento.abreviatura" :key="acuartelamiento.id">
-              <b><p>
+            <AccordionTab v-for="acuartelamiento in acuartelamientos" :header="acuartelamiento.abreviatura"
+              :key="acuartelamiento.id">
+              <b>
+                <p>
+                  <font-awesome-icon icon="fa-solid fa-envelope" />{{ acuartelamiento.email }}<br>
+                  <font-awesome-icon icon="fa-solid fa-user" /> {{ acuartelamiento.responsableEmpleo }} {{ acuartelamiento.responsableNombre }} <br>
+                  <font-awesome-icon icon="fa-solid fa-address-card" /> {{ acuartelamiento.email }}<br>
+                  <font-awesome-icon icon="fa-solid fa-phone" /> {{ acuartelamiento.telefono }}
+                </p>
+              </b>
+              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                @click="editAcuart(acuartelamiento)" />
+              <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                :disabled="acuartelamiento.numDepartamentos > 0" @click="confirmDeleteAcuart(acuartelamiento)" />
 
-                Email: {{ acuartelamiento.email }}<br>
-                Responsable: {{ acuartelamiento.responsableEmpleo }} {{ acuartelamiento.responsableNombre }} <br>
-                Dirección: {{ acuartelamiento.email }}<br>
-                Teléfono: {{ acuartelamiento.telefono }}
-              </p></b>
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                  @click="editAcuart(acuartelamiento)" />
-                  <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" :disabled="acuartelamiento.numMateriales > 0"
-                   @click="confirmDeleteAcuart(acuartelamiento)" />
-              
             </AccordionTab>
           </Accordion>
         </div>
       </div>
     </section>
     <section class="right-section">
-   
+
     </section>
   </div>
 
@@ -284,13 +272,15 @@ export default {
   flex: 1;
   padding-left: 1rem;
 }
-s
-.boton-nuevo {
+
+s .boton-nuevo {
   margin-bottom: 20px;
 }
+
 .card {
   margin-top: 1rem;
 }
+
 .boton-mostrar {
   margin-top: 25px;
 }
@@ -314,5 +304,4 @@ s
 
 .custom-field {
   margin-right: 1rem;
-}
-</style>
+}</style>

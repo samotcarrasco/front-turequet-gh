@@ -3,6 +3,7 @@ import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 
 import { departamentosStore } from '@/stores/departamentos';
+import { acuartelamientosStore } from '@/stores/acuartelamientos';
 import { mapState, mapWritableState, mapActions } from 'pinia'
 import InputText from 'primevue/inputtext';
 import Accordion from 'primevue/accordion';
@@ -12,6 +13,9 @@ import Button from 'primevue/button';
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
 import ProgressSpinner from 'primevue/progressspinner';
+//importamos el get directmante de api-service, despues de tener problemas llamando al del store
+//import { getAcuartPorSiglas } from '@/stores/api-service';
+
 
 
 export default {
@@ -32,20 +36,24 @@ export default {
       deleteDptoDialog: false,
       departamento: {
         id: undefined,
+        acuartelamientoF: undefined, //filtro
         nombre: '',
         abreviatura: '',
         acuartelamiento: '',
+        acuartelamientoN: '',
         email: '',
         responsableEmpleo: '',
         responsableNombre: '',
         telefono: '',
         latitud: '',
-        numMateriales: '',
+        numMateriales: 0,
         longitud: '', // Corregir el nombre de la propiedad aquí
         direccion: '',
       },
       isLoading: true,
       filtroAcuartelamiento: null,
+      acuartelamientoFiltroModal: undefined,
+      kk: undefined
       // departamentos: []
     };
   },
@@ -54,15 +62,19 @@ export default {
     ...mapWritableState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['empleos']),
     ...mapState(departamentosStore, ['bases']),
+    ...mapWritableState(acuartelamientosStore, ['acuartelamiento']),
 
+
+    acuartFiltroModal() {
+      return this.departamento.acuartelamientoN;
+    },
 
     departamentosFiltrados() {
 
       if (this.filtroAcuartelamiento) {
         console.log("hay acuartelamiento", this.filtroAcuartelamiento);
 
-        const departamentosCopy = this.departamentos;
-        return departamentosCopy.filter(departamento => {
+        return this.departamentos.filter(departamento => {
           return this.filtroAcuartelamiento === departamento.acuartelamientoN;
         });
         //console.log(this.departamentos);
@@ -70,6 +82,15 @@ export default {
         return this.getDepartamentos();
       }
     },
+
+    abreviaturaAntesDelGuion() {
+    const guionIndex = this.departamento.abreviatura.indexOf('-');
+    if (guionIndex !== -1) {
+      return this.departamento.abreviatura.substring(0, guionIndex);
+    } else {
+      return this.departamento.abreviatura;
+    }
+  }, 
   },
 
 
@@ -107,31 +128,33 @@ export default {
 
     const saveDpto = () => {
       this.submitted = true;
+      //console.log("acuartelamiento", this.acuartelamiento);
 
+      //asignamos el valor del store, ya que contiene la url del acuartelameiento
+      this.departamento.acuartelamiento = this.acuartelamiento;
 
-      this.departamento.acuartelamiento = 'ACING';
-      const [latitud, longitud] = this.latLong.split(",");
-      this.departamento.latitud = latitud;
-      this.departamento.longitud = longitud;
-      this.departamento.direccion = this.address;
+      const [latitud, longitud] = this.latLong.split(",")
+      this.departamento.latitud = latitud
+      this.departamento.longitud = longitud
+      this.departamento.direccion = this.address
       // console.log(this.departamento.nombre);
       //console.log("id" + this.departamento.id + this.formularioRellenado(this.departamento))
       // console.log("entrando en la funcion saveDpto con el material", JSON.stringify(this.departamento))
 
       if (this.formularioRellenado(this.departamento)) {
         if (this.departamento.id) {
-          console.log("1111111")
+          this.departamento.acuartelamiento = this.departamento._links.acuartelamiento.href
+          this.departamento.abreviatura = this.departamento.abreviatura.replace(/-.*$/, '');
+          console.log("Entrando en putDpto con dpto: ", JSON.stringify(this.departamento))  
           this.putDepartamento(this.departamento).then(() => { this.getDepartamentos() })
-          console.log("2222")
           toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
-          console.log("3333")
         } else {
           console.log("Entrando en saveDpto con dpto: ", JSON.stringify(this.departamento))
           this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() })
           toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 })
         }
         this.dptoDialog = false;
-        this.departamento = {};
+        this.departamentoF = {};
       }
     };
 
@@ -173,30 +196,22 @@ export default {
     ...mapActions(departamentosStore, ['deleteDpto']),
     ...mapActions(departamentosStore, ['getEmpleos']),
     ...mapActions(departamentosStore, ['getBases']),
+    ...mapActions(acuartelamientosStore, ['getAcuartPorSiglas']),
 
 
+    actualizarAcuartelamiento() {
+      //  this.acuartelamientoFiltroModal = this.departamento.acuartelamientoN
+      // this.acuartelamiento = this.departamento.acuartelamientoN
 
-    // filtrarDepartamentos() {
-
-    //   this.getDepartamentos();
-
-    //   console.log("Filtrando por acuartelamiento:-", this.filtroAcuartelamiento.trim(), "-");
-
-    //   const kk = this.filtroAcuartelamiento.trim();
-    //   console.log("-" + kk + "-")
-    //   console.log("Departamentos sin foltrar:", this.departamentos);
-
-    //   this.departamentos = this.departamentos.filter((dep) =>
-    //     dep.acuartelamientoN === kk)
-    //   console.log("Departamentos filtrados:", this.departamentos);
-    // },
+      this.getAcuartPorSiglas(this.acuartFiltroModal)
+      // console.log("ACTUALIZADO FILTRO MODAL", this.departamento.acuartelamientoN)
+      // console.log("this.acuartelamiento = ", this.acuartelamiento)
+    },
 
     filtrarDepartamentos() {
       // this.getDepartamentos();
 
       console.log("Filtrando por acuartelamiento:", this.filtroAcuartelamiento.trim());
-
-
 
       if (this.filtroAcuartelamiento) {
         console.log("-" + this.filtroAcuartelamiento + "-");
@@ -206,11 +221,10 @@ export default {
       }
 
       this.getDepartamentos();
-     // console.log("dptssssss filtrados:", this.departamentosCopy)
+      // console.log("dptssssss filtrados:", this.departamentosCopy)
     },
 
-
-
+    
     mostrarYCentrarMapa(idMapa) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
@@ -356,9 +370,9 @@ export default {
       console.log(dep.abreviatura && dep.nombre);
       //lo hacemos así porque no entiendo por qué no lo evalua como booleano
       //por ejemplo, comos e hace en Categrias.vue
-      if (dep.nombre == '' || dep.abreviatura == '' ||
-        dep.email == '' || dep.responsableNombre == '' ||
-        dep.responsableEmpleo == '' || dep.telefono == '') {
+      if (!dep.nombre || !dep.abreviatura ||
+        !dep.email || !dep.responsableNombre ||
+        !dep.responsableEmpleo || !dep.telefono) {
         return false
       } else {
         return true
@@ -400,16 +414,23 @@ export default {
         </div>
         <div class="card">
           <Accordion :multiple="true" :activeIndex="[0]">
-            <AccordionTab v-for="departamento in departamentosFiltrados" :header="departamento.abreviatura"
+            <AccordionTab v-for="departamento in departamentosFiltrados"
               :key="departamento.id">
+              <template #header>
+                <span> {{ departamento.abreviatura }} </span>
+                <span class="spacer"></span>
+                <span> <font-awesome-icon icon="fa-solid fa-dolly" /> </span>
+                <span> {{ departamento.numMateriales }} </span>
+              </template>
               <b>
                 <p>
-
-                  Email: {{ departamento.email }}<br>
-                  <i class="fa-solid fa-coins"></i> {{ departamento.credito }} &mu;ilis<br>
-                  Responsable: {{ departamento.responsableEmpleo }} {{ departamento.responsableNombre }}<br>
-                  Dirección: {{ departamento.direccion }}<br>
-                  Teléfono: {{ departamento.teléfono }} <br>
+                  <font-awesome-icon icon="fa-solid fa-envelope" /> {{ departamento.email }}<br>
+                  <font-awesome-icon icon="fa-solid fa-coins" /> {{ departamento.credito }} &mu;ilis<br>
+                  <font-awesome-icon icon="fa-solid fa-user" /> {{ departamento.responsableEmpleo }} 
+                      {{ departamento.responsableNombre }}<br>
+                  <font-awesome-icon icon="fa-solid fa-address-card" /> {{ departamento.direccion }}<br>
+                  <font-awesome-icon icon="fa-solid fa-address-phone" /> {{ departamento.telefono }} <br>
+                  <font-awesome-icon icon="fa-solid fa-dolly" />{{ departamento.numMateriales }}
                 </p>
               </b>
               <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
@@ -444,7 +465,9 @@ export default {
       </div>
       <div class="field col custom-field">
         <label for="name">Abreviatura:</label>
-        <InputText id="name" v-model.trim="departamento.abreviatura" required="true" autofocus=""
+        <InputText v-if="departamento.id" id="name" v-model.trim="abreviaturaAntesDelGuion"  required="true" autofocus=""
+          :class="{ 'p-invalid': submitted && !departamento.abreviatura }" />
+          <InputText v-else id="name" v-model.trim="departamento.abreviatura"  required="true" autofocus=""
           :class="{ 'p-invalid': submitted && !departamento.abreviatura }" />
       </div>
       <div class="field col custom-field">
@@ -492,8 +515,9 @@ export default {
 
       <div class="field col custom-field">
         <label for="empleo">Acuartelamiento: </label>
-        <Dropdown v-model="departamento.acuartelamiento" :options="bases" placeholder="Seleccione"
-          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento }">
+        <Dropdown v-model="departamento.acuartelamientoN" :options="bases" placeholder="Seleccione"
+          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id}" @change="actualizarAcuartelamiento"
+          :disabled="departamento.id">  
           <template #value="base">
             <div>
               <span v-if="!base.value" class="departamento-placeholder">Seleccione</span>
@@ -507,7 +531,7 @@ export default {
         <Button class="boton-mostrar" label="Mostrar mapa" @click="mostrarYCentrarMapa('mapModal')" />
       </div> -->
     </div>
-    <div id="mapModal" ref="mapModalRef">
+    <div id="mapModal">
     </div>
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -591,4 +615,9 @@ export default {
 .custom-field {
   margin-right: 1rem;
 }
+
+.spacer {
+  margin-right: 4vw;
+}
+
 </style>
