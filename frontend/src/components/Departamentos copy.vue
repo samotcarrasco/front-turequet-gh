@@ -3,7 +3,8 @@ import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 
 import { departamentosStore } from '@/stores/departamentos';
-import { mapState, mapActions } from 'pinia'
+import { acuartelamientosStore } from '@/stores/acuartelamientos';
+import { mapState, mapWritableState, mapActions } from 'pinia'
 import InputText from 'primevue/inputtext';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
@@ -12,6 +13,9 @@ import Button from 'primevue/button';
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
 import ProgressSpinner from 'primevue/progressspinner';
+//importamos el get directmante de api-service, despues de tener problemas llamando al del store
+//import { getAcuartPorSiglas } from '@/stores/api-service';
+
 
 
 export default {
@@ -32,33 +36,67 @@ export default {
       deleteDptoDialog: false,
       departamento: {
         id: undefined,
+        acuartelamientoF: undefined, //filtro
         nombre: '',
         abreviatura: '',
         acuartelamiento: '',
+        acuartelamientoN: '',
         email: '',
         responsableEmpleo: '',
         responsableNombre: '',
         telefono: '',
         latitud: '',
-        numMateriales: '',
+        numMateriales: 0,
         longitud: '', // Corregir el nombre de la propiedad aquí
         direccion: '',
       },
       isLoading: true,
+      filtroAcuartelamiento: null,
+      acuartelamientoFiltroModal: undefined,
+      kk: undefined
+      // departamentos: []
     };
   },
 
   computed: {
-    ...mapState(departamentosStore, ['departamentos']),
+    ...mapWritableState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['empleos']),
     ...mapState(departamentosStore, ['bases']),
+    ...mapWritableState(acuartelamientosStore, ['acuartelamiento']),
+
+
+    acuartFiltroModal() {
+      return this.departamento.acuartelamientoN;
+    },
+
+    departamentosFiltrados() {
+
+      if (this.filtroAcuartelamiento) {
+        console.log("hay acuartelamiento", this.filtroAcuartelamiento);
+
+        return this.departamentos.filter(departamento => {
+          return this.filtroAcuartelamiento === departamento.acuartelamientoN;
+        });
+        //console.log(this.departamentos);
+      } else {
+        return this.getDepartamentos();
+      }
+    },
+
+    abreviaturaAntesDelGuion() {
+    const guionIndex = this.departamento.abreviatura.indexOf('-');
+    if (guionIndex !== -1) {
+      return this.departamento.abreviatura.substring(0, guionIndex);
+    } else {
+      return this.departamento.abreviatura;
+    }
+  }, 
   },
+
 
 
   mounted() {
     const toast = useToast();
-
-
 
     const modalCreate = () => {
       this.departamento = {}
@@ -70,15 +108,16 @@ export default {
     };
 
 
-    // const autocomplete = new google.maps.places.Autocomplete(
-    //   document.getElementById("direccion")
-    // );
+    //prueba autocompletado dirección
+    //  const autocomplete = new google.maps.places.Autocomplete(
+    //    document.getElementById("direccion")
+    //  );
 
-    // autocomplete.addListener("place_changed", () => {
-    //   const place = autocomplete.getPlace();
-    //   this.address = place.formatted_address;
-    //   this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
-    // });
+    //  autocomplete.addListener("place_changed", () => {
+    //    const place = autocomplete.getPlace();
+    //    this.address = place.formatted_address;
+    //    this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
+    //  });
 
 
 
@@ -89,46 +128,49 @@ export default {
 
     const saveDpto = () => {
       this.submitted = true;
+      //console.log("acuartelamiento", this.acuartelamiento);
 
+      //asignamos el valor del store, ya que contiene la url del acuartelameiento
+      this.departamento.acuartelamiento = this.acuartelamiento;
 
-      this.departamento.acuartelamiento = 'ACING';
-      const [latitud, longitud] = this.latLong.split(",");
-      this.departamento.latitud = latitud;
-      this.departamento.longitud = longitud;
-      this.departamento.direccion = this.address;
+      const [latitud, longitud] = this.latLong.split(",")
+      this.departamento.latitud = latitud
+      this.departamento.longitud = longitud
+      this.departamento.direccion = this.address
+    
       // console.log(this.departamento.nombre);
       //console.log("id" + this.departamento.id + this.formularioRellenado(this.departamento))
       // console.log("entrando en la funcion saveDpto con el material", JSON.stringify(this.departamento))
 
       if (this.formularioRellenado(this.departamento)) {
         if (this.departamento.id) {
-          console.log("1111111")
+          this.departamento.acuartelamiento = this.departamento._links.acuartelamiento.href
+          this.departamento.abreviatura = this.departamento.abreviatura.replace(/-.*$/, '');
+          console.log("Entrando en putDpto con dpto: ", JSON.stringify(this.departamento))  
           this.putDepartamento(this.departamento).then(() => { this.getDepartamentos() })
-          console.log("2222")
           toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
-          console.log("3333")
         } else {
           console.log("Entrando en saveDpto con dpto: ", JSON.stringify(this.departamento))
           this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() })
           toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 })
         }
         this.dptoDialog = false;
-        this.departamento = {};
+        this.departamentoF = {};
       }
     };
 
 
     const editDpto = (editDpto) => {
-      this.departamento = { ...editDpto };
-      console.log(this.departamento);
-      this.dptoDialog = true;
+      this.departamento = { ...editDpto }
+      console.log(this.departamento)
+      this.dptoDialog = true
       this.cabecera = "Editar departamento"
-
+      this.mostrarYCentrarMapa("mapModal")
     };
 
     const confirmDeleteDpto = (dpto) => {
-      this.departamento = dpto;
-      this.deleteDptoDialog = true;
+      this.departamento = dpto
+      this.deleteDptoDialog = true
     };
 
     const borrarDpto = () => {
@@ -155,16 +197,39 @@ export default {
     ...mapActions(departamentosStore, ['deleteDpto']),
     ...mapActions(departamentosStore, ['getEmpleos']),
     ...mapActions(departamentosStore, ['getBases']),
+    ...mapActions(acuartelamientosStore, ['getAcuartPorSiglas']),
 
 
+    actualizarAcuartelamiento() {
+      //llamada a la api a través del método del store
+      this.getAcuartPorSiglas(this.acuartFiltroModal)
+      // console.log("ACTUALIZADO FILTRO MODAL", this.departamento.acuartelamientoN)
+      // console.log("this.acuartelamiento = ", this.acuartelamiento)
+    },
 
+    filtrarDepartamentos() {
 
+      console.log("Filtrando por acuartelamiento:", this.filtroAcuartelamiento.trim());
+
+      if (this.filtroAcuartelamiento) {
+        console.log("-" + this.filtroAcuartelamiento + "-");
+        this.departamentos = this.departamentos.filter(departamento => {
+          return departamento.acuartelamientoN === this.filtroAcuartelamiento;
+        });
+      }
+
+      this.getDepartamentos();
+    },
+
+    
     mostrarYCentrarMapa(idMapa) {
+      console.log("1")
       if (navigator.geolocation) {
+        console.log("2")
         navigator.geolocation.getCurrentPosition(position => {
           const { latitude, longitude } = position.coords;
           this.getAddressFrom(latitude, longitude);
-
+          console.log("3")
           this.mostrarUbicacion(idMapa, latitude, longitude);
 
         }, error => {
@@ -202,6 +267,9 @@ export default {
       });
 
       if (idMapa == "map") {
+        // const dptos = this.departamentosFiltrados;        
+        // console.log("ddddddddddppptttooosss",dptos)
+
         this.departamentos.forEach(dpto => {
           console.log("obteniendo coordenadas........." + dpto.latitud, dpto.longitud)
           const marker = new google.maps.Marker({
@@ -238,43 +306,43 @@ export default {
 
 
 
-    onDialogShow() {
-      console.log("modal abierto")
+    // onDialogShow() {
+    //   console.log("modal abierto")
 
-      // navigator.geolocation.getCurrentPosition(position => {
-      //   const { latitude, longitude } = position.coords;
-      //   this.getAddressFrom(latitude, longitude);
+    // navigator.geolocation.getCurrentPosition(position => {
+    //   const { latitude, longitude } = position.coords;
+    //   this.getAddressFrom(latitude, longitude);
 
-      //   this.mostrarUbicacion("mapModal", latitude, longitude);
+    //   this.mostrarUbicacion("mapModal", latitude, longitude);
 
-      // }, error => {
-      //   this.error = error;
-      // });
+    // }, error => {
+    //   this.error = error;
+    // });
 
 
-      // const direccionModalElement = document.getElementById("direccionModal");
-      // if (direccionModalElement) {
-      //   console.log("modal abierto");
+    // const direccionModalElement = document.getElementById("direccionModal");
+    // if (direccionModalElement) {
+    //   console.log("modal abierto");
 
-      //   const autocomplete = new google.maps.places.Autocomplete(direccionModalElement);
-      //   console.log(autocomplete);
-      //   console.log(direccionModalElement);
-      //   console.log(document.getElementById("direccion"));
-      //   autocomplete.addListener("place_changed", () => {
-      //     console.log("Lugar seleccionado");
-      //     const place = autocomplete.getPlace();
-      //     this.address = place.formatted_address;
-      //     this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
-      //   });
+    //   const autocomplete = new google.maps.places.Autocomplete(direccionModalElement);
+    //   console.log(autocomplete);
+    //   console.log(direccionModalElement);
+    //   console.log(document.getElementById("direccion"));
+    //   autocomplete.addListener("place_changed", () => {
+    //     console.log("Lugar seleccionado");
+    //     const place = autocomplete.getPlace();
+    //     this.address = place.formatted_address;
+    //     this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
+    //   });
 
-      //   console.log("ID encontrado correctamente");
-      // } else {
-      //   console.log("No se encontró ningún elemento con el ID 'direccionModal'");
-      // }
+    //   console.log("ID encontrado correctamente");
+    // } else {
+    //   console.log("No se encontró ningún elemento con el ID 'direccionModal'");
+    // }
 
-      // Asociar el mapa al autocompletado
+    // Asociar el mapa al autocompletado
 
-    },
+    //  },
 
 
     handleMapClick(event) {
@@ -301,9 +369,9 @@ export default {
       console.log(dep.abreviatura && dep.nombre);
       //lo hacemos así porque no entiendo por qué no lo evalua como booleano
       //por ejemplo, comos e hace en Categrias.vue
-      if (dep.nombre == '' || dep.abreviatura == '' ||
-        dep.email == '' || dep.responsableNombre == '' ||
-        dep.responsableEmpleo == '' || dep.telefono == '') {
+      if (!dep.nombre || !dep.abreviatura ||
+        !dep.email || !dep.responsableNombre ||
+        !dep.responsableEmpleo || !dep.telefono) {
         return false
       } else {
         return true
@@ -314,7 +382,9 @@ export default {
   async created() {
     this.isLoading = true
     await this.getDepartamentos()
+
     this.mostrarYCentrarMapa("map");
+    this.mostrarYCentrarMapa("mapModal");
 
     //this.isLoading = false
 
@@ -323,6 +393,7 @@ export default {
     await this.getBases()
 
     this.isLoading = false
+    // console.log(this.departamentos)
 
   }
 }
@@ -336,44 +407,56 @@ export default {
         <ProgressSpinner />
       </div>
       <div v-else>
-        
-          
-
-        <Button label="Crear nuevo" class="boton-nuevo" icon="pi pi-plus" @click="modalCreate" />
+        <div>
+          <Button label="Crear nuevo" class="boton-nuevo" icon="pi pi-plus" @click="modalCreate" />
+          <Dropdown class="filtro" v-model="filtroAcuartelamiento" :options="bases"
+            placeholder="Seleccione un acuartelamiento" @change="filtrarDepartamentos" />
+        </div>
         <div class="card">
           <Accordion :multiple="true" :activeIndex="[0]">
-            <AccordionTab v-for="departamento in departamentos" :header="departamento.abreviatura" :key="departamento.id">
-              <b><p>
+            <AccordionTab v-for="departamento in departamentosFiltrados"
+              :key="departamento.id">
+              <template #header>
+                <span> {{ departamento.abreviatura }} </span>
+                <span class="spacer"></span>
+                <span> <font-awesome-icon icon="fa-solid fa-dolly" /> </span>
+                <span> {{ departamento.numMateriales }} </span>
+              </template>
+              <b>
+                <p>
+                  <font-awesome-icon icon="fa-solid fa-envelope" /> {{ departamento.email }}<br>
+                  <font-awesome-icon icon="fa-solid fa-coins" /> {{ departamento.credito }} &mu;ilis<br>
+                  <font-awesome-icon icon="fa-solid fa-user" /> {{ departamento.responsableEmpleo }} 
+                      {{ departamento.responsableNombre }}<br>
+                  <font-awesome-icon icon="fa-solid fa-address-card" /> {{ departamento.direccion }}<br>
+                  <font-awesome-icon icon="fa-solid fa-phone" /> {{ departamento.telefono }} <br>
+                  <font-awesome-icon icon="fa-solid fa-dolly" />{{ departamento.numMateriales }}
+                </p>
+              </b>
+              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                @click="editDpto(departamento)" />
+              <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                :disabled="departamento.numMateriales > 0" @click="confirmDeleteDpto(departamento)" />
 
-                Email: {{ departamento.email }}<br>
-                <i class="fa-solid fa-coins"></i> {{ departamento.credito }}  &mu;ilis<br>
-                Responsable: {{ departamento.responsableEmpleo }} {{ departamento.responsableNombre }}
-
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                  @click="editDpto(departamento)" />
-                  <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" :disabled="departamento.numMateriales > 0"
-                   @click="confirmDeleteDpto(departamento)" />
-              </p></b>
             </AccordionTab>
           </Accordion>
         </div>
       </div>
     </section>
     <section class="right-section">
-      <Dropdown v-model="departamento.acuartelamiento" :options="bases" placeholder="Seleccione un acuartelamiento" />
       <InputText id="direccion" v-model.trim="address" required="true" autofocus />
       <!-- <div>
         <InputText id="direccion" v-model.trim="address" required="true" autofocus />
         <InputText id="LatLong" v-model.trim="latLong" disabled />
         <Button label="Posicionar unidades" click="obtenerCoordenadas" /> 
       </div> -->
-      <section id="map">
+      <section id="map" ref="mapContainer">
       </section>
     </section>
   </div>
 
-  <Dialog v-model:visible="dptoDialog" :style="{ width: '70vw' }" :header="cabecera" :modal="true" class="p-fluid"
-    @show="onDialogShow">
+  <Dialog v-model:visible="dptoDialog" :style="{ width: '70vw' }" :header="cabecera" :modal="true" class="p-fluid">
+    <!-- @show="onDialogShow"> -->
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="name">Nombre:</label>
@@ -382,7 +465,9 @@ export default {
       </div>
       <div class="field col custom-field">
         <label for="name">Abreviatura:</label>
-        <InputText id="name" v-model.trim="departamento.abreviatura" required="true" autofocus=""
+        <InputText v-if="departamento.id" id="name" v-model.trim="abreviaturaAntesDelGuion"  required="true" autofocus=""
+          :class="{ 'p-invalid': submitted && !departamento.abreviatura }" />
+          <InputText v-else id="name" v-model.trim="departamento.abreviatura"  required="true" autofocus=""
           :class="{ 'p-invalid': submitted && !departamento.abreviatura }" />
       </div>
       <div class="field col custom-field">
@@ -420,28 +505,33 @@ export default {
       <div class="field col custom-field">
         <label for="name">Direccion</label>
         <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/> -->
-        <InputText id="direccion" v-model.trim="address" required="true" autofocus />
+        <InputText id="direccion" v-model.trim="departamento.direccion" required="true" autofocus />
 
       </div>
       <div class="field col custom-field">
         <label for="name">Coordenadas</label>
         <InputText id="LatLongModal" v-model.trim="latLong" disabled />
       </div>
-      <label for="empleo">Acuartelamiento: </label>
-        <Dropdown v-model="departamento.responsableEmpleo" :options="empleos" placeholder="Seleccione un empleo"
-          :class="{ 'p-invalid': submitted && !departamento.responsableEmpleo }">
-          <template #value="empleo">
+
+      <div class="field col custom-field">
+        <label for="empleo">Acuartelamiento: </label>
+        <Dropdown v-model="departamento.acuartelamientoN" :options="bases" placeholder="Seleccione"
+          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id}" @change="actualizarAcuartelamiento" 
+          :disabled="departamento.id"> 
+          <template #value="base">
             <div>
-              <span v-if="!empleo.value" class="departamento-placeholder">Seleccione</span>
-              <span v-else :class="'departamento-badge status-' + empleo.value">{{ empleo.value }}</span>
+              <span v-if="!base.value" class="departamento-placeholder">Seleccione</span>
+              <span v-else :class="'departamento-badge status-' + base.value">{{ base.value }}</span>
             </div>
           </template>
         </Dropdown>
-              <!-- <div class="field col custom-field">
+      </div>
+
+      <!-- <div class="field col custom-field">
         <Button class="boton-mostrar" label="Mostrar mapa" @click="mostrarYCentrarMapa('mapModal')" />
       </div> -->
     </div>
-    <div id="mapModal" ref="mapModalRef">
+    <div id="mapModal">
     </div>
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -494,6 +584,11 @@ export default {
 
 .boton-nuevo {
   margin-bottom: 20px;
+  margin-right: 80px;
+}
+
+.filtro {
+  margin-bottom: 20px;
 }
 
 .boton-mostrar {
@@ -511,4 +606,18 @@ export default {
   background: rgb(136, 158, 89);
   border: 0 none;
 }
+
+
+.field.d-flex {
+  margin-bottom: 1rem;
+}
+
+.custom-field {
+  margin-right: 1rem;
+}
+
+.spacer {
+  margin-right: 4vw;
+}
+
 </style>

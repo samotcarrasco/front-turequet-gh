@@ -37,7 +37,7 @@ export const departamentosStore = defineStore('departamentos', {
       await getDepartamentos().then(r => {
         this.departamentos = r.data._embedded.departamentos;
         this.departamentosSiglas = this.departamentos.map(dpto => {
-          return { id: dpto.id, siglas: dpto.abreviatura };
+          return { id: dpto.id, siglas: dpto.abreviatura};
         });
       });
     },

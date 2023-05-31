@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import { getAcuartelamientos, putAcuartelamiento, deleteAcuartelamiento, postAcuartelamiento, getAcuartPorSiglas, 
-  putAumentarCretido, getEmpleos, getMaterialPorId } from './api-service'
+import { getAcuartelamientos, putAcuartelamiento, deleteAcuartelamiento, postAcuartelamiento, 
+  getAcuartPorSiglas, getEmpleos } from './api-service'
 
 
 export const acuartelamientosStore = defineStore('acuartelamientos', {
   state: () => ({
+    acuartelamiento: undefined,
     acuartelamientos: [],
     acuartelamientosSiglas: [],
      rolActual: undefined,
@@ -50,12 +51,6 @@ export const acuartelamientosStore = defineStore('acuartelamientos', {
       await postAcuartelamiento(acuart);
     },
 
-    async getMaterialPorId(id) {
-      //la de dentro es la funcion importada
-      await getMaterialPorId(id);
-    },
-
-
     async putAcuartelamiento(acuart) {
       //la de dentro es la funcion importada
       await putAcuartelamiento(acuart);
@@ -72,5 +67,13 @@ export const acuartelamientosStore = defineStore('acuartelamientos', {
       //la de dentro es la funcion importada
       await deleteAcuartelamiento(acuart)
     },
+
+    async getAcuartPorSiglas(siglas){
+      //la de dentro es la funcion importada
+      await getAcuartPorSiglas(siglas).then(r => {
+        console.log("leyendo acuartelamiento", r)
+        this.acuartelamiento = r.data._links.self.href;
+      });
+    }
   }
 })

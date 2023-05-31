@@ -193,15 +193,13 @@ export function getBonificacion(id) {
 // ACUARTELAMIENTOS
 
 
-//DEPARTAMENTOS
-
 export function getAcuartelamientos() {
   console.log("llamando a get acuartelamientos")
   return getEntidades('acuartelamientos')
 }
 
-export function getAcuartPorSiglas(valor) {
-  return getEntidadPorNombre('acuartelamientos', 'siglas', valor)
+export function getAcuartPorSiglas(siglas) {
+  return getEntidadPorNombre('acuartelamientos', 'siglas', siglas)
 }
 
 export function postAcuartelamiento(acuart) {
@@ -209,7 +207,7 @@ export function postAcuartelamiento(acuart) {
 }
 
 export function putAcuartelamiento(acuart) {
-  console.log("llamando a put", acuart, acuart.id)
+  console.log("llamanssdo a put", acuart, acuart.id)
   return putEntidad(acuart, acuart.id, 'acuartelamientos')
 }
 

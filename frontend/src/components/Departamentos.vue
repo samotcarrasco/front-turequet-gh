@@ -137,6 +137,7 @@ export default {
       this.departamento.latitud = latitud
       this.departamento.longitud = longitud
       this.departamento.direccion = this.address
+    
       // console.log(this.departamento.nombre);
       //console.log("id" + this.departamento.id + this.formularioRellenado(this.departamento))
       // console.log("entrando en la funcion saveDpto con el material", JSON.stringify(this.departamento))
@@ -160,16 +161,16 @@ export default {
 
 
     const editDpto = (editDpto) => {
-      this.departamento = { ...editDpto };
-      console.log(this.departamento);
-      this.dptoDialog = true;
+      this.departamento = { ...editDpto }
+      console.log(this.departamento)
+      this.dptoDialog = true
       this.cabecera = "Editar departamento"
-
+      this.mostrarYCentrarMapa("mapModal")
     };
 
     const confirmDeleteDpto = (dpto) => {
-      this.departamento = dpto;
-      this.deleteDptoDialog = true;
+      this.departamento = dpto
+      this.deleteDptoDialog = true
     };
 
     const borrarDpto = () => {
@@ -200,16 +201,13 @@ export default {
 
 
     actualizarAcuartelamiento() {
-      //  this.acuartelamientoFiltroModal = this.departamento.acuartelamientoN
-      // this.acuartelamiento = this.departamento.acuartelamientoN
-
+      //llamada a la api a través del método del store
       this.getAcuartPorSiglas(this.acuartFiltroModal)
       // console.log("ACTUALIZADO FILTRO MODAL", this.departamento.acuartelamientoN)
       // console.log("this.acuartelamiento = ", this.acuartelamiento)
     },
 
     filtrarDepartamentos() {
-      // this.getDepartamentos();
 
       console.log("Filtrando por acuartelamiento:", this.filtroAcuartelamiento.trim());
 
@@ -221,16 +219,17 @@ export default {
       }
 
       this.getDepartamentos();
-      // console.log("dptssssss filtrados:", this.departamentosCopy)
     },
 
     
     mostrarYCentrarMapa(idMapa) {
+      console.log("1")
       if (navigator.geolocation) {
+        console.log("2")
         navigator.geolocation.getCurrentPosition(position => {
           const { latitude, longitude } = position.coords;
           this.getAddressFrom(latitude, longitude);
-
+          console.log("3")
           this.mostrarUbicacion(idMapa, latitude, longitude);
 
         }, error => {
@@ -385,6 +384,7 @@ export default {
     await this.getDepartamentos()
 
     this.mostrarYCentrarMapa("map");
+    this.mostrarYCentrarMapa("mapModal");
 
     //this.isLoading = false
 
@@ -429,7 +429,7 @@ export default {
                   <font-awesome-icon icon="fa-solid fa-user" /> {{ departamento.responsableEmpleo }} 
                       {{ departamento.responsableNombre }}<br>
                   <font-awesome-icon icon="fa-solid fa-address-card" /> {{ departamento.direccion }}<br>
-                  <font-awesome-icon icon="fa-solid fa-address-phone" /> {{ departamento.telefono }} <br>
+                  <font-awesome-icon icon="fa-solid fa-phone" /> {{ departamento.telefono }} <br>
                   <font-awesome-icon icon="fa-solid fa-dolly" />{{ departamento.numMateriales }}
                 </p>
               </b>
@@ -505,7 +505,7 @@ export default {
       <div class="field col custom-field">
         <label for="name">Direccion</label>
         <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/> -->
-        <InputText id="direccion" v-model.trim="address" required="true" autofocus />
+        <InputText id="direccion" v-model.trim="departamento.direccion" required="true" autofocus />
 
       </div>
       <div class="field col custom-field">
@@ -516,8 +516,8 @@ export default {
       <div class="field col custom-field">
         <label for="empleo">Acuartelamiento: </label>
         <Dropdown v-model="departamento.acuartelamientoN" :options="bases" placeholder="Seleccione"
-          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id}" @change="actualizarAcuartelamiento"
-          :disabled="departamento.id">  
+          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id}" @change="actualizarAcuartelamiento" 
+          :disabled="departamento.id"> 
           <template #value="base">
             <div>
               <span v-if="!base.value" class="departamento-placeholder">Seleccione</span>

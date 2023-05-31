@@ -9,13 +9,8 @@ import MaterialInfo from '@/components/MaterialInfo.vue'
 import MaterialesMain from '@/components/MaterialesMain.vue'
 import Categorias from '@/components/Categorias.vue'
 import Estadisticas from '@/components/Estadisticas.vue'
-import ComponenteDummy from '@/components/ComponenteDummy.vue'
 import ComponenteInicio from '@/components/ComponenteInicio.vue'
 import Unidades from '@/components/UnidadesMain.vue'
-
-import Acuartelamientos2 from '@/components/Acuartelamientos2.vue'
-import Departamentos2 from '@/components/Departamentos2.vue'
-
 
 //Bootstrap
  import 'bootstrap/dist/css/bootstrap.css'
@@ -35,7 +30,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 //import { faFutbolBall, faMobile, faSquareFull, faUser, faBoxesStacked } from '@fortawesome/free-solid-svg-icons'
-import { faUser ,faCoins} from '@fortawesome/free-solid-svg-icons'
+import { faUser ,faCoins, faEnvelope, faPhone, faAddressCard, faDolly} from '@fortawesome/free-solid-svg-icons'
 
 //pinia
 import { createPinia } from 'pinia'
@@ -52,11 +47,7 @@ const routes = [
    },
   { path: '/categorias', component: Categorias, name: 'categorias' },
   { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
-  { path: '/dummy', component: ComponenteDummy, name: 'asdf' },
-  { path: '/unidades', component: Unidades, name: 'unidades' },
-  { path: '/dep2', component: Departamentos2, name: 'dep2' },
-  { path: '/acu2', component: Acuartelamientos2, name: 'acu2' }
-
+  { path: '/unidades', component: Unidades, name: 'unidades' }
 ]
 
 const router = createRouter({
@@ -69,6 +60,10 @@ const pinia = createPinia()
 
 library.add(faUser)
 library.add(faCoins)
+library.add(faPhone)
+library.add(faAddressCard)
+library.add(faEnvelope)
+library.add(faDolly)
 
 // library.add(faBoxesStacked)
 
