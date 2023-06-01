@@ -136,7 +136,7 @@ export default {
       const [latitud, longitud] = this.latLong.split(",")
       this.departamento.latitud = latitud
       this.departamento.longitud = longitud
-      this.departamento.direccion = this.address
+      //this.departamento.direccion = this.address
     
       // console.log(this.departamento.nombre);
       //console.log("id" + this.departamento.id + this.formularioRellenado(this.departamento))
@@ -165,7 +165,9 @@ export default {
       console.log(this.departamento)
       this.dptoDialog = true
       this.cabecera = "Editar departamento"
+      console.log("entrando en edipdotp mapModal", this.departamento.latitud, this.departamento.longitud)
       this.mostrarYCentrarMapa("mapModal")
+      
     };
 
     const confirmDeleteDpto = (dpto) => {
@@ -210,15 +212,17 @@ export default {
     filtrarDepartamentos() {
 
       console.log("Filtrando por acuartelamiento:", this.filtroAcuartelamiento.trim());
-
+      //actualizamos el mapa despues de cada filtro, para que se muestren solamente los markers
+      // en los departamentos filtrados
+      this.mostrarYCentrarMapa("map")
       if (this.filtroAcuartelamiento) {
-        console.log("-" + this.filtroAcuartelamiento + "-");
+        console.log("-" + this.filtroAcuartelamiento + "-")
         this.departamentos = this.departamentos.filter(departamento => {
-          return departamento.acuartelamientoN === this.filtroAcuartelamiento;
+          return departamento.acuartelamientoN === this.filtroAcuartelamiento
         });
       }
 
-      this.getDepartamentos();
+      this.getDepartamentos()
     },
 
     
@@ -227,11 +231,12 @@ export default {
       if (navigator.geolocation) {
         console.log("2")
         navigator.geolocation.getCurrentPosition(position => {
-          const { latitude, longitude } = position.coords;
-          this.getAddressFrom(latitude, longitude);
+          const { latitude, longitude } = position.coords
+          this.getAddressFrom(latitude, longitude)
           console.log("3")
-          this.mostrarUbicacion(idMapa, latitude, longitude);
-
+         
+          this.mostrarUbicacion(idMapa, latitude, longitude)
+         
         }, error => {
           this.error = error;
         });
@@ -241,6 +246,8 @@ export default {
       }
     },
 
+
+    
     getAddressFrom(lat, long) {
       axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=AIzaSyAFnZTjnmXpBH9nZgMyzxKZzwzAYPKpYow`)
         .then(response => {
@@ -265,8 +272,8 @@ export default {
         center: new google.maps.LatLng(lat, long),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
-
-      if (idMapa == "map") {
+      
+      if (idMapa == "map" && this.filtroAcuartelamiento) {
         // const dptos = this.departamentosFiltrados;        
         // console.log("ddddddddddppptttooosss",dptos)
 
@@ -279,7 +286,7 @@ export default {
 
           const infoWindow = new google.maps.InfoWindow({
             //content: `Departamento: ${dpto.abreviatura} - ${dpto.credito} μ`
-            content: `${dpto.abreviatura} (${dpto.acuartelamiento}) - ${dpto.credito} μ`
+            content: `${dpto.abreviatura} ( # ${dpto.numMateriales} - ${dpto.credito} μ )`
           });
 
           marker.addListener("click", () => {
@@ -357,7 +364,8 @@ export default {
         if (status === google.maps.GeocoderStatus.OK && results[0]) {
           const formattedAddress = results[0].formatted_address;
           this.latLong = latlng.toString().replace(/\(|\)/g, "");
-          this.address = formattedAddress;
+          //this.address = formattedAddress;
+          this.departamento.direccion = formattedAddress;
         } else {
           console.log('No se pudo obtener la dirección correspondiente a las coordenadas.');
         }
@@ -383,8 +391,9 @@ export default {
     this.isLoading = true
     await this.getDepartamentos()
 
+    //mostramos el mapa inicialmente
     this.mostrarYCentrarMapa("map");
-    this.mostrarYCentrarMapa("mapModal");
+    //this.mostrarYCentrarMapa("mapModal");
 
     //this.isLoading = false
 
@@ -424,6 +433,7 @@ export default {
               </template>
               <b>
                 <p>
+                  {{ departamento.nombre }} <br>
                   <font-awesome-icon icon="fa-solid fa-envelope" /> {{ departamento.email }}<br>
                   <font-awesome-icon icon="fa-solid fa-coins" /> {{ departamento.credito }} &mu;ilis<br>
                   <font-awesome-icon icon="fa-solid fa-user" /> {{ departamento.responsableEmpleo }} 
@@ -444,7 +454,7 @@ export default {
       </div>
     </section>
     <section class="right-section">
-      <InputText id="direccion" v-model.trim="address" required="true" autofocus />
+      <!-- <InputText id="direccion" v-model.trim="address" required="true" autofocus /> -->
       <!-- <div>
         <InputText id="direccion" v-model.trim="address" required="true" autofocus />
         <InputText id="LatLong" v-model.trim="latLong" disabled />
@@ -504,8 +514,8 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="name">Direccion</label>
-        <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/> -->
-        <InputText id="direccion" v-model.trim="departamento.direccion" required="true" autofocus />
+         <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/>   -->
+          <InputText id="direccionModal" v-model.trim="departamento.direccion" required="true" autofocus />  
 
       </div>
       <div class="field col custom-field">
