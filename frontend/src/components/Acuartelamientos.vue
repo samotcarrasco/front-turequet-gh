@@ -165,7 +165,7 @@ export default {
                   {{ acuartelamiento.nombre }} <br>
                   <font-awesome-icon icon="fa-solid fa-envelope" />{{ acuartelamiento.email }}<br>
                   <font-awesome-icon icon="fa-solid fa-user" /> {{ acuartelamiento.responsableEmpleo }} {{ acuartelamiento.responsableNombre }} <br>
-                  <font-awesome-icon icon="fa-solid fa-address-card" /> {{ acuartelamiento.email }}<br>
+                  <font-awesome-icon icon="fa-solid fa-address-card" /> {{ acuartelamiento.direccion }}<br>
                   <font-awesome-icon icon="fa-solid fa-phone" /> {{ acuartelamiento.telefono }}
                 </p>
               </b>
