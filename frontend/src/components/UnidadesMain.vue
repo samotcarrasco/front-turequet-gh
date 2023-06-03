@@ -7,16 +7,14 @@ import Acuartelamientos from './Acuartelamientos.vue';
 
 
 export default {
-
-  props: {
-  },
+  components: { Panel, TabView, TabPanel, Departamentos, Acuartelamientos },
+  
   data() {
     return {
       currentTab: 'departamentos'
     };
   },
  
-  components: { Panel, TabView, TabPanel, Departamentos, Acuartelamientos },
   computed: {
 
   },

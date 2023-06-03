@@ -88,14 +88,20 @@ function deleteEntidad(id, nombre) {
 
 
 
-
-
 //CATEGORÍAS
 
 export function getCategorias() {
-  return getEntidades('categorias')
+  return getEntidades('categorias/categoriasNormales')
 }
 
+export function getCategoriasPrincipales() {
+  return getEntidades('categorias/categoriasPrincipales')
+}
+
+
+export function getGrupos() {
+  return getEntidades('categorias/grupos')
+}
 
 export function postCategoria(categoria) {
   return postEntidad(categoria, 'categorias')

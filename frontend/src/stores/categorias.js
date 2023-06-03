@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
-//import { storeDptoActual } from './dptoActual'
-// import { mapState } from 'pinia'
-import { getCategorias, putCategoria, postCategoria, deleteCategoria } from './api-service'
+import { getCategorias, getCategoriasPrincipales, putCategoria, postCategoria, deleteCategoria, getGrupos } from './api-service'
 
 
 export const categoriasStore = defineStore('categorias', {
   state: () => ({
+    grupos: [],
     categorias: [],
   }),
   getters: {
@@ -17,23 +16,23 @@ export const categoriasStore = defineStore('categorias', {
       return this.categorias.filter(material => material.departamento === this.dptoActual)
     },
 
-    getGrupos() {
-      const grupos = ["Informatica"," Comunicaciones", "Mobiliario_Oficina", "Material_Oficina", "Otros"]
-      return grupos;
-      // const grupoSet = new Set()
-      // this.categorias.forEach(categoria => {
-      //   if (!grupoSet.has(categoria.grupo)) {
-      //     grupoSet.add(categoria.grupo)
-      //     grupos.push(categoria.grupo)
-      //   }
-      // })
-      return grupos
+    async getGrupos() {
+      await getGrupos().then(r => {
+        console.log("leyendo grupo", r)
+        this.grupos = r.data;
+      });
+    },
+
+    async getCategoriasPrincipales() {
+      await getCategoriasPrincipales().then(r => {
+        this.catPrincipales = r.data._embedded.categorias;
+      });
     },
 
     async getCategorias() {
       //la de dentro es la funcion importada
       await getCategorias().then(r => this.categorias = r.data._embedded.categorias);
-     //await getCategorias().then(r => this.categorias = Object.values(r.data));
+      //await getCategorias().then(r => this.categorias = Object.values(r.data));
     },
 
     async postCategoria(categoria) {

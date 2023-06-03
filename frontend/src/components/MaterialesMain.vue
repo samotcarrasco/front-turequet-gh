@@ -3,11 +3,10 @@ import Panel from 'primevue/panel'
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import Materiales from './Materiales.vue';
-//import Carrusel from './Carrusel.vue';
 
 
 export default {
-
+  components: { Panel, TabView, TabPanel, Materiales },
   props: {
     tipoVista: {
       type: String,
@@ -23,13 +22,6 @@ export default {
       valorReactivo: 0
     }
   },
-  // provide() {
-  //   // use function syntax so that we can access `this`
-  //   return {
-  //    // message: this.message
-  //   }
-  // },
-  components: { Panel, TabView, TabPanel, Materiales },
   computed: {
 
   },
@@ -43,7 +35,6 @@ export default {
 </script>
 
 <template>
-  <!-- <div class="tab-view-container"> -->
   <TabView>
     <TabPanel header="MATERIALES DISPONIBLES"> 
      <Materiales :tipoVista="disponibles" />
@@ -59,5 +50,4 @@ export default {
     </TabPanel> 
 
   </TabView>
-  <!-- </div> -->
 </template>

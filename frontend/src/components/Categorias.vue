@@ -12,15 +12,17 @@ import InputText from 'primevue/inputtext';
 import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
 import Dialog from 'primevue/dialog';
+import InputSwitch from 'primevue/inputswitch';
 import ProgressSpinner from 'primevue/progressspinner';
 import { categoriasStore } from '@/stores/categorias';
-import { mapState, mapActions } from 'pinia'
+import { mapState, mapActions } from 'pinia';
+import { host } from '@/stores/api-service';
 
 
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea,
-    InputText, Column, InputNumber, Dialog, ProgressSpinner
+    InputText, Column, InputNumber, Dialog, ProgressSpinner, InputSwitch
   },
 
   data() {
@@ -36,6 +38,7 @@ export default {
       minMilis: undefined,  //para solucionar warings al cargar las categorias
       modalEditCreate: null,
       isLoading: true,
+      esPrincipal: undefined
 
     };
   },
@@ -56,20 +59,40 @@ export default {
     };
 
     const saveCategoria = () => {
-      console.log("entrando en la funcion saveCategoria con la categoria: " + this.categoria)
       this.submitted = true;
 
+      const catPadre = this.catPrincipales.find(cat => cat.categoria === this.categoria.grupo);
+
+      if (catPadre) {
+        this.categoria.categoriaPadre = host + "api/categorias/" + catPadre.id;
+      }
+
+      console.log("entrando en la funcion saveCategoria con la categoria: " + this.categoria)
+
+      //detalle para mostrar en los toast
+      const detalle = this.categoria.categoria;
+
       if (this.formularioRellenado(this.categoria)) {
-      //  console.log("punto 1");
+        //  console.log("punto 1");
         if (this.categoria.id) {
-      //    console.log("punto 2");
-          this.putCategoria(this.categoria).then(() => { this.getCategorias() });
-          toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: this.categoria.categoria, life: 3000 });
+            //  console.log("punto 2", this.categoria.categoria);
+          this.putCategoria(this.categoria).then(() => { this.getCategorias() 
+          toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: detalle, life: 3000 });
+          })
+          .catch(error => {
+              toast.add({ severity: 'error', summary: 'Error. No se ha podido crear la categoría', detail: detalle, life: 4000 });
+            });
         } else {
-     //     console.log("punto 3");
-          console.log(this.categoria);
-          this.postCategoria(this.categoria).then(() => { this.getCategorias() });
-          toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.categoria.categoria, life: 4000 });
+          //     console.log("punto 3");
+
+          console.log(JSON.stringify(this.categoria));
+          this.postCategoria(this.categoria).then(() => {
+            this.getCategorias()
+            toast.add({ severity: 'success', summary: 'Categoría creada', detail: detalle, life: 4000 })
+          })
+            .catch(error => {
+              toast.add({ severity: 'error', summary: 'Error. No se ha podido editar la categoría', detail: detalle, life: 4000 });
+            });
         }
         this.categoriaDialog = false;
         this.categoria = {};
@@ -106,12 +129,19 @@ export default {
     this.editCategoria = editCategoria;
     this.confirmDeleteCategoria = confirmDeleteCategoria;
     this.borrarCategoria = borrarCategoria;
-
-
-
   },
   computed: {
     ...mapState(categoriasStore, ['categorias']),
+    //  ...mapState(categoriasStore, ['grupos']),
+    ...mapState(categoriasStore, ['catPrincipales']),
+
+    getGrupos() {
+      const grupos = [];
+      this.catPrincipales.forEach(cat => {
+        grupos.push(cat.categoria);
+      });
+      return grupos;
+    }
   },
 
   methods: {
@@ -119,7 +149,8 @@ export default {
     ...mapActions(categoriasStore, ['postCategoria']),
     ...mapActions(categoriasStore, ['putCategoria']),
     ...mapActions(categoriasStore, ['deleteCategoria']),
-    ...mapActions(categoriasStore, ['getGrupos']),
+    // ...mapActions(categoriasStore, ['getGrupos']),
+    ...mapActions(categoriasStore, ['getCategoriasPrincipales']),
 
     initFilters() {
       this.filters = {
@@ -128,12 +159,16 @@ export default {
     },
 
     formularioRellenado(cat) {
-      return (cat.categoria &&
-        cat.descripcion &&
-        cat.minMilis &&
-        cat.maxMilis &&
-        cat.grupo &&
-        (cat.minMilis <= cat.maxMilis))
+      if (!this.esPrincipal)
+        return (cat.categoria &&
+          cat.descripcion &&
+          cat.minMilis &&
+          cat.maxMilis &&
+          cat.grupo &&
+          (cat.minMilis <= cat.maxMilis))
+      else
+        return (cat.categoria &&
+          cat.descripcion)
     },
 
   },
@@ -141,6 +176,10 @@ export default {
     this.initFilters()
     this.isLoading = true
     await this.getCategorias()
+
+    //await this.getGrupos()
+
+    await this.getCategoriasPrincipales()
 
     this.isLoading = false
 
@@ -210,6 +249,10 @@ export default {
 
         <Dialog v-model:visible="categoriaDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
           class="p-fluid">
+          <div class="field col custom-field-switch">
+            <label for="esPrincipal" class="custom-label">Categoría principal </label>
+            <InputSwitch v-model="esPrincipal" class="custom-input-switch" />
+          </div>
           <div class="field">
             <label for="name">Nombre de la categoría</label>
             <InputText id="name" v-model.trim="categoria.categoria" required="true" autofocus
@@ -221,9 +264,9 @@ export default {
               :class="{ 'p-invalid': submitted && !categoria.descripcion }" :required="true" />
           </div>
 
-          <div class="field">
+          <div v-if="!esPrincipal" class="field">
             <label for="grupo" class="mb-3">Grupo</label>
-            <Dropdown id="grupo" v-model="categoria.grupo" :options="getGrupos()"
+            <Dropdown v-if="catPrincipales" id="grupo" v-model="categoria.grupo" :options="getGrupos"
               :class="{ 'p-invalid': submitted && !categoria.grupo }" placeholder="Seleccione grupo">
               <template #value="grupo">
                 <div>
@@ -234,7 +277,7 @@ export default {
             </Dropdown>
           </div>
 
-          <div class="formgrid grid">
+          <div v-if="!esPrincipal" class="formgrid grid">
             <div class="field col">
               <label for="minMilis">μilis MIN</label>
               <InputNumber id="minMilis" v-model="categoria.minMilis" rows="1" cols="3"
@@ -253,7 +296,8 @@ export default {
           </template>
         </Dialog>
 
-        <Dialog v-model:visible="deleteCategoriaDialog" :style="{ width: '450px' }" header="Confirmación de borrado de categoría" :modal="true">
+        <Dialog v-model:visible="deleteCategoriaDialog" :style="{ width: '450px' }"
+          header="Confirmación de borrado de categoría" :modal="true">
           <div class="flex align-items-center justify-content-center">
             <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
             <span v-if="categoria">¿Está seguro que desea eliminar la categoría <b>{{ categoria.categoria
@@ -303,5 +347,15 @@ export default {
 .p-datatable-tbody .p-datatable-row {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.custom-input-switch {
+  margin-top: 4px;
+  margin-left: 1rem;
+}
+
+.custom-field-switch {
+  display: flex;
+  justify-content: center;
 }
 </style>

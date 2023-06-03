@@ -13,9 +13,6 @@ import Button from 'primevue/button';
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
 import ProgressSpinner from 'primevue/progressspinner';
-//importamos el get directmante de api-service, despues de tener problemas llamando al del store
-//import { getAcuartPorSiglas } from '@/stores/api-service';
-
 
 
 export default {
@@ -34,35 +31,18 @@ export default {
       modalCreate: null,
       submitted: false,
       deleteDptoDialog: false,
-      departamento: {
-        id: undefined,
-        acuartelamientoF: undefined, //filtro
-        nombre: '',
-        abreviatura: '',
-        acuartelamiento: '',
-        acuartelamientoN: '',
-        email: '',
-        responsableEmpleo: '',
-        responsableNombre: '',
-        telefono: '',
-        latitud: '',
-        numMateriales: 0,
-        longitud: '', // Corregir el nombre de la propiedad aquí
-        direccion: '',
-      },
+      departamento: {},
       isLoading: true,
       filtroAcuartelamiento: null,
       acuartelamientoFiltroModal: undefined,
-      kk: undefined
-      // departamentos: []
     };
   },
 
   computed: {
-    ...mapWritableState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['empleos']),
     ...mapState(departamentosStore, ['bases']),
     ...mapWritableState(acuartelamientosStore, ['acuartelamiento']),
+    ...mapWritableState(departamentosStore, ['departamentos']),
 
 
     acuartFiltroModal() {
@@ -109,15 +89,17 @@ export default {
 
 
     //prueba autocompletado dirección
-    //  const autocomplete = new google.maps.places.Autocomplete(
-    //    document.getElementById("direccion")
-    //  );
+    // descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
+    //      (en modal no funciona)
+      // const autocomplete = new google.maps.places.Autocomplete(
+      //   document.getElementById("direccion")
+      // );
 
-    //  autocomplete.addListener("place_changed", () => {
-    //    const place = autocomplete.getPlace();
-    //    this.address = place.formatted_address;
-    //    this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
-    //  });
+      // autocomplete.addListener("place_changed", () => {
+      //   const place = autocomplete.getPlace();
+      //   this.address = place.formatted_address;
+      //   this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
+      // });
 
 
 
@@ -132,11 +114,9 @@ export default {
 
       //asignamos el valor del store, ya que contiene la url del acuartelameiento
       this.departamento.acuartelamiento = this.acuartelamiento;
-
       const [latitud, longitud] = this.latLong.split(",")
       this.departamento.latitud = latitud
       this.departamento.longitud = longitud
-      //this.departamento.direccion = this.address
     
       // console.log(this.departamento.nombre);
       //console.log("id" + this.departamento.id + this.formularioRellenado(this.departamento))
@@ -246,7 +226,6 @@ export default {
       }
     },
 
-
     
     getAddressFrom(lat, long) {
       axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=AIzaSyAFnZTjnmXpBH9nZgMyzxKZzwzAYPKpYow`)
@@ -298,58 +277,8 @@ export default {
 
       if (idMapa == "mapModal") {
         map.addListener('click', this.handleMapClick);
-
-        // const autocomplete = new google.maps.places.Autocomplete(
-        //   document.getElementById("direccionModal")
-        // );
-
-        // autocomplete.addListener("place_changed", () => {
-        //   const place = autocomplete.getPlace();
-        //   this.address = place.formatted_address;
-        //   this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
-        // });
       }
     },
-
-
-
-    // onDialogShow() {
-    //   console.log("modal abierto")
-
-    // navigator.geolocation.getCurrentPosition(position => {
-    //   const { latitude, longitude } = position.coords;
-    //   this.getAddressFrom(latitude, longitude);
-
-    //   this.mostrarUbicacion("mapModal", latitude, longitude);
-
-    // }, error => {
-    //   this.error = error;
-    // });
-
-
-    // const direccionModalElement = document.getElementById("direccionModal");
-    // if (direccionModalElement) {
-    //   console.log("modal abierto");
-
-    //   const autocomplete = new google.maps.places.Autocomplete(direccionModalElement);
-    //   console.log(autocomplete);
-    //   console.log(direccionModalElement);
-    //   console.log(document.getElementById("direccion"));
-    //   autocomplete.addListener("place_changed", () => {
-    //     console.log("Lugar seleccionado");
-    //     const place = autocomplete.getPlace();
-    //     this.address = place.formatted_address;
-    //     this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
-    //   });
-
-    //   console.log("ID encontrado correctamente");
-    // } else {
-    //   console.log("No se encontró ningún elemento con el ID 'direccionModal'");
-    // }
-
-    // Asociar el mapa al autocompletado
-
-    //  },
 
 
     handleMapClick(event) {
@@ -454,12 +383,9 @@ export default {
       </div>
     </section>
     <section class="right-section">
-      <!-- <InputText id="direccion" v-model.trim="address" required="true" autofocus /> -->
-      <!-- <div>
-        <InputText id="direccion" v-model.trim="address" required="true" autofocus />
-        <InputText id="LatLong" v-model.trim="latLong" disabled />
-        <Button label="Posicionar unidades" click="obtenerCoordenadas" /> 
-      </div> -->
+      <!-- descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
+            (en modal no funciona)-->
+       <!-- <InputText id="direccion" v-model.trim="address" required="true" autofocus />   -->
       <section id="map" ref="mapContainer">
       </section>
     </section>

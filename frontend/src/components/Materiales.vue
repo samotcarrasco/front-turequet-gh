@@ -21,15 +21,13 @@ import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api'
-import { llamadaAPI, host } from '@/stores/api-service'
-
-
+import { host } from '@/stores/api-service'
 
 
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
-    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch//, Toolbar
+    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch, Toolbar
   },
   // provide: {
   //   tipoVista: undefined
@@ -53,25 +51,7 @@ export default {
       // categoriaSeleccionada: null,
       visible: false,
       filters: {},
-      material: {
-        // nombre: '',
-        // descripcion: '',
-        // fechaAdquisicion: null,
-        // fechaOferta: null,
-        // categoria: '',
-        // imagen: '',
-        // imgReducida: '',
-        // estado: '',
-        // milis: 0,
-        // cantidad: 1,
-        // dimensiones: '',
-        // peso: '',
-        // tipoMaterial: '',
-        // inventariable: '',
-        // noc: '',
-        // numeroSerie: '',
-        // bonificacion: undefined,
-      },
+      material: {},
       esInventariable: false,
       idCategoria: undefined,
       submitted: false,
@@ -135,22 +115,33 @@ export default {
 
       this.submitted = true;
 
+      //detalle para mostrar en los toast
+      const detalle = this.material.nombre;
+
       if (this.formularioRellenado(this.material)) {
         if (this.material.id) {
-          console.log("punto 2");
-          this.putMaterial(this.material).then(() => { this.getMateriales() });
-          toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 });
+        //  console.log("punto 2");
+          this.putMaterial(this.material).then(() => 
+          { this.getMateriales()
+            toast.add({ severity: 'success', summary: 'Material modificado', detail: detalle, life: 3000 });
+          }).catch(error => {
+              toast.add({ severity: 'error', summary: 'Error. No se ha podido editar el material', detail: detalle, life: 4000 });
+            });
         } else {
-          console.log("punto 3");
+         // console.log("punto 3");
 
-          this.postMaterial(this.material).then(() => { this.getMateriales() });
-          toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 });
-
+          this.postMaterial(this.material).then(() => { 
+            this.getMateriales() 
+            toast.add({ severity: 'success', summary: 'Material creado', detail: detalle, life: 3000 });
+         }).catch(error => {
+              toast.add({ severity: 'error', summary: 'Error. No se ha podido crear el material', detail: detalle, life: 4000 });
+            });
+       
         }
 
         if (this.material.bonificacion) {
           toast.add({ severity: 'info', summary: 'Bonificación obtenida', detail: this.material.bonificacion + " μilis", life: 3050 });
-          //this.milisMenu = this.milisMenu + this.material.bonificacion;ç
+          //this.milisMenu = this.milisMenu + this.material.bonificacion;
           console.log("llamando a actualizar milis menu")
           this.actualizarMilisMenu(this.material.bonificacion)
         }
@@ -165,25 +156,15 @@ export default {
 
     const patchFechaEntregaModal = () => {
 
-
-      // this.material.categoria = host + "api/categorias/" + this.idCategoria
-      // this.material.estado = 0
-      // this.material.fechaOferta = new Date()
-
-      //   this.material.dptoOferta = this.dptoActualAPI._links.self.href
-
-      // this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad;
-
-
       const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario });
       console.log("entrando en la funcion patchFechaEntregaModal con el modelo", modeloFecha);
 
       this.submitted = true;
 
-      //if (this.formularioRellenado(this.material)) {
-
-      this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { this.getMateriales() });
-      toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 });
+      this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { 
+        this.getMateriales() 
+        toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 });
+      });
       this.asignarFechaDialog = false;
       //}
     };
@@ -211,13 +192,8 @@ export default {
     this.hideDialog = hideDialog;
     this.saveMaterial = saveMaterial;
     this.patchFechaEntregaModal = patchFechaEntregaModal;
-    //this.editMaterial = editMaterial;
     this.confirmDeleteMaterial = confirmDeleteMaterial;
     this.borrarMaterial = borrarMaterial;
-
-
-    //  //Agrupar categorías por grupo
-
 
   },
 
@@ -246,9 +222,6 @@ export default {
 
 
     materialesFiltrados() {
-      //this.asignarPendientes();
-      //this.asignarEntregados();
-
       switch (this.tipoVista) {
         case "ofertados":
           return this.categoriasSeleccionadas.length === 0
@@ -403,9 +376,7 @@ export default {
         const img = new Image();
         img.onload = () => {
           context.drawImage(img, 0, 0, newWidth, newHeight);
-
           const reducedImage = canvas.toDataURL('image/jpeg', 0.8);
-
           //console.log("imagen reducida", reducedImage);
           this.material.imgReducida = reducedImage;
         };
@@ -417,11 +388,6 @@ export default {
     asignarPendientes() {
       // Actualizar el estado a "pendiente entrega/rececpcion" en los materiales pendientes y de la unidad actual
       this.materiales.forEach(material => {
-        //  console.log("material ", material.id, material.estado)
-        // if (material.estado ==  "pendiente" || material.estado ==  "pendiente entrega" || material.estado ==  "pendiente rececpcion"  ){
-        //       console.log("el material " , material.id, " esta en estado ", 
-        //       material.estado, " dpto of,", material.dptoOfertaN, "dpto Adq", material.dptoAdquisicionN ," actual",this.dptoActual)
-        // }
         if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
           //   console.log("   el material " , material.id, " esta en estado pendiente entrega  para el dpeto",this.dptoActual)
           material.estado = "pendiente entrega"
@@ -442,22 +408,11 @@ export default {
       });
     },
 
-    asignarCategoriaMaterial() {
-      this.materiales.forEach(m => {
-        //console.log("URL LINK " + m._links.categoria.href)
-        llamadaAPI('get', null, m._links.categoria.href).then(r => {
-          m.categoria = r.data;
-          //console.log("ASDFASDF" + m.categoria)
-        })
-      })
-
-    },
-
     inicializarSelectorCategorias() {
       this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
         let grupo = grupos.find(g => g.label === categoria.grupo);
         if (!grupo) {
-          // Si no existe, crear un nuevo grupo
+          // Si no existe, creamos un nuevo grupo
           grupo = {
             label: categoria.grupo,
             code: categoria.grupo,
@@ -508,18 +463,7 @@ export default {
 
     console.log("DPTO ACTUAL API", JSON.stringify(this.dptoActualAPI));
 
-    //this.asignarCategoriaMaterial();
-
     this.inicializarSelectorCategorias();
-
-    // // Resultado final: categorías agrupadas por grupo
-    //console.log("categorias agrupadas", this.categoriasAgrupadas);
-
-    // this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
-    //   .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
-    //  this.categoriasFiltro = Array.from(new Set(this.materiales.map(material => material.categoriaN)))
-    // .map((categoriaN, index) => ({ id: index + 1, name: categoriaN }));
-
 
   }
 
@@ -711,10 +655,6 @@ export default {
         <InputText id="bonificacion" v-model.trim="bonificacion" disabled />
         <!-- <InputText id="bonificacion" v-model="material.bonificacion" :required="false" readonly /> -->
       </div>
-      <!-- <div v-if="!esInventariable || !isInventariable" class="field col custom-field">
-        <label for="null"> </label>
-      </div> -->
-
     </div>
 
     <template #footer>
