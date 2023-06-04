@@ -1,16 +1,16 @@
 <script>
-import { useToast } from 'primevue/usetoast';
-import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast'
+import Toast from 'primevue/toast'
 import { mapActions, mapState } from 'pinia'
 import { materialesStore } from '@/stores/materiales'
 import { departamentosStore } from '@/stores/departamentos'
-import jsPDF from 'jspdf';
-import Card from 'primevue/card';
-import Button from 'primevue/button';
-import Galleria from 'primevue/galleria';
-import Dialog from 'primevue/dialog';
+import jsPDF from 'jspdf'
+import Card from 'primevue/card'
+import Button from 'primevue/button'
+import Galleria from 'primevue/galleria'
+import Dialog from 'primevue/dialog'
 import Divider from 'primevue/divider'
-import ProgressSpinner from 'primevue/progressspinner';
+import ProgressSpinner from 'primevue/progressspinner'
 
 
 export default {
@@ -49,10 +49,6 @@ export default {
     ...mapActions(materialesStore, ['putMaterial']),
     ...mapActions(departamentosStore, ['putAumentarCretido']),
 
-    eliminarMaterial() {
-      // Lógica para eliminar el material
-    },
-
     materialAdquirido(material) {
       // console.log("acutal", this.dptoActual)
       // console.log("adquisicion", this.dptoActualAPI);
@@ -73,120 +69,118 @@ export default {
 
 
     adquirirMaterial(material) {
-      //this.material = { ...material };
-      this.material = material;
-      console.log(this.material);
-      this.adquirirDialog = true;
-      this.cabecera = "Adquirir material";
+      this.material = material
+      console.log(this.material)
+      this.adquirirDialog = true
+      this.cabecera = "Adquirir material"
     },
 
     mostrarDetallesAdq(material) {
-      this.materal = { ...material };
-      this.detallesAdqDialog = true;
+      this.detallesAdqDialog = true
       this.cabecera = "Detalles de la adquisición"
     },
 
 
     generarPDF(material) {
-      const doc = new jsPDF();
+      const doc = new jsPDF()
 
-      const logo = new Image();
-      const logoACING = new Image();
+      const logo = new Image()
+      const logoACING = new Image()
 
       //estas imagenes las hemos cargado en "public" por compatibilidad con netlifly
-      logo.src = "./logo.png";
-      logoACING.src = "./logoACING.png";
+      logo.src = "./logo.png"
+      logoACING.src = "./logoACING.png"
       // logo.src = "./src/assets/img/logos/logo.png";
       // logoACING.src = "./src/assets/img/logos/logoACING.png";
       
-      const logoWidth = 12;
-      const logoHeight = 12;
-      const logoACINGWidth = 12;
-      const logoACINGHeight = 18;
+      const logoWidth = 12
+      const logoHeight = 12
+      const logoACINGWidth = 12
+      const logoACINGHeight = 18
 
 
-      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight);
-      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight);
-      doc.setFontSize(16);
-      doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center');
-      doc.setFontSize(14);
-      doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center');
-      doc.setFontSize(12);
+      doc.addImage(logo, 'PNG', 10, 6, logoWidth, logoHeight)
+      doc.addImage(logoACING, 'PNG', 180, 4, logoACINGWidth, logoACINGHeight)
+      doc.setFontSize(16)
+      doc.text('SISTEMA TRUEQUET', doc.internal.pageSize.getWidth() / 2, 10, null, null, 'center')
+      doc.setFontSize(14)
+      doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center')
+      doc.setFontSize(12)
       // línea horizontal
-      doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30);
-      doc.text(`Material intercambiado: ${material.nombre}`, 10, 40);
-      doc.text(`Descripción: ${material.descripcion}`, 10, 50);
-      doc.text(`Crédito en μilis: ${material.milis}`, 10, 60);
-      doc.text(`Unidad ofertante: ${material.dptoOfertaN}`, 10, 70);
-      doc.text('Responsable:', 10, 80);
-      doc.text('Teléfono:', 10, 90);
-      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicionN}`, 10, 100);
-      doc.text('Responsable:', 10, 110);
-      doc.text('Teléfono:', 10, 120);
+      doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30)
+      doc.text(`Material intercambiado: ${material.nombre}`, 10, 40)
+      doc.text(`Descripción: ${material.descripcion}`, 10, 50)
+      doc.text(`Crédito en μilis: ${material.milis}`, 10, 60)
+      doc.text(`Unidad ofertante: ${material.dptoOfertaN}`, 10, 70)
+      doc.text('Responsable:', 10, 80)
+      doc.text('Teléfono:', 10, 90)
+      doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicionN}`, 10, 100)
+      doc.text('Responsable:', 10, 110)
+      doc.text('Teléfono:', 10, 120)
 
       // línea horizontal
-      doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130);
+      doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130)
 
-      doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140);
-      doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150);
+      doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140)
+      doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150)
 
-      doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200);
-      doc.save(`intercambio-material${material.nombre}.pdf`);
+      doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200)
+      doc.save(`intercambio-material${material.nombre}.pdf`)
 
     },
 
     goBack() {
-      console.log('Botón volver presionado');
-      this.$router.back();
-      window.location.reload();
+      console.log('Botón volver presionado')
+      this.$router.back()
+      window.location.reload()
     }
 
 
   },
   mounted() {
-    // console.log("mountedddd ", this.$route.query.tipoVista);
+    // console.log("mountedddd ", this.$route.query.tipoVista)
 
-    const toast = useToast();
+    const toast = useToast()
 
     const modalAdquirirMaterial = () => {
-      this.material = {};
-      this.submitted = false;
-      this.adquirirDialog = true;
+      this.material = {}
+      this.submitted = false
+      this.adquirirDialog = true
       this.cabecera = "Confirmación de adquisición de material"
-    };
+    }
 
     const modalDetallesAdq = () => {
-      this.material = {};
-      this.submitted = false;
-      this.detallesAdqDialog = true;
+      this.material = {}
+      this.submitted = false
+      this.detallesAdqDialog = true
       this.cabecera = "Detalles de la adquisición de material"
-    };
+    }
 
     const hideDialog = () => {
-      this.adquirirDialog = false;
-      this.submitted = false;
-    };
+      this.adquirirDialog = false
+      this.submitted = false
+    }
 
     const hideDialogDet = () => {
-      this.mostrarDetallesAdq = false;
-      this.submitted = false;
-    };
+      this.mostrarDetallesAdq = false
+      this.submitted = false
+    }
 
 
     const saveMaterial = () => {
-      this.submitted = true;
+      this.submitted = true
 
-      this.generarPDF(this.material);
+      this.generarPDF(this.material)
       //console.log("actualizando material: " +  JSON.stringify(this.material))
       //actualizamos el material con la info correspondiente
       this.material.estado = "pendiente"
       //this.material.dptoAdquisicion = this.dptoActualAPI
-      this.material.categoria = this.material._links.categoria.href;
+      this.material.categoria = this.material._links.categoria.href
       this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
-      this.material.dptoAdquisicionN = this.dptoActual;
+      this.material.dptoAdquisicionN = this.dptoActual
       // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
-      this.material.dptoOferta = this.material._links.dptoOferta.href;
-      delete this.material._links;
+      this.material.dptoOferta = this.material._links.dptoOferta.href
+      delete this.material._links
       this.material.fechaAdquisicion = new Date()
       //console.log("actualizando material: " +  JSON.stringify(this.material))
       Promise.all([
@@ -194,20 +188,19 @@ export default {
         this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis*this.material.cantidad),
         this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis*this.material.cantidad)
       ]).then(() => {
-        this.getMateriales();
-        console.log("Actualizando credito de unidades implicadas");
-        toast.add({ severity: 'success', summary: 'Adquisición realizada', detail: this.material.nombre, life: 3000 });
+        this.getMateriales()
+        console.log("Actualizando credito de unidades implicadas")
+        toast.add({ severity: 'success', summary: 'Adquisición realizada', detail: this.material.nombre, life: 3000 })
       }).catch((error) => {
-        console.error('Error al actualizar material:', error);
-      });
+        console.error('Error al actualizar material:', error)
+      })
     }
 
-
-    this.modalAdquirirMaterial = modalAdquirirMaterial;
-    this.modalDetallesAdq = modalDetallesAdq;
-    this.hideDialog = hideDialog;
-    this.hideDialogDet = hideDialogDet;
-    this.saveMaterial = saveMaterial;
+    this.modalAdquirirMaterial = modalAdquirirMaterial
+    this.modalDetallesAdq = modalDetallesAdq
+    this.hideDialog = hideDialog
+    this.hideDialogDet = hideDialogDet
+    this.saveMaterial = saveMaterial
 
 
   },
@@ -216,13 +209,13 @@ export default {
   async created() {
 
     //iniciamos la aplicación con rol gestor  
-    this.isLoading = true;
-    console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id);
-    await this.getMaterialPorId(this.$route.params.id);
+    this.isLoading = true
+    console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id)
+    await this.getMaterialPorId(this.$route.params.id)
     // console.log("material string: ", JSON.stringify(this.materialActual))
-    this.material = this.materialActual;
+    this.material = this.materialActual
     console.log(JSON.stringify(this.material))
-    this.isLoading = false;
+    this.isLoading = false
 
   }
 }
@@ -252,38 +245,16 @@ export default {
           
         </div>
         <div class="col-sm-4">
-          <!-- <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw"> -->
           <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
-          <!-- <Galleria v-model:visible="displayBasic" :value="images" :responsiveOptions="responsiveOptions" :numVisible="9"
-            containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
-            <template #item="slotProps">
-              <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />
-            </template>
-            <template #thumbnail="slotProps">
-              <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
-            </template>
-          </Galleria> -->
-
-
-          <!-- <Button label="Show" icon="pi pi-external-link" @click="displayBasic = true" /> -->
         </div>
         <div class="p-mb-2">
           <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart"
             @click="adquirirMaterial(material)" />
-          <!-- <Button v-if="materialOfertado(material)" label="Editar" icon="pi pi-pencil" class="p-button-secondary" />
-          <Button v-if="materialOfertado(material)" label="Eliminar" icon="pi pi-trash" class="p-button-danger" />
-          <Button v-if="tipoVista === 'ofertados'" label="Eliminar" icon="pi pi-trash" class="p-button-danger" /> -->
           <Button v-if="materialAdquirido(material)" label="Ver detalles intercambio" class="p-button-info" 
             @click="mostrarDetallesAdq(material)" />
-          <!-- <router-link :to="{ name: 'materiales' }  />"> -->
-          <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
-          <!-- </router-link> -->
-          <!-- <router-link class="nav-link" :to="{ name: 'materiales' } @click="goBack" />">volver</router-link> -->
-
         </div>
       </div>
     </template>
-    <!-- <Button label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" @click="goBack" /> -->
   </Card>
 
 

@@ -21,11 +21,7 @@ export const materialesStore = defineStore('materiales', {
       //la de dentro es la funcion importada
       await getMateriales().then(r => this.materiales = r.data._embedded.materiales)
       //añadimos la categoria de cada material
-    },
-    // getMaterialPorId(id) {
-    //   return this.materiales.find(m => m.id == id)
-    // },
-    
+    },  
 
     async getMaterialPorId(id) {
       await getMaterialPorId(id).then(r => this.materialActual = r.data)

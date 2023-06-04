@@ -1,7 +1,7 @@
 <script>
-import { departamentosStore } from '@/stores/departamentos';
+import { departamentosStore } from '@/stores/departamentos'
 import { mapWritableState, mapState, mapActions } from 'pinia'
-import ProgressSpinner from 'primevue/progressspinner';
+import ProgressSpinner from 'primevue/progressspinner'
 
 export default {
  
@@ -10,7 +10,7 @@ export default {
   },
   data() {
     return {
-      roles: ['Unidad', 'Gestor'],
+      roles: ['Departamento', 'Gestor'],
       loading: true 
     }
   },
@@ -31,21 +31,21 @@ export default {
     ...mapActions(departamentosStore, ['getDeptoActualAPI']),
 
     cambiarDpto(event) {
-      const storeDepto = departamentosStore();
-      storeDepto.cambiarDpto(event.target.value);
+      const storeDepto = departamentosStore()
+      storeDepto.cambiarDpto(event.target.value)
       console.log("milis", this.milisMenu)
-      //this.getBonificacion(this.dptoActualAPI.id);
+      //this.getBonificacion(this.dptoActualAPI.id)
     },
 
     cambiarRol(event) {
-      const storeDepto = departamentosStore();
+      const storeDepto = departamentosStore()
       storeDepto.cambiarRol(event.target.value)
       if (event.target.value === 'Gestor') {
-        this.$router.push({ name: 'categorias' });
+        this.$router.push({ name: 'categorias' })
       } else {
-        this.$router.push({ name: 'materiales' });
-        this.getDepartamentos();
-        this.getDeptoActualAPI();
+        this.$router.push({ name: 'materiales' })
+        this.getDepartamentos()
+        this.getDeptoActualAPI()
       }
     },
 
@@ -53,19 +53,19 @@ export default {
   },
   async created() {
 
-    this.loading = true;
+    this.loading = true
 
-    await this.getDepartamentos();
+    await this.getDepartamentos()
     //console.log("long dptos siglas:" + this.departamentosSiglas.length)
     //iniciamos la aplicación con rol gestor  
 
-   // await this.getDeptoActualAPI();
+   // await this.getDeptoActualAPI()
 
-    this.loading = false;
+    this.loading = false
 
 
     // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
-    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
+    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href)
     //iniciamos la aplicación con rol gestor  
   },
 }
@@ -95,7 +95,7 @@ export default {
           </li>
         </ul>
       </div>
-      <div v-if="rolActual == 'Unidad' && milisMenu" class="milis-menu">
+      <div v-if="rolActual == 'Departamento' && milisMenu" class="milis-menu">
           {{ milisMenu }} μ
         </div>
       <div class="card flex justify-content-center" v-if="loading">
@@ -105,7 +105,7 @@ export default {
           <!-- <li class="milisMenu" v-if="getMilisUnidad > 0"> milis: {{ getMilisUnidad }} </li>  -->
           <li v-if="departamentosSiglas.length > 0
             && $route.name !== 'material'
-            && rolActual == 'Unidad'">
+            && rolActual == 'Departamento'">
             <!-- se puede quitar el evento @Change, porque el store es writable-->
             <select class="form-select mr-2" v-model="dptoActual" @change="cambiarDpto">
               <option v-for="dep in departamentosSiglas" :key="dep.id" :value="dep.siglas">{{ dep.siglas }}</option>

@@ -1,16 +1,16 @@
 <script>
-import { useToast } from 'primevue/usetoast';
-import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast'
+import Toast from 'primevue/toast'
 
-import { acuartelamientosStore } from '@/stores/acuartelamientos';
+import { acuartelamientosStore } from '@/stores/acuartelamientos'
 import { mapState, mapActions } from 'pinia'
-import InputText from 'primevue/inputtext';
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
+import InputText from 'primevue/inputtext'
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button';
-import Dropdown from 'primevue/dropdown';
-import ProgressSpinner from 'primevue/progressspinner';
+import Button from 'primevue/button'
+import Dropdown from 'primevue/dropdown'
+import ProgressSpinner from 'primevue/progressspinner'
 
 
 
@@ -33,7 +33,7 @@ export default {
       deleteAcuartDialog: false,
       acuartelamiento: {},
       isLoading: true,
-    };
+    }
   },
 
   computed: {
@@ -43,29 +43,29 @@ export default {
 
 
   mounted() {
-    const toast = useToast();
+    const toast = useToast()
 
     const modalCreate = () => {
       this.acuartelamiento = {}
       this.submitted = false
       this.acuartDialog = true
       this.cabecera = "Alta de nuevo acuartelamiento"
-    };
+    }
 
 
 
     const hideDialog = () => {
       this.acuartDialog = false
       this.submitted = false
-    };
+    }
 
     const saveAcuart = () => {
-      this.submitted = true;
+      this.submitted = true
 
 
 
-      this.acuartelamiento.direccion = this.address;
-      // console.log(this.acuartelamiento.nombre);
+      this.acuartelamiento.direccion = this.address
+      // console.log(this.acuartelamiento.nombre)
       //console.log("id" + this.acuartelamiento.id + this.formularioRellenado(this.acuartelamiento))
       // console.log("entrando en la funcion saveAcuart con el material", JSON.stringify(this.acuartelamiento))
 
@@ -78,39 +78,39 @@ export default {
           this.postAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
           toast.add({ severity: 'success', summary: 'Acuartelamiento creado', detail: this.acuartelamiento.nombre + " se ha creado correctamente", life: 4000 })
         }
-        this.acuartDialog = false;
-        this.acuartelamiento = {};
+        this.acuartDialog = false
+        this.acuartelamiento = {}
       }
-    };
+    }
 
 
     const editAcuart = (editAcuart) => {
-      this.acuartelamiento = { ...editAcuart };
-      console.log("entrando en editar acuartelamento", this.acuartelamiento);
-      this.acuartDialog = true;
+      this.acuartelamiento = { ...editAcuart }
+      console.log("entrando en editar acuartelamento", this.acuartelamiento)
+      this.acuartDialog = true
       this.cabecera = "Editar acuartelamiento"
 
-    };
+    }
 
     const confirmDeleteAcuart = (acuart) => {
-      this.acuartelamiento = acuart;
-      this.deleteAcuartDialog = true;
-    };
+      this.acuartelamiento = acuart
+      this.deleteAcuartDialog = true
+    }
 
     const borrarAcuart = () => {
-      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
-      this.deleteAcuartDialog = false;
-      console.log("antes de borrar", this.acuartelamiento);
-      this.deleteAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() });
-      toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 });
+      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id)
+      this.deleteAcuartDialog = false
+      console.log("antes de borrar", this.acuartelamiento)
+      this.deleteAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
+      toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 })
 
-    };
-    this.modalCreate = modalCreate;
-    this.hideDialog = hideDialog;
-    this.saveAcuart = saveAcuart;
-    this.editAcuart = editAcuart;
-    this.confirmDeleteAcuart = confirmDeleteAcuart;
-    this.borrarAcuart = borrarAcuart;
+    }
+    this.modalCreate = modalCreate
+    this.hideDialog = hideDialog
+    this.saveAcuart = saveAcuart
+    this.editAcuart = editAcuart
+    this.confirmDeleteAcuart = confirmDeleteAcuart
+    this.borrarAcuart = borrarAcuart
 
   },
   methods: {

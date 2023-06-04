@@ -1,22 +1,22 @@
 
 <script>
 
-import { useToast } from 'primevue/usetoast';
-import { FilterMatchMode } from 'primevue/api';
-import Toast from 'primevue/toast';
-import Button from 'primevue/button';
-import Dropdown from 'primevue/dropdown';
-import DataTable from 'primevue/datatable';
-import Textarea from 'primevue/textarea';
-import InputText from 'primevue/inputtext';
-import Column from 'primevue/column';
-import InputNumber from 'primevue/inputnumber';
-import Dialog from 'primevue/dialog';
-import InputSwitch from 'primevue/inputswitch';
-import ProgressSpinner from 'primevue/progressspinner';
-import { categoriasStore } from '@/stores/categorias';
-import { mapState, mapActions } from 'pinia';
-import { host } from '@/stores/api-service';
+import { useToast } from 'primevue/usetoast'
+import { FilterMatchMode } from 'primevue/api'
+import Toast from 'primevue/toast'
+import Button from 'primevue/button'
+import Dropdown from 'primevue/dropdown'
+import DataTable from 'primevue/datatable'
+import Textarea from 'primevue/textarea'
+import InputText from 'primevue/inputtext'
+import Column from 'primevue/column'
+import InputNumber from 'primevue/inputnumber'
+import Dialog from 'primevue/dialog'
+import InputSwitch from 'primevue/inputswitch'
+import ProgressSpinner from 'primevue/progressspinner'
+import { categoriasStore } from '@/stores/categorias'
+import { mapState, mapActions } from 'pinia'
+import { host } from '@/stores/api-service'
 
 
 export default {
@@ -40,95 +40,95 @@ export default {
       isLoading: true,
       esPrincipal: undefined
 
-    };
+    }
   },
   mounted() {
 
-    const toast = useToast();
+    const toast = useToast()
 
     const modalEditCreate = () => {
-      this.categoria = {};
-      this.submitted = false;
-      this.categoriaDialog = true;
+      this.categoria = {}
+      this.submitted = false
+      this.categoriaDialog = true
       this.cabecera = "Alta de nueva categoría"
-    };
+    }
 
     const hideDialog = () => {
-      this.categoriaDialog = false;
-      this.submitted = false;
-    };
+      this.categoriaDialog = false
+      this.submitted = false
+    }
 
     const saveCategoria = () => {
-      this.submitted = true;
+      this.submitted = true
 
-      const catPadre = this.catPrincipales.find(cat => cat.categoria === this.categoria.grupo);
+      const catPadre = this.catPrincipales.find(cat => cat.categoria === this.categoria.grupo)
 
       if (catPadre) {
-        this.categoria.categoriaPadre = host + "api/categorias/" + catPadre.id;
+        this.categoria.categoriaPadre = host + "api/categorias/" + catPadre.id
       }
 
       console.log("entrando en la funcion saveCategoria con la categoria: " + this.categoria)
 
       //detalle para mostrar en los toast
-      const detalle = this.categoria.categoria;
+      const detalle = this.categoria.categoria
 
       if (this.formularioRellenado(this.categoria)) {
-        //  console.log("punto 1");
+        //  console.log("punto 1")
         if (this.categoria.id) {
-            //  console.log("punto 2", this.categoria.categoria);
+            //  console.log("punto 2", this.categoria.categoria)
           this.putCategoria(this.categoria).then(() => { this.getCategorias() 
-          toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: detalle, life: 3000 });
+          toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: detalle, life: 3000 })
           })
           .catch(error => {
-              toast.add({ severity: 'error', summary: 'Error. No se ha podido crear la categoría', detail: detalle, life: 4000 });
-            });
+              toast.add({ severity: 'error', summary: 'Error. No se ha podido crear la categoría', detail: detalle, life: 4000 })
+            })
         } else {
-          //     console.log("punto 3");
+          //     console.log("punto 3")
 
-          console.log(JSON.stringify(this.categoria));
+          console.log(JSON.stringify(this.categoria))
           this.postCategoria(this.categoria).then(() => {
             this.getCategorias()
             toast.add({ severity: 'success', summary: 'Categoría creada', detail: detalle, life: 4000 })
           })
             .catch(error => {
-              toast.add({ severity: 'error', summary: 'Error. No se ha podido editar la categoría', detail: detalle, life: 4000 });
-            });
+              toast.add({ severity: 'error', summary: 'Error. No se ha podido editar la categoría', detail: detalle, life: 4000 })
+            })
         }
-        this.categoriaDialog = false;
-        this.categoria = {};
+        this.categoriaDialog = false
+        this.categoria = {}
       }
-    };
+    }
 
     const editCategoria = (editCategoria) => {
-      this.categoria = { ...editCategoria };
-      console.log(this.categoria);
-      this.categoriaDialog = true;
+      this.categoria = { ...editCategoria }
+      console.log(this.categoria)
+      this.categoriaDialog = true
       this.cabecera = "Editar categoría"
 
-    };
+    }
 
     const confirmDeleteCategoria = (categoria) => {
-      this.categoria = categoria;
-      this.deleteCategoriaDialog = true;
-    };
+      this.categoria = categoria
+      this.deleteCategoriaDialog = true
+    }
 
     //cambiamos deleteCategoria por borrarCategoria
     //para que no entre en bucle con la variable del store
     const borrarCategoria = () => {
-      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
-      this.deleteCategoriaDialog = false;
-      //console.log("antes de borrar");
-      this.deleteCategoria(this.categoria).then(() => { this.getCategorias() });
-      toast.add({ severity: 'success', summary: 'Categoría eliminada', detail: this.categoria.categoria, life: 3000 });
+      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id)
+      this.deleteCategoriaDialog = false
+      //console.log("antes de borrar")
+      this.deleteCategoria(this.categoria).then(() => { this.getCategorias() })
+      toast.add({ severity: 'success', summary: 'Categoría eliminada', detail: this.categoria.categoria, life: 3000 })
 
-    };
+    }
 
-    this.modalEditCreate = modalEditCreate;
-    this.hideDialog = hideDialog;
-    this.saveCategoria = saveCategoria;
-    this.editCategoria = editCategoria;
-    this.confirmDeleteCategoria = confirmDeleteCategoria;
-    this.borrarCategoria = borrarCategoria;
+    this.modalEditCreate = modalEditCreate
+    this.hideDialog = hideDialog
+    this.saveCategoria = saveCategoria
+    this.editCategoria = editCategoria
+    this.confirmDeleteCategoria = confirmDeleteCategoria
+    this.borrarCategoria = borrarCategoria
   },
   computed: {
     ...mapState(categoriasStore, ['categorias']),
@@ -136,11 +136,11 @@ export default {
     ...mapState(categoriasStore, ['catPrincipales']),
 
     getGrupos() {
-      const grupos = [];
+      const grupos = []
       this.catPrincipales.forEach(cat => {
-        grupos.push(cat.categoria);
-      });
-      return grupos;
+        grupos.push(cat.categoria)
+      })
+      return grupos
     }
   },
 
@@ -155,7 +155,7 @@ export default {
     initFilters() {
       this.filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      };
+      }
     },
 
     formularioRellenado(cat) {

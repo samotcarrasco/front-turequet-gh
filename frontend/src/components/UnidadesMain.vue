@@ -1,9 +1,9 @@
 <script>
 import Panel from 'primevue/panel'
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import Departamentos from './Departamentos.vue';
-import Acuartelamientos from './Acuartelamientos.vue';
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import Departamentos from './Departamentos.vue'
+import Acuartelamientos from './Acuartelamientos.vue'
 
 
 export default {
@@ -12,7 +12,7 @@ export default {
   data() {
     return {
       currentTab: 'departamentos'
-    };
+    }
   },
  
   computed: {
@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     handleTabChange(tab) {
-      this.currentTab = tab.header;
+      this.currentTab = tab.header
     }
 
   },

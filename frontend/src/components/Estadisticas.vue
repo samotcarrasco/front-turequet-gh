@@ -1,7 +1,7 @@
 
 <script>
-import Chart from 'primevue/chart';
-import Accordion from 'primevue/accordion';
+import Chart from 'primevue/chart'
+import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import { categoriasStore } from '@/stores/categorias'
 import { materialesStore } from '@/stores/materiales'
@@ -17,14 +17,13 @@ export default {
     return {
       categMateriales: [],
       maxMin: "",
-      barData: {
+      grafBarras: {
         labels: [],
         datasets: [
           {
             label: 'Número de materiales por categoría',
             backgroundColor: '#889e59',
             data: [],
-            //fontSize: 26 
           }
         ]
       },
@@ -53,42 +52,46 @@ export default {
             }
           }
         }
-      }
-    };
+      },
+      grafQueso: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Número de materiales por categoría',
+            backgroundColor: [],
+            data: [],
+            //fontSize: 26 
+          }
+        ]
+      },
+    }
   },
   computed: {
     ...mapState(categoriasStore, ['categorias'])
 
   },
   methods: {
-    ...mapActions(materialesStore, ['getNumeroMaterialesPorCategoria']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(materialesStore, ['getMateriales']),
 
 
     getNumMaterialesPorCategoria() {
-      const categMateriales = [];
+      const categMateriales = []
 
       for (let i = 0; i < this.categorias.length; i++) {
-        const categoria = this.categorias[i].categoria;
-        const numMateriales = this.categorias[i].numMateriales;
+        const categoria = this.categorias[i].categoria
+        const numMateriales = this.categorias[i].numMateriales
 
         // Crear un objeto de categoría y agregarlo al array
-        const categObjeto = { categoria: categoria, numMateriales: numMateriales };
-        categMateriales.push(categObjeto);
+        const categObjeto = { categoria: categoria, numMateriales: numMateriales }
+        categMateriales.push(categObjeto)
       }
 
-      return categMateriales;
+      return categMateriales
     },
 
-    // asignarMaterialesACategorias() {
-    //   this.categorias.forEach(categoria => {
-    //     categoria.cantidadMateriales = this.getNumMaterialesPorCategoria()[categoria.categoria] || 0
-    //     //console.log ("categoria: ", categoria.categoria , " materiales: ", this.getNumMaterialesPorCategoria()[categoria.categoria] )
-    //   })
-    // },
 
-    actualizarDatosGrafico() {
+    actualizarGraficoBarras() {
       // this.asignarMaterialesACategorias()
       // console.log(this.categorias)
 
@@ -98,41 +101,55 @@ export default {
       this.categMateriales.forEach(categoria => {
         labels.push(categoria.categoria)
         data.push(categoria.numMateriales)
-        console.log("PUSHH" + categoria.categoria, categoria.numMateriales)
+        console.log("PUSH " + categoria.categoria, categoria.numMateriales)
       })
 
-      this.barData.labels = labels;
-      this.barData.datasets[0].data = data;
+      this.grafBarras.labels = labels
+      this.grafBarras.datasets[0].data = data
+      this.grafQueso.labels = labels
+      this.grafQueso.datasets[0].data = data
 
+      let backgroundColor = this.generarColoresVerdeMilitar(this.categMateriales.length)
+      this.grafQueso.datasets[0].backgroundColor = backgroundColor
     },
 
-    obtenerMaxMin() {
-      const maxCantidad = Math.max(...this.barData.datasets[0].data);
-      const maxCategoriaIndex = this.barData.datasets[0].data.indexOf(maxCantidad);
-      const maxCategoria = this.barData.labels[maxCategoriaIndex];
-      console.log("MAX", maxCategoria, maxCantidad)
+    generarColoresVerdeMilitar(numColores) {
+      const colores = [
+        "#556B2F",
+        "#6B8E23",
+        "#808000",
+        "#BDB76B",
+        "#8FBC8F",
+        "#98FB98",
+        "#9ACD32",
+        "#7FFF00",
+        "#7CFC00",
+        "#ADFF2F"
+      ]
 
-      const minCantidad = Math.min(...this.barData.datasets[0].data);
-      const minCategoriaIndex = this.barData.datasets[0].data.indexOf(minCantidad);
-      const minCategoria = this.barData.labels[minCategoriaIndex];
-      console.log("MIN", minCategoria, minCantidad)
+      // if (numColores <= colores.length) {
+      //   return colores.slice(0, numColores)
+      // }
 
-      const MAX_MIN = "MAX: " + maxCategoria + "(" + maxCantidad + ")" + " MIN: " + minCategoria + "(" + minCantidad + ")";
-      //console.log(MAX_MIN)
-      return MAX_MIN;
+       const coloresExtendidos = []
 
-    }
+      for (let i = 0; i < numColores; i++) {
+         const colorIndex = i % colores.length
+         coloresExtendidos.push(colores[colorIndex])
+      }
+
+      return coloresExtendidos
+    },
+
 
 
   },
   async created() {
     await this.getCategorias()
-    //await this.getMateriales()
-      
-    this.categMateriales = this.getNumMaterialesPorCategoria();
-    this.actualizarDatosGrafico()
-    this.maxMin = this.obtenerMaxMin()
-    console.log(this.maxMin)
+    this.categMateriales = this.getNumMaterialesPorCategoria()
+    this.actualizarGraficoBarras()
+    //   this.actualizarGraficoQueso()
+
 
   },
 
@@ -140,52 +157,12 @@ export default {
 </script>
 
 <template>
-  
   <div>
-    <Chart type="bar" :data="barData" :options="barOptions" />
-    <div class="grid p-fluid">
-      <div class="col-12 xl:col-6">
-        <div class="card flex flex-column align-items-center">
-          <h5 class="text-left w-full">Número de materiales por categoría</h5>
-          <Accordion>
-            <AccordionTab :header="`${maxMin}`">
-              <Chart type="bar" :data="barData" :options="barOptions" />
-            </AccordionTab>
-          </Accordion>
-        </div>
-      </div>
-      <div class="col-12 xl:col-6">
-        <div class="card flex flex-column align-items-center">
-          <h5 class="text-left w-full">Doughnut Chart</h5>
-          <Accordion>
-            <AccordionTab :header="`Matariales por categoría: ${maxMin}`">
-              <Chart type="bar" :data="barData" :options="barOptions" />
-            </AccordionTab>
-          </Accordion>
-        </div>
-      </div>
-      <div class="col-12 xl:col-6">
-        <div class="card flex flex-column align-items-center">
-          <h5 class="text-left w-full">Polar Area Chart</h5>
-          <Accordion>
-            <AccordionTab :header="`Matariales por categoría: ${maxMin}`">
-              <Chart type="bar" :data="barData" :options="barOptions" />
-            </AccordionTab>
-          </Accordion>
-        </div>
-      </div>
-      <div class="col-12 xl:col-6">
-        <div class="card flex flex-column align-items-center">
-          <h5 class="text-left w-full">Radar Chart</h5>
-          <Accordion>
-            <AccordionTab :header="`Matariales por categoría: ${maxMin}`">
-              <Chart type="bar" :data="barData" :options="barOptions" />
-            </AccordionTab>
-          </Accordion>
-        </div>
-      </div>
-    </div>
-
+    <h3>Gráfico de barras, por categorías</h3>
+    <Chart type="bar" :data="grafBarras" :options="barOptions" />
+    <br>
+    <h3>Gráfico circular, por categorías</h3>
+    <Chart type="pie" :data="grafQueso"  :style="{ width: '60vw'}" />
 
   </div>
 </template>

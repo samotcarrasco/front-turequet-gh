@@ -2,17 +2,17 @@
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 
-import { departamentosStore } from '@/stores/departamentos';
-import { acuartelamientosStore } from '@/stores/acuartelamientos';
+import { departamentosStore } from '@/stores/departamentos'
+import { acuartelamientosStore } from '@/stores/acuartelamientos'
 import { mapState, mapWritableState, mapActions } from 'pinia'
-import InputText from 'primevue/inputtext';
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
+import InputText from 'primevue/inputtext'
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button';
-import axios from 'axios';
-import Dropdown from 'primevue/dropdown';
-import ProgressSpinner from 'primevue/progressspinner';
+import Button from 'primevue/button'
+import axios from 'axios'
+import Dropdown from 'primevue/dropdown'
+import ProgressSpinner from 'primevue/progressspinner'
 
 
 export default {
@@ -46,27 +46,27 @@ export default {
 
 
     acuartFiltroModal() {
-      return this.departamento.acuartelamientoN;
+      return this.departamento.acuartelamientoN
     },
 
     departamentosFiltrados() {
 
       if (this.filtroAcuartelamiento) {
-        console.log("hay acuartelamiento", this.filtroAcuartelamiento);
+        console.log("hay acuartelamiento", this.filtroAcuartelamiento)
 
         return this.departamentos.filter(departamento => {
-          return this.filtroAcuartelamiento === departamento.acuartelamientoN;
+          return this.filtroAcuartelamiento === departamento.acuartelamientoN
         });
-        //console.log(this.departamentos);
+        //console.log(this.departamentos)
       } else {
-        return this.getDepartamentos();
+        return this.getDepartamentos()
       }
     },
 
     abreviaturaAntesDelGuion() {
-    const guionIndex = this.departamento.abreviatura.indexOf('-');
+    const guionIndex = this.departamento.abreviatura.indexOf('-')
     if (guionIndex !== -1) {
-      return this.departamento.abreviatura.substring(0, guionIndex);
+      return this.departamento.abreviatura.substring(0, guionIndex)
     } else {
       return this.departamento.abreviatura;
     }
@@ -83,8 +83,8 @@ export default {
       this.submitted = false
       this.dptoDialog = true
       this.cabecera = "Alta de nuevo departamento"
-      //this.mostrarUbicacion("mapModal", this.latitude, this.longitude);
-      this.mostrarYCentrarMapa("mapModal");
+      //this.mostrarUbicacion("mapModal", this.latitude, this.longitude)
+      this.mostrarYCentrarMapa("mapModal")
     };
 
 
@@ -98,7 +98,7 @@ export default {
       // autocomplete.addListener("place_changed", () => {
       //   const place = autocomplete.getPlace();
       //   this.address = place.formatted_address;
-      //   this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`;
+      //   this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`
       // });
 
 
@@ -110,10 +110,10 @@ export default {
 
     const saveDpto = () => {
       this.submitted = true;
-      //console.log("acuartelamiento", this.acuartelamiento);
+      //console.log("acuartelamiento", this.acuartelamiento)
 
       //asignamos el valor del store, ya que contiene la url del acuartelameiento
-      this.departamento.acuartelamiento = this.acuartelamiento;
+      this.departamento.acuartelamiento = this.acuartelamiento
       const [latitud, longitud] = this.latLong.split(",")
       this.departamento.latitud = latitud
       this.departamento.longitud = longitud
@@ -125,7 +125,7 @@ export default {
       if (this.formularioRellenado(this.departamento)) {
         if (this.departamento.id) {
           this.departamento.acuartelamiento = this.departamento._links.acuartelamiento.href
-          this.departamento.abreviatura = this.departamento.abreviatura.replace(/-.*$/, '');
+          this.departamento.abreviatura = this.departamento.abreviatura.replace(/-.*$/, '')
           console.log("Entrando en putDpto con dpto: ", JSON.stringify(this.departamento))  
           this.putDepartamento(this.departamento).then(() => { this.getDepartamentos() })
           toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
@@ -134,8 +134,8 @@ export default {
           this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() })
           toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 })
         }
-        this.dptoDialog = false;
-        this.departamentoF = {};
+        this.dptoDialog = false
+        this.departamentoF = {}
       }
     };
 
@@ -163,13 +163,13 @@ export default {
       toast.add({ severity: 'success', summary: 'Departamento eliminado', detail: this.departamento.nombre, life: 3000 });
 
     };
-    this.modalCreate = modalCreate;
-    this.hideDialog = hideDialog;
-    this.saveDpto = saveDpto;
-    //this.onModalShow = onModalShow;
-    this.editDpto = editDpto;
-    this.confirmDeleteDpto = confirmDeleteDpto;
-    this.borrarDpto = borrarDpto;
+    this.modalCreate = modalCreate
+    this.hideDialog = hideDialog
+    this.saveDpto = saveDpto
+    //this.onModalShow = onModalShow
+    this.editDpto = editDpto
+    this.confirmDeleteDpto = confirmDeleteDpto
+    this.borrarDpto = borrarDpto
 
   },
   methods: {
