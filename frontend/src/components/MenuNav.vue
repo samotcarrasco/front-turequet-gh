@@ -20,7 +20,6 @@ export default {
     ...mapState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['departamentosSiglas']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
-//    ...mapState(departamentosStore, ['milisMenu']),
        //writable para que sea reactiva
     ...mapWritableState(departamentosStore, ['milisMenu']),
 

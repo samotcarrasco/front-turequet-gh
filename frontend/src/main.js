@@ -4,13 +4,15 @@ import App from './App.vue'
 import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice';
 
-//componentes para rutas
-import MaterialInfo from '@/components/MaterialInfo.vue'
-import MaterialesMain from '@/components/MaterialesMain.vue'
-import Categorias from '@/components/Categorias.vue'
-import Estadisticas from '@/components/Estadisticas.vue'
-import ComponenteInicio from '@/components/ComponenteInicio.vue'
-import Unidades from '@/components/UnidadesMain.vue'
+//componentes lazy para rutas
+const MaterialInfo = () => import('@/components/MaterialInfo.vue')
+const MaterialesMain = () => import('@/components/MaterialesMain.vue')
+const Categorias = () => import('@/components/Categorias.vue')
+const Estadisticas = () => import('@/components/Estadisticas.vue')
+const Unidades = () => import('@/components/UnidadesMain.vue')
+
+//Home lo cargamos siempre
+import Home from '@/components/ComponenteInicio.vue'
 
 //Bootstrap
  import 'bootstrap/dist/css/bootstrap.css'
@@ -39,7 +41,7 @@ import { createPinia } from 'pinia'
 //definimos objeto rutas
 const routes = [
   {
-    path: '/', component: ComponenteInicio, name: 'home'
+    path: '/', component: Home, name: 'home'
   },
   { path: '/materiales', component: MaterialesMain, name: 'materiales' },
    {

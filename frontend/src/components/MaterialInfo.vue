@@ -14,6 +14,8 @@ import ProgressSpinner from 'primevue/progressspinner'
 
 
 export default {
+  components: { Toast, Card, Button, Galleria, Dialog, Divider, ProgressSpinner },
+
   data() {
     return {
       material: {},
@@ -24,13 +26,7 @@ export default {
       isLoading: true,
     }
   },
-  props: {
-    // tipoVista: {
-    //   type: String,
-    //   required: true
-    // }
-  },
-  components: { Toast, Card, Button, Galleria, Dialog, Divider, ProgressSpinner },
+
 
   computed: {
     ...mapState(materialesStore, ['materiales']),
@@ -38,10 +34,6 @@ export default {
     ...mapState(departamentosStore, ['dptoActual']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
 
-    // material() {
-    //   // return this.participantes.find(p => p.id == this.$route.params.id)
-    //   return this.getMaterialPorId(this.$route.params.id)
-    // },
   },
   methods: {
     ...mapActions(materialesStore, ['getMateriales']),

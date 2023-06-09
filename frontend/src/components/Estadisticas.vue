@@ -126,11 +126,6 @@ export default {
         "#7CFC00",
         "#ADFF2F"
       ]
-
-      // if (numColores <= colores.length) {
-      //   return colores.slice(0, numColores)
-      // }
-
        const coloresExtendidos = []
 
       for (let i = 0; i < numColores; i++) {

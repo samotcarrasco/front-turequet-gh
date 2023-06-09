@@ -29,11 +29,10 @@ import { llamadaAPI, host } from '@/stores/api-service'
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
-    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch//, Toolbar
+    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch
   },
-  // provide: {
-  //   tipoVista: undefined
-  // },
+
+
   props: {
     tipoVista: {
       type: String,
@@ -62,7 +61,6 @@ export default {
       maxMilis: null,
       categoriaSeleccionada: null,
       //bonificacion: 0
-
     }
   },
   mounted() {
@@ -85,7 +83,6 @@ export default {
 
     const saveMaterial = () => {
 
-      //this.material.categoria
       //console.log("CATEG", this.material)
       this.material.categoria = host + "api/categorias/" + this.idCategoria
       this.material.estado = 0
@@ -145,16 +142,6 @@ export default {
 
 
     const patchFechaEntregaModal = () => {
-
-
-      // this.material.categoria = host + "api/categorias/" + this.idCategoria
-      // this.material.estado = 0
-      // this.material.fechaOferta = new Date()
-
-      //   this.material.dptoOferta = this.dptoActualAPI._links.self.href
-
-      // this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null ? 1 : this.material.cantidad
-
 
       const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario })
       console.log("entrando en la funcion patchFechaEntregaModal con el modelo", modeloFecha)
@@ -223,9 +210,7 @@ export default {
 
 
     materialesFiltrados() {
-      //this.asignarPendientes()
-      //this.asignarEntregados()
-
+    
       switch (this.tipoVista) {
         case "ofertados":
           return this.categoriasSeleccionadas.length === 0

@@ -14,19 +14,11 @@ export default {
       currentTab: 'departamentos'
     }
   },
- 
-  computed: {
-
-  },
   methods: {
     handleTabChange(tab) {
       this.currentTab = tab.header
     }
-
-  },
-  mounted() {
-
-  }
+ },
 }
 </script>
 
