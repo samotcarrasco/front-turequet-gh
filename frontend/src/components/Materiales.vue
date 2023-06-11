@@ -16,23 +16,17 @@ import Calendar from 'primevue/calendar'
 import Textarea from 'primevue/textarea'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
-import Toolbar from 'primevue/toolbar'
 import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api'
-import { llamadaAPI, host } from '@/stores/api-service'
-
-
-
+import { llamadaAPI } from '@/stores/api-service'
 
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
     Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch
   },
-
-
   props: {
     tipoVista: {
       type: String,
@@ -51,22 +45,19 @@ export default {
       grupoSeleccionado: null,
       visible: false,
       filters: {},
-      material: {},
+      material: undefined,
       esInventariable: false,
       idCategoria: undefined,
       submitted: false,
-      cabecera: 'Crear material',
       grupos: [],
       minMilis: null,
       maxMilis: null,
       categoriaSeleccionada: null,
-      //bonificacion: 0
+      categoriaLink: null
     }
   },
   mounted() {
     const toast = useToast()
-    console.log(this.categoriasAgrupadas)
-
     const modalEditCreate = () => {
       this.inicializarSelectorCategorias()
       this.material = {}
@@ -83,18 +74,10 @@ export default {
 
     const saveMaterial = () => {
 
-      //console.log("CATEG", this.material)
-      this.material.categoria = host + "api/categorias/" + this.idCategoria
       this.material.estado = 0
       this.material.fechaOferta = new Date()
-
-
-      console.log("DPTO API" + JSON.stringify(this.dptoActualAPI))
-      console.log("DPTO API" + this.dptoActualAPI._links.self.href)
-      // console.log("IMAGEN REDUCIDA" + this.material.imgReducida)
-
+      this.material.categoria =  this.categoriaLink;
       this.material.dptoOferta = this.dptoActualAPI._links.self.href
-
       this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null || this.material.cantidad === undefined
         ? 1 : this.material.cantidad
 
@@ -109,53 +92,41 @@ export default {
           break
       }
 
-      //  console.log("entrando en la funcion saveMaterial con el material", JSON.stringify(this.material))
-
       this.submitted = true
-
+      
+      
       if (this.formularioRellenado(this.material)) {
         if (this.material.id) {
-          console.log("punto 2")
+          this.material.imgReducida = this.material.imagen
+          console.log("material antes de PUT", JSON.stringify(this.material))
+        
           this.putMaterial(this.material).then(() => { this.getMateriales() })
           toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 })
         } else {
-          console.log("punto 3")
           console.log("material antes de POST", JSON.stringify(this.material))
           this.postMaterial(this.material).then(() => { this.getMateriales() })
           toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 })
-
         }
 
         if (this.material.bonificacion) {
           toast.add({ severity: 'info', summary: 'Bonificación obtenida', detail: this.material.bonificacion + " μilis", life: 3050 })
-          //this.milisMenu = this.milisMenu + this.material.bonificacion
-          console.log("llamando a actualizar milis menu")
           this.actualizarMilisMenu(this.material.bonificacion)
         }
 
-
         this.materialDialog = false
+        this.inicializarSelectorCategorias()
         this.material = {}
 
       }
     }
 
-
     const patchFechaEntregaModal = () => {
-
       const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario })
-      console.log("entrando en la funcion patchFechaEntregaModal con el modelo", modeloFecha)
-
       this.submitted = true
-
-      //if (this.formularioRellenado(this.material)) {
-
       this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { this.getMateriales() })
       toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 })
       this.asignarFechaDialog = false
-      //}
     }
-
 
     const confirmDeleteMaterial = (material) => {
       this.material = material
@@ -164,14 +135,11 @@ export default {
 
     const borrarMaterial = () => {
       this.deleteMaterialDialog = false
-      //console.log("antes de borrar")
-      console.log("bonificacion", this.material.bonificacion)
       if (this.material.bonificacion) {
         this.actualizarMilisMenu(-this.material.bonificacion)
       }
       this.deleteMaterial(this.material).then(() => { this.getMateriales() })
       toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.material.nombre, life: 3000 })
-
     }
 
 
@@ -259,22 +227,20 @@ export default {
 
     getMilisDeCategoria() {
       let categoria = undefined
-      console.log(JSON.stringify(this.material))
       if (this.categoriaSeleccionada) {
         categoria = this.categorias.find(c => c.categoria === this.categoriaSeleccionada.value)
       } else if (this.material.categoriaN) {
-        console.log("HAY material", JSON.stringify(this.material.categoriaN.label))
-        categoria = this.categorias.find(c => c.categoria.label === this.material.categoriaN)
+        categoria = this.categorias.find(c => c.categoria === this.material.categoriaN)
       }
       if (categoria != undefined) {
-        console.log("HAY CATEGORIA", categoria.categoria, categoria.minMilis, categoria.maxMilis)
+        this.categoriaLink = categoria._links.self.href
         this.minMilis = categoria.minMilis
         this.maxMilis = categoria.maxMilis
         this.idCategoria = categoria.id
         this.categoria = undefined
+        
       }
       else {
-        console.log("NO HAY CATEGORIA")
           this.minMilis = null
           this.maxMilis = null
           this.categoria = undefined
@@ -305,18 +271,15 @@ export default {
 
     async editMaterial(id) {
       await this.getMaterialPorId(id)
-      console.log("entrando en editar material con el material.....")
-      console.log(this.materialActual)
       this.material = this.materialActual
       this.materialDialog = true
+      console.log("editttttttttttttttttttttttttttttttttt amaterial", JSON.stringify(this.material))
       this.cabecera = "Editar material"
     },
 
 
     async asignarFechaEntrega(id) {
       await this.getMaterialPorId(id)
-      console.log("entrando en asignar fecha al material.....")
-      console.log(this.materialActual)
       this.material = this.materialActual
       this.asignarFechaDialog = true
       this.cabecera = "Confirme la fecha de entrega/recepción"
@@ -351,7 +314,6 @@ export default {
     },
 
     cargarImagen(e) {
-      console.log("subiendo fichero...")
       let file = e.files[0]
       let reader = new FileReader()
       reader.onload = () => {
@@ -359,8 +321,8 @@ export default {
         const canvas = document.createElement('canvas')
         const context = canvas.getContext('2d')
 
-        const newWidth = 80 // Nueva anchura deseada
-        const newHeight = 80 // Nueva altura deseada
+        const newWidth = 80
+        const newHeight = 80
 
         canvas.width = newWidth
         canvas.height = newHeight
@@ -368,10 +330,7 @@ export default {
         const img = new Image()
         img.onload = () => {
           context.drawImage(img, 0, 0, newWidth, newHeight)
-
           const reducedImage = canvas.toDataURL('image/jpeg', 0.8)
-
-          //console.log("imagen reducida", reducedImage)
           this.material.imgReducida = reducedImage
         }
         img.src = this.material.imagen
@@ -380,18 +339,10 @@ export default {
     },
 
     asignarPendientes() {
-      // Actualizar el estado a "pendiente entrega/rececpcion" en los materiales pendientes y de la unidad actual
       this.materiales.forEach(material => {
-        //  console.log("material ", material.id, material.estado)
-        // if (material.estado ==  "pendiente" || material.estado ==  "pendiente entrega" || material.estado ==  "pendiente rececpcion"  ){
-        //       console.log("el material " , material.id, " esta en estado ", 
-        //       material.estado, " dpto of,", material.dptoOfertaN, "dpto Adq", material.dptoAdquisicionN ," actual",this.dptoActual)
-        // }
-        if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
-          //   console.log("   el material " , material.id, " esta en estado pendiente entrega  para el dpeto",this.dptoActual)
+            if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
           material.estado = "pendiente entrega"
         } else if (material.estado === "pendiente" || material.estado == "pendiente entrega" && material.dptoAdquisicionN === this.dptoActual) {
-          //  console.log("   el material " , material.id, " esta en estado pendiente repecion  para el dpeto",this.dptoActual)
           material.estado = "pendiente recepcion"
         }
       })
@@ -409,10 +360,8 @@ export default {
 
     asignarCategoriaMaterial() {
       this.materiales.forEach(m => {
-        //console.log("URL LINK " + m._links.categoria.href)
         llamadaAPI('get', null, m._links.categoria.href).then(r => {
           m.categoria = r.data
-          //console.log("ASDFASDF" + m.categoria)
         })
       })
 
@@ -428,11 +377,8 @@ export default {
             code: categoria.grupo,
             items: []
           }
-          console.log("leido grupo", grupo)
           grupos.push(grupo)
         }
-        //grupos.push(grupo)
-        // Agregar la categoría al grupo
         grupo.items.push({ label: categoria.categoria, value: categoria.categoria })
         return grupos
       }, [])
@@ -440,17 +386,34 @@ export default {
     },
 
     actualizarCategorias() {
-      const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado || grupo.label === this.material.grupoN)
+      //const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado || grupo.label === this.material.grupoN)
+      const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado)
+      console.log("grupo seleccionado", grupo)
       this.material.categoriaN = undefined
       this.categoriasSeleccionadas = grupo ? grupo.items : []
     },
 
     formularioRellenado(mat) {
-      console.log("validando  ", this.minMilis, " ", this.maxMilis, " ", this.material.milis)
-      console.log(mat.nombre && mat.descripcion && mat.milis >= this.minMilis
-        && mat.milis <= this.maxMilis && mat.milis > 0 && mat.categoria && mat.imagen)
-      return (mat.nombre && mat.descripcion && mat.milis >= this.minMilis
-        && mat.milis <= this.maxMilis && mat.milis > 0 && mat.categoria && mat.imagen)
+       console.log("dentro de formularioRelllllllllllllllenado", JSON.stringify(mat))
+       console.log("validando  ", this.minMilis, " ", this.maxMilis, " ", this.material.milis)
+       console.log("mat.nombre",mat.nombre)
+       console.log("mat.descripcion",mat.descripcion)
+       console.log("mat.milis", mat.milis)
+       console.log("this.minmilis",this.minMilis)
+       console.log("mat.milis",mat.milis)
+       console.log("this.maxMilis",this.maxMilis) 
+       console.log("mat.milis", mat.milis)
+       console.log("mat.categoria", mat.categoria)
+       console.log("mat.imagen", mat.imagen)
+        
+
+      // console.log(mat.nombre && mat.descripcion && mat.milis >= this.minMilis
+      //   && mat.milis <= this.maxMilis && mat.milis > 0 && mat.categoria && mat.imagen)
+      console.log(mat.nombre != null && mat.descripcion != null && mat.milis >= this.minMilis
+        && mat.milis <= this.maxMilis && mat.milis > 0 && mat.imagen != null)
+        
+      return (mat.nombre != null && mat.descripcion != null && mat.milis >= this.minMilis
+        && mat.milis <= this.maxMilis && mat.milis > 0 && mat.imagen != null)
     },
 
     incrementarCantidad() {
@@ -480,12 +443,6 @@ export default {
 <template>
   <div class="materiales-container">
     <Toast />
-
-    <!-- <div v-if="!this.departamentos">
-      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
-      {{ console.log('Mostrando icono') }}
-    </div> -->
-
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -605,18 +562,14 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="grupo">Grupo: </label>
-        <Dropdown v-if="material.id" v-model="material.grupoN" :options="grupos" :placeholder="material.grupoN"
-          @change="actualizarCategorias" required="true" />
-        <Dropdown v-else v-model="grupoSeleccionado" :options="grupos" placeholder="Seleccione un grupo"
+        <Dropdown v-model="grupoSeleccionado" :options="grupos" :placeholder="material.id ? material.grupoN : 'Seleccione un grupo'"
           @change="actualizarCategorias" required="true" />
       </div>
       <div class="field col custom-field">
         <label for="categoria">Categoría: </label>
-        <Dropdown v-if="material.id" v-model="material.categoriaN" :options="categoriasSeleccionadas" optionLabel="label"
-          :placeholder="material.categoriaN" @change="getMilisDeCategoria" required="true" />
-        <Dropdown v-else v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
-          placeholder="Seleccione una categoría" @change="getMilisDeCategoria" required="true" />
-      </div>
+        <Dropdown  v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
+          :placeholder="material.id ? material.categoriaN : 'Seleccione una categoría'" @change="getMilisDeCategoria" required="true" />
+      </div> 
       <div class="field col custom-field">
         <label for="milis">Milis: </label>
         <InputNumber id="milis" v-model="material.milis" required="true"

@@ -44,7 +44,6 @@ export default {
     ...mapWritableState(acuartelamientosStore, ['acuartelamiento']),
     ...mapWritableState(departamentosStore, ['departamentos']),
 
-
     acuartFiltroModal() {
       return this.departamento.acuartelamientoN
     },
@@ -57,7 +56,6 @@ export default {
         return this.departamentos.filter(departamento => {
           return this.filtroAcuartelamiento === departamento.acuartelamientoN
         });
-        //console.log(this.departamentos)
       } else {
         return this.getDepartamentos()
       }
@@ -73,8 +71,6 @@ export default {
   }, 
   },
 
-
-
   mounted() {
     const toast = useToast();
 
@@ -83,25 +79,22 @@ export default {
       this.submitted = false
       this.dptoDialog = true
       this.cabecera = "Alta de nuevo departamento"
-      //this.mostrarUbicacion("mapModal", this.latitude, this.longitude)
       this.mostrarYCentrarMapa("mapModal")
     };
 
 
-    //prueba autocompletado dirección
-    // descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
-    //      (en modal no funciona)
-      // const autocomplete = new google.maps.places.Autocomplete(
-      //   document.getElementById("direccion")
-      // );
+    //Autocompletado de dirección
+    /* descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
+       const autocomplete = new google.maps.places.Autocomplete(
+         document.getElementById("direccion")
+       );
 
-      // autocomplete.addListener("place_changed", () => {
-      //   const place = autocomplete.getPlace();
-      //   this.address = place.formatted_address;
-      //   this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`
-      // });
-
-
+       autocomplete.addListener("place_changed", () => {
+         const place = autocomplete.getPlace();
+         this.address = place.formatted_address;
+         this.latLong = `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`
+       });
+       */
 
     const hideDialog = () => {
       this.dptoDialog = false
@@ -110,27 +103,18 @@ export default {
 
     const saveDpto = () => {
       this.submitted = true;
-      //console.log("acuartelamiento", this.acuartelamiento)
-
-      //asignamos el valor del store, ya que contiene la url del acuartelameiento
       this.departamento.acuartelamiento = this.acuartelamiento
       const [latitud, longitud] = this.latLong.split(",")
       this.departamento.latitud = latitud
       this.departamento.longitud = longitud
-    
-      // console.log(this.departamento.nombre);
-      //console.log("id" + this.departamento.id + this.formularioRellenado(this.departamento))
-      // console.log("entrando en la funcion saveDpto con el material", JSON.stringify(this.departamento))
-
+     
       if (this.formularioRellenado(this.departamento)) {
         if (this.departamento.id) {
           this.departamento.acuartelamiento = this.departamento._links.acuartelamiento.href
           this.departamento.abreviatura = this.departamento.abreviatura.replace(/-.*$/, '')
-          console.log("Entrando en putDpto con dpto: ", JSON.stringify(this.departamento))  
           this.putDepartamento(this.departamento).then(() => { this.getDepartamentos() })
           toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
         } else {
-          console.log("Entrando en saveDpto con dpto: ", JSON.stringify(this.departamento))
           this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() })
           toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 })
         }
@@ -139,13 +123,11 @@ export default {
       }
     };
 
-
     const editDpto = (editDpto) => {
       this.departamento = { ...editDpto }
       console.log(this.departamento)
       this.dptoDialog = true
       this.cabecera = "Editar departamento"
-      console.log("entrando en edipdotp mapModal", this.departamento.latitud, this.departamento.longitud)
       this.mostrarYCentrarMapa("mapModal")
       
     };
@@ -156,9 +138,7 @@ export default {
     };
 
     const borrarDpto = () => {
-      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id);
       this.deleteDptoDialog = false;
-      //console.log("antes de borrar");
       this.deleteDpto(this.departamento).then(() => { this.getDepartamentos() });
       toast.add({ severity: 'success', summary: 'Departamento eliminado', detail: this.departamento.nombre, life: 3000 });
 
@@ -166,7 +146,6 @@ export default {
     this.modalCreate = modalCreate
     this.hideDialog = hideDialog
     this.saveDpto = saveDpto
-    //this.onModalShow = onModalShow
     this.editDpto = editDpto
     this.confirmDeleteDpto = confirmDeleteDpto
     this.borrarDpto = borrarDpto
@@ -183,10 +162,7 @@ export default {
 
 
     actualizarAcuartelamiento() {
-      //llamada a la api a través del método del store
       this.getAcuartPorSiglas(this.acuartFiltroModal)
-      // console.log("ACTUALIZADO FILTRO MODAL", this.departamento.acuartelamientoN)
-      // console.log("this.acuartelamiento = ", this.acuartelamiento)
     },
 
     filtrarDepartamentos() {

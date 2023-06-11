@@ -12,10 +12,6 @@ import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import ProgressSpinner from 'primevue/progressspinner'
 
-
-
-
-
 export default {
   components: {
     Toast, InputText, Button, Accordion, AccordionTab, Dialog, Dropdown, ProgressSpinner
@@ -41,7 +37,6 @@ export default {
     ...mapState(acuartelamientosStore, ['empleos']),
   },
 
-
   mounted() {
     const toast = useToast()
 
@@ -52,8 +47,6 @@ export default {
       this.cabecera = "Alta de nuevo acuartelamiento"
     }
 
-
-
     const hideDialog = () => {
       this.acuartDialog = false
       this.submitted = false
@@ -61,21 +54,20 @@ export default {
 
     const saveAcuart = () => {
       this.submitted = true
-
-
-
       this.acuartelamiento.direccion = this.address
-      // console.log(this.acuartelamiento.nombre)
-      //console.log("id" + this.acuartelamiento.id + this.formularioRellenado(this.acuartelamiento))
-      // console.log("entrando en la funcion saveAcuart con el material", JSON.stringify(this.acuartelamiento))
-
       if (this.formularioRellenado(this.acuartelamiento)) {
         if (this.acuartelamiento.id) {
-          this.putAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
+          this.putAcuartelamiento(this.acuartelamiento).then(r => { 
+           // this.getAcuartelamientos()
+                   this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1, r.data) 
+                })
           toast.add({ severity: 'success', summary: 'Acuartelamiento actualizado', detail: this.acuartelamiento.nombre, life: 3000 })
         } else {
           //  console.log("Entrando en saveAcuart con acuart: ", JSON.stringify(this.acuartelamiento))
-          this.postAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
+          this.postAcuartelamiento(this.acuartelamiento).then(r => { 
+            this.acuartelamientos.push(r.data)
+            // this.getAcuartelamientos() 
+          })
           toast.add({ severity: 'success', summary: 'Acuartelamiento creado', detail: this.acuartelamiento.nombre + " se ha creado correctamente", life: 4000 })
         }
         this.acuartDialog = false
@@ -98,10 +90,11 @@ export default {
     }
 
     const borrarAcuart = () => {
-      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id)
       this.deleteAcuartDialog = false
       console.log("antes de borrar", this.acuartelamiento)
-      this.deleteAcuartelamiento(this.acuartelamiento).then(() => { this.getAcuartelamientos() })
+      this.deleteAcuartelamiento(this.acuartelamiento).then(() => {   
+                                 this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1) 
+                                })
       toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 })
 
     }
@@ -138,8 +131,6 @@ export default {
   async created() {
     this.isLoading = true
     await this.getAcuartelamientos()
-    //this.isLoading = false
-
     await this.getEmpleos()
     this.isLoading = false
 
@@ -231,7 +222,6 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="name">Direccion</label>
-        <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/> -->
         <InputText id="direccion" v-model.trim="address" required="true" autofocus />
 
       </div>
