@@ -1,7 +1,6 @@
 <script>
 import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
-
 import { acuartelamientosStore } from '@/stores/acuartelamientos'
 import { mapState, mapActions } from 'pinia'
 import InputText from 'primevue/inputtext'
@@ -30,6 +29,8 @@ export default {
       deleteAcuartDialog: false,
       acuartelamiento: {},
       isLoading: true,
+      cabecera: null,
+      onDialogShow: undefined
     }
   },
 
@@ -59,31 +60,27 @@ export default {
       if (this.formularioRellenado(this.acuartelamiento)) {
         if (this.acuartelamiento.id) {
           putAcuartelamiento(this.acuartelamiento).then(r => {
-            // this.getAcuartelamientos()
             if (r.status == 200) {
               this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1, r.data)
+              toast.add({ severity: 'success', summary: 'Acuartelamiento actualizado', detail: this.acuartelamiento.nombre, life: 3000 })
             }
           })
-          toast.add({ severity: 'success', summary: 'Acuartelamiento actualizado', detail: this.acuartelamiento.nombre, life: 3000 })
+       
         } else {
-          //  console.log("Entrando en saveAcuart con acuart: ", JSON.stringify(this.acuartelamiento))
           postAcuartelamiento(this.acuartelamiento).then(r => {
             if (r.status == 200) {
               this.acuartelamientos.unshift(r.data)
+              toast.add({ severity: 'success', summary: 'Acuartelamiento creado', detail: this.acuartelamiento.nombre + " se ha creado correctamente", life: 4000 })
             }
-            // this.getAcuartelamientos() 
-          })
-          toast.add({ severity: 'success', summary: 'Acuartelamiento creado', detail: this.acuartelamiento.nombre + " se ha creado correctamente", life: 4000 })
+          })         
         }
         this.acuartDialog = false
         this.acuartelamiento = {}
       }
     }
 
-
     const editAcuart = (editAcuart) => {
       this.acuartelamiento = { ...editAcuart }
-      console.log("entrando en editar acuartelamento", this.acuartelamiento)
       this.acuartDialog = true
       this.cabecera = "Editar acuartelamiento"
 
@@ -96,14 +93,13 @@ export default {
 
     const borrarAcuart = () => {
       this.deleteAcuartDialog = false
-      console.log("antes de borrar", this.acuartelamiento)
       deleteAcuartelamiento(this.acuartelamiento).then(r => {
-        if (r.status == 204) {
+       if (r.status == 200) {  
           this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1)
+          toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 })
         }
       })
-      toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 })
-
+      
     }
     this.modalCreate = modalCreate
     this.hideDialog = hideDialog
@@ -115,24 +111,13 @@ export default {
   },
   methods: {
     ...mapActions(acuartelamientosStore, ['getAcuartelamientos']),
-    // ...mapActions(acuartelamientosStore, ['postAcuartelamiento']),
-    //...mapActions(acuartelamientosStore, ['putAcuartelamiento']),
-    //...mapActions(acuartelamientosStore, ['deleteAcuartelamiento']),
     ...mapActions(acuartelamientosStore, ['getEmpleos']),
 
-
-
-    formularioRellenado(acu) {
-      //lo hacemos así porque no entiendo por qué no lo evalua como booleano
-      //por ejemplo, comos e hace en Categrias.vue
-      if (!acu.nombre || !acu.abreviatura ||
+    formularioRellenado(acu) {     
+      return !(!acu.nombre || ! acu.abreviatura ||
         !acu.email || !acu.responsableNombre ||
-        !acu.responsableEmpleo || !acu.telefono) {
-        return false
-      } else {
-        return true
-      }
-    },
+        !acu.responsableEmpleo || !acu.telefono) 
+      },
   },
 
   async created() {
@@ -177,9 +162,6 @@ export default {
           </Accordion>
         </div>
       </div>
-    </section>
-    <section class="right-section">
-
     </section>
   </div>
 
@@ -256,23 +238,18 @@ export default {
 </template>
 
 <style scoped>
-.container {
+ .container {
   display: flex;
-  margin-top: 20px !important;
+  margin-top: 20px;
   padding-top: 0;
-}
+} 
 
 .left-section {
   flex: 1;
   padding-right: 1rem;
 }
 
-.right-section {
-  flex: 1;
-  padding-left: 1rem;
-}
-
-s .boton-nuevo {
+.boton-nuevo {
   margin-bottom: 20px;
 }
 
@@ -280,20 +257,8 @@ s .boton-nuevo {
   margin-top: 1rem;
 }
 
-.boton-mostrar {
-  margin-top: 25px;
-}
-
-
 .p-button-rounded {
   margin-left: 4px;
-}
-
-.p-button.p-button-success,
-.p-button.p-button-warning {
-  color: #fff;
-  background: rgb(136, 158, 89);
-  border: 0 none;
 }
 
 
@@ -304,4 +269,6 @@ s .boton-nuevo {
 .custom-field {
   margin-right: 1rem;
 }
+
+
 </style>

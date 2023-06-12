@@ -249,8 +249,6 @@ export default {
     </template>
   </Card>
 
-
-
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
   <div>
     <p><span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span></p>

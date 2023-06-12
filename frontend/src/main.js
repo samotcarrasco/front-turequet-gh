@@ -9,6 +9,7 @@ const MaterialesMain = () => import('@/components/MaterialesMain.vue')
 const Categorias = () => import('@/components/Categorias.vue')
 const Estadisticas = () => import('@/components/Estadisticas.vue')
 const Unidades = () => import('@/components/UnidadesMain.vue')
+const NotFound = () => import('@/components/NotFound.vue')
 import Home from '@/components/ComponenteInicio.vue'
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -17,6 +18,7 @@ import 'primevue/resources/primevue.min.css'
 
 //tema personalizado creado desde el editor de temas de primevue
 import '@/scss/tema-verde-militar.css'
+import '@/scss/custom-style.css'
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -34,7 +36,8 @@ const routes = [
    },
   { path: '/categorias', component: Categorias, name: 'categorias' },
   { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
-  { path: '/unidades', component: Unidades, name: 'unidades' }
+  { path: '/unidades', component: Unidades, name: 'unidades' },
+  { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound' },
 ]
 
 const router = createRouter({

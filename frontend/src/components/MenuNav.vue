@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     ...mapState(departamentosStore, ['dptoActual']),
-    ...mapState(departamentosStore, ['rolActual']),
+    ...mapWritableState(departamentosStore, ['rolActual']),
     ...mapState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['departamentosSiglas']),
     ...mapState(departamentosStore, ['dptoActualAPI']),

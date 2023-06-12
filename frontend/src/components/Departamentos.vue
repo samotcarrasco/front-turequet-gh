@@ -13,6 +13,8 @@ import Button from 'primevue/button'
 import axios from 'axios'
 import Dropdown from 'primevue/dropdown'
 import ProgressSpinner from 'primevue/progressspinner'
+import { postDepartamento, putDepartamento, deleteDepartamento } from '@/stores/api-service'
+
 
 
 export default {
@@ -49,26 +51,27 @@ export default {
     },
 
     departamentosFiltrados() {
-
+      let dptosFiltrados = undefined;
       if (this.filtroAcuartelamiento) {
-        console.log("hay acuartelamiento", this.filtroAcuartelamiento)
-
-        return this.departamentos.filter(departamento => {
+        dptosFiltrados = this.departamentos.filter(departamento => {
           return this.filtroAcuartelamiento === departamento.acuartelamientoN
         });
       } else {
-        return this.getDepartamentos()
+        dptosFiltrados = this.getDepartamentos()
       }
+      return dptosFiltrados;
     },
 
     abreviaturaAntesDelGuion() {
-    const guionIndex = this.departamento.abreviatura.indexOf('-')
-    if (guionIndex !== -1) {
-      return this.departamento.abreviatura.substring(0, guionIndex)
-    } else {
-      return this.departamento.abreviatura;
-    }
-  }, 
+      const guionIndex = this.departamento.abreviatura.indexOf('-')
+      let abreviatura = undefined
+      if (guionIndex !== -1) {
+        abreviatura = this.departamento.abreviatura.substring(0, guionIndex)
+      } else {
+        abreviatura = this.departamento.abreviatura;
+      }
+      return abreviatura
+    },
   },
 
   mounted() {
@@ -107,16 +110,25 @@ export default {
       const [latitud, longitud] = this.latLong.split(",")
       this.departamento.latitud = latitud
       this.departamento.longitud = longitud
-     
+
       if (this.formularioRellenado(this.departamento)) {
         if (this.departamento.id) {
           this.departamento.acuartelamiento = this.departamento._links.acuartelamiento.href
           this.departamento.abreviatura = this.departamento.abreviatura.replace(/-.*$/, '')
-          this.putDepartamento(this.departamento).then(() => { this.getDepartamentos() })
-          toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
+
+          putDepartamento(this.departamento).then(r => {
+            if (r.status == 200) {
+              this.departamentos.splice(this.departamentos.indexOf(this.departamentos), 1, r.data)
+              toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
+            }
+          })
         } else {
-          this.postDepartamento(this.departamento).then(() => { this.getDepartamentos() })
-          toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 })
+          postDepartamento(this.departamento).then(r => {
+            if (r.status == 200) {
+              this.departamentos.unshift(r.data)
+              toast.add({ severity: 'success', summary: 'Departamento creado', detail: this.departamento.nombre + " se ha creado correctamente", life: 4000 })
+            }
+          })
         }
         this.dptoDialog = false
         this.departamentoF = {}
@@ -125,11 +137,10 @@ export default {
 
     const editDpto = (editDpto) => {
       this.departamento = { ...editDpto }
-      console.log(this.departamento)
       this.dptoDialog = true
       this.cabecera = "Editar departamento"
       this.mostrarYCentrarMapa("mapModal")
-      
+
     };
 
     const confirmDeleteDpto = (dpto) => {
@@ -139,8 +150,12 @@ export default {
 
     const borrarDpto = () => {
       this.deleteDptoDialog = false;
-      this.deleteDpto(this.departamento).then(() => { this.getDepartamentos() });
-      toast.add({ severity: 'success', summary: 'Departamento eliminado', detail: this.departamento.nombre, life: 3000 });
+      deleteDepartamento(this.departamento).then(r => {
+       if (r.status == 200) {  
+          this.departamentos.splice(this.departamentos.indexOf(this.departamentos), 1)
+          toast.add({ severity: 'success', summary: 'Departamento eliminado', detail: this.departamento.nombre, life: 3000 });
+        }
+      })
 
     };
     this.modalCreate = modalCreate
@@ -153,9 +168,6 @@ export default {
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
-    ...mapActions(departamentosStore, ['postDepartamento']),
-    ...mapActions(departamentosStore, ['putDepartamento']),
-    ...mapActions(departamentosStore, ['deleteDpto']),
     ...mapActions(departamentosStore, ['getEmpleos']),
     ...mapActions(departamentosStore, ['getBases']),
     ...mapActions(acuartelamientosStore, ['getAcuartPorSiglas']),
@@ -166,13 +178,10 @@ export default {
     },
 
     filtrarDepartamentos() {
-
-      console.log("Filtrando por acuartelamiento:", this.filtroAcuartelamiento.trim());
       //actualizamos el mapa despues de cada filtro, para que se muestren solamente los markers
       // en los departamentos filtrados
       this.mostrarYCentrarMapa("map")
       if (this.filtroAcuartelamiento) {
-        console.log("-" + this.filtroAcuartelamiento + "-")
         this.departamentos = this.departamentos.filter(departamento => {
           return departamento.acuartelamientoN === this.filtroAcuartelamiento
         });
@@ -181,18 +190,14 @@ export default {
       this.getDepartamentos()
     },
 
-    
+
     mostrarYCentrarMapa(idMapa) {
-      console.log("1")
       if (navigator.geolocation) {
-        console.log("2")
         navigator.geolocation.getCurrentPosition(position => {
           const { latitude, longitude } = position.coords
           this.getAddressFrom(latitude, longitude)
-          console.log("3")
-         
           this.mostrarUbicacion(idMapa, latitude, longitude)
-         
+
         }, error => {
           this.error = error;
         });
@@ -202,22 +207,20 @@ export default {
       }
     },
 
-    
+
     getAddressFrom(lat, long) {
       axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=AIzaSyAFnZTjnmXpBH9nZgMyzxKZzwzAYPKpYow`)
         .then(response => {
           if (response.data.error_message) {
             this.error = response.data.error_message;
-            console.log(response.data.error_message);
-          } else {
-            //inicialmente dejamos estos datos vación (hasta pulsar en mostrar mapa)
+         } else {
+            //inicialmente dejamos estos datos vacios (hasta pulsar en mostrar mapa)
             // this.address = response.data.results[0].formatted_address;
             // this.latLong = `${lat}, ${long}`;
           }
         })
         .catch(error => {
           this.error = error.message;
-          console.log(error.message);
         });
     },
 
@@ -227,29 +230,20 @@ export default {
         center: new google.maps.LatLng(lat, long),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
-      
       if (idMapa == "map" && this.filtroAcuartelamiento) {
-        // const dptos = this.departamentosFiltrados;        
-        // console.log("ddddddddddppptttooosss",dptos)
-
         this.departamentos.forEach(dpto => {
-          console.log("obteniendo coordenadas........." + dpto.latitud, dpto.longitud)
           const marker = new google.maps.Marker({
             position: new google.maps.LatLng(dpto.latitud, dpto.longitud),
             map: map
           });
-
           const infoWindow = new google.maps.InfoWindow({
-            //content: `Departamento: ${dpto.abreviatura} - ${dpto.credito} μ`
             content: `${dpto.abreviatura} ( # ${dpto.numMateriales} - ${dpto.credito} μ )`
           });
-
           marker.addListener("click", () => {
             infoWindow.open(map, marker);
           });
         });
       }
-
 
       if (idMapa == "mapModal") {
         map.addListener('click', this.handleMapClick);
@@ -260,8 +254,6 @@ export default {
     handleMapClick(event) {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();
-      console.log(`Maps clickeado:   ${lat}, ${lng}`);
-
       const geocoder = new google.maps.Geocoder();
       const latlng = new google.maps.LatLng(lat, lng);
 
@@ -269,7 +261,6 @@ export default {
         if (status === google.maps.GeocoderStatus.OK && results[0]) {
           const formattedAddress = results[0].formatted_address;
           this.latLong = latlng.toString().replace(/\(|\)/g, "");
-          //this.address = formattedAddress;
           this.departamento.direccion = formattedAddress;
         } else {
           console.log('No se pudo obtener la dirección correspondiente a las coordenadas.');
@@ -279,36 +270,18 @@ export default {
     },
 
     formularioRellenado(dep) {
-      console.log(dep.abreviatura && dep.nombre);
-      //lo hacemos así porque no entiendo por qué no lo evalua como booleano
-      //por ejemplo, comos e hace en Categrias.vue
-      if (!dep.nombre || !dep.abreviatura ||
-        !dep.email || !dep.responsableNombre ||
-        !dep.responsableEmpleo || !dep.telefono) {
-        return false
-      } else {
-        return true
-      }
+      return !(!dep.nombre || !dep.abreviatura || !dep.email || !dep.responsableNombre ||
+               !dep.responsableEmpleo || !dep.telefono)
     },
   },
 
   async created() {
     this.isLoading = true
     await this.getDepartamentos()
-
-    //mostramos el mapa inicialmente
     this.mostrarYCentrarMapa("map");
-    //this.mostrarYCentrarMapa("mapModal");
-
-    //this.isLoading = false
-
     await this.getEmpleos()
-
     await this.getBases()
-
     this.isLoading = false
-    // console.log(this.departamentos)
-
   }
 }
 </script>
@@ -328,8 +301,7 @@ export default {
         </div>
         <div class="card">
           <Accordion :multiple="true" :activeIndex="[0]">
-            <AccordionTab v-for="departamento in departamentosFiltrados"
-              :key="departamento.id">
+            <AccordionTab v-for="departamento in departamentosFiltrados" :key="departamento.id">
               <template #header>
                 <span> {{ departamento.abreviatura }} </span>
                 <span class="spacer"></span>
@@ -341,8 +313,8 @@ export default {
                   {{ departamento.nombre }} <br>
                   <font-awesome-icon icon="fa-solid fa-envelope" /> {{ departamento.email }}<br>
                   <font-awesome-icon icon="fa-solid fa-coins" /> {{ departamento.credito }} &mu;ilis<br>
-                  <font-awesome-icon icon="fa-solid fa-user" /> {{ departamento.responsableEmpleo }} 
-                      {{ departamento.responsableNombre }}<br>
+                  <font-awesome-icon icon="fa-solid fa-user" /> {{ departamento.responsableEmpleo }}
+                  {{ departamento.responsableNombre }}<br>
                   <font-awesome-icon icon="fa-solid fa-address-card" /> {{ departamento.direccion }}<br>
                   <font-awesome-icon icon="fa-solid fa-phone" /> {{ departamento.telefono }} <br>
                   <font-awesome-icon icon="fa-solid fa-dolly" />{{ departamento.numMateriales }}
@@ -361,7 +333,7 @@ export default {
     <section class="right-section">
       <!-- descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
             (en modal no funciona)-->
-       <!-- <InputText id="direccion" v-model.trim="address" required="true" autofocus />   -->
+      <!-- <InputText id="direccion" v-model.trim="address" required="true" autofocus />   -->
       <section id="map" ref="mapContainer">
       </section>
     </section>
@@ -377,9 +349,9 @@ export default {
       </div>
       <div class="field col custom-field">
         <label for="name">Abreviatura:</label>
-        <InputText v-if="departamento.id" id="name" v-model.trim="abreviaturaAntesDelGuion"  required="true" autofocus=""
+        <InputText v-if="departamento.id" id="name" v-model.trim="abreviaturaAntesDelGuion" required="true" autofocus=""
           :class="{ 'p-invalid': submitted && !departamento.abreviatura }" />
-          <InputText v-else id="name" v-model.trim="departamento.abreviatura"  required="true" autofocus=""
+        <InputText v-else id="name" v-model.trim="departamento.abreviatura" required="true" autofocus=""
           :class="{ 'p-invalid': submitted && !departamento.abreviatura }" />
       </div>
       <div class="field col custom-field">
@@ -416,8 +388,8 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="name">Direccion</label>
-         <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/>   -->
-          <InputText id="direccionModal" v-model.trim="departamento.direccion" required="true" autofocus />  
+        <!-- <InputText id="direccionModal" v-model.trim="address" required="true" autofocus/>   -->
+        <InputText id="direccionModal" v-model.trim="departamento.direccion" required="true" autofocus />
 
       </div>
       <div class="field col custom-field">
@@ -428,8 +400,8 @@ export default {
       <div class="field col custom-field">
         <label for="empleo">Acuartelamiento: </label>
         <Dropdown v-model="departamento.acuartelamientoN" :options="bases" placeholder="Seleccione"
-          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id}" @change="actualizarAcuartelamiento" 
-          :disabled="departamento.id"> 
+          :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id }"
+          @change="actualizarAcuartelamiento" :disabled="departamento.id">
           <template #value="base">
             <div>
               <span v-if="!base.value" class="departamento-placeholder">Seleccione</span>
@@ -512,14 +484,6 @@ export default {
   margin-left: 4px;
 }
 
-.p-button.p-button-success,
-.p-button.p-button-warning {
-  color: #fff;
-  background: rgb(136, 158, 89);
-  border: 0 none;
-}
-
-
 .field.d-flex {
   margin-bottom: 1rem;
 }
@@ -531,5 +495,4 @@ export default {
 .spacer {
   margin-right: 4vw;
 }
-
 </style>

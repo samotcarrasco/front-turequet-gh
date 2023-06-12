@@ -13,6 +13,7 @@ import Textarea from 'primevue/textarea'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
+import Toolbar from 'primevue/toolbar'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api'
@@ -26,7 +27,7 @@ import { mapState, mapActions } from 'pinia'
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
-    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch
+    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch, Toolbar
   },
   props: {
     tipoVista: {
@@ -54,7 +55,9 @@ export default {
       minMilis: null,
       maxMilis: null,
       categoriaSeleccionada: null,
-      categoriaLink: null
+      categoriaLink: null,
+      cabecera: null,
+      modalEditCreate: undefined
     }
   },
   mounted() {
@@ -115,6 +118,7 @@ export default {
         }
 
         this.materialDialog = false
+        this.categoriasSeleccionadas = []
         this.inicializarSelectorCategorias()
         this.material = {}
       }
@@ -533,7 +537,7 @@ export default {
         <label for="cantidad">Cantidad: </label>
         <div class="p-inputgroup">
           <Button icon="pi pi-minus" @click="decrementarCantidad" />
-          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" :placeholder="1"
+          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" placeholder="1"
             class="c-cantidad" />
           <Button icon="pi pi-plus" @click="incrementarCantidad" />
         </div>
@@ -563,6 +567,7 @@ export default {
       </div>
       <div v-if="!esInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>
+        <label v-if="material.id" for="bonificacion"> (no aplicable al editar)</label>
         <InputText id="bonificacion" v-model.trim="bonificacion" disabled />
       </div>
     </div>
