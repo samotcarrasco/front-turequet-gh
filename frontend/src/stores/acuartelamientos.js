@@ -46,10 +46,10 @@ export const acuartelamientosStore = defineStore('acuartelamientos', {
       
     // },
 
-    async postAcuartelamiento(acuart) {
-      //la de dentro es la funcion importada
-      await postAcuartelamiento(acuart);
-    },
+    // async postAcuartelamiento(acuart) {
+    //   //la de dentro es la funcion importada
+    //   await postAcuartelamiento(acuart);
+    // },
 
     async putAcuartelamiento(acuart) {
       //la de dentro es la funcion importada

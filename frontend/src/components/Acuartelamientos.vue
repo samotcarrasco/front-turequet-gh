@@ -11,6 +11,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import ProgressSpinner from 'primevue/progressspinner'
+import { postAcuartelamiento, putAcuartelamiento, deleteAcuartelamiento } from '@/stores/api-service'
 
 export default {
   components: {
@@ -57,15 +58,19 @@ export default {
       this.acuartelamiento.direccion = this.address
       if (this.formularioRellenado(this.acuartelamiento)) {
         if (this.acuartelamiento.id) {
-          this.putAcuartelamiento(this.acuartelamiento).then(r => { 
-           // this.getAcuartelamientos()
-                   this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1, r.data) 
-                })
+          putAcuartelamiento(this.acuartelamiento).then(r => {
+            // this.getAcuartelamientos()
+            if (r.status == 200) {
+              this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1, r.data)
+            }
+          })
           toast.add({ severity: 'success', summary: 'Acuartelamiento actualizado', detail: this.acuartelamiento.nombre, life: 3000 })
         } else {
           //  console.log("Entrando en saveAcuart con acuart: ", JSON.stringify(this.acuartelamiento))
-          this.postAcuartelamiento(this.acuartelamiento).then(r => { 
-            this.acuartelamientos.push(r.data)
+          postAcuartelamiento(this.acuartelamiento).then(r => {
+            if (r.status == 200) {
+              this.acuartelamientos.unshift(r.data)
+            }
             // this.getAcuartelamientos() 
           })
           toast.add({ severity: 'success', summary: 'Acuartelamiento creado', detail: this.acuartelamiento.nombre + " se ha creado correctamente", life: 4000 })
@@ -92,9 +97,11 @@ export default {
     const borrarAcuart = () => {
       this.deleteAcuartDialog = false
       console.log("antes de borrar", this.acuartelamiento)
-      this.deleteAcuartelamiento(this.acuartelamiento).then(() => {   
-                                 this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1) 
-                                })
+      deleteAcuartelamiento(this.acuartelamiento).then(r => {
+        if (r.status == 204) {
+          this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1)
+        }
+      })
       toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 })
 
     }
@@ -108,12 +115,12 @@ export default {
   },
   methods: {
     ...mapActions(acuartelamientosStore, ['getAcuartelamientos']),
-    ...mapActions(acuartelamientosStore, ['postAcuartelamiento']),
-    ...mapActions(acuartelamientosStore, ['putAcuartelamiento']),
-    ...mapActions(acuartelamientosStore, ['deleteAcuartelamiento']),
+    // ...mapActions(acuartelamientosStore, ['postAcuartelamiento']),
+    //...mapActions(acuartelamientosStore, ['putAcuartelamiento']),
+    //...mapActions(acuartelamientosStore, ['deleteAcuartelamiento']),
     ...mapActions(acuartelamientosStore, ['getEmpleos']),
 
-    
+
 
     formularioRellenado(acu) {
       //lo hacemos así porque no entiendo por qué no lo evalua como booleano
@@ -155,7 +162,8 @@ export default {
                 <p>
                   {{ acuartelamiento.nombre }} <br>
                   <font-awesome-icon icon="fa-solid fa-envelope" />{{ acuartelamiento.email }}<br>
-                  <font-awesome-icon icon="fa-solid fa-user" /> {{ acuartelamiento.responsableEmpleo }} {{ acuartelamiento.responsableNombre }} <br>
+                  <font-awesome-icon icon="fa-solid fa-user" /> {{ acuartelamiento.responsableEmpleo }} {{
+                    acuartelamiento.responsableNombre }} <br>
                   <font-awesome-icon icon="fa-solid fa-address-card" /> {{ acuartelamiento.direccion }}<br>
                   <font-awesome-icon icon="fa-solid fa-phone" /> {{ acuartelamiento.telefono }}
                 </p>
@@ -295,4 +303,5 @@ s .boton-nuevo {
 
 .custom-field {
   margin-right: 1rem;
-}</style>
+}
+</style>

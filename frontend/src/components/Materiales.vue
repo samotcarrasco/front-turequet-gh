@@ -6,10 +6,6 @@ import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import MultiSelect from 'primevue/multiselect'
-import { departamentosStore } from '@/stores/departamentos'
-import { materialesStore } from '@/stores/materiales'
-import { categoriasStore } from '@/stores/categorias'
-import { mapState, mapActions } from 'pinia'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Calendar from 'primevue/calendar'
@@ -20,7 +16,12 @@ import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api'
-import { llamadaAPI } from '@/stores/api-service'
+import { llamadaAPI, postMaterial } from '@/stores/api-service'
+import { departamentosStore } from '@/stores/departamentos'
+import { materialesStore } from '@/stores/materiales'
+import { categoriasStore } from '@/stores/categorias'
+import { mapState, mapActions } from 'pinia'
+
 
 export default {
   components: {
@@ -73,10 +74,9 @@ export default {
     }
 
     const saveMaterial = () => {
-
       this.material.estado = 0
       this.material.fechaOferta = new Date()
-      this.material.categoria =  this.categoriaLink;
+      this.material.categoria = this.categoriaLink;
       this.material.dptoOferta = this.dptoActualAPI._links.self.href
       this.material.cantidad = this.material.cantidad === 0 || this.material.cantidad === null || this.material.cantidad === undefined
         ? 1 : this.material.cantidad
@@ -93,22 +93,23 @@ export default {
       }
 
       this.submitted = true
-      
-      
+
+
       if (this.formularioRellenado(this.material)) {
         if (this.material.id) {
           this.material.imgReducida = this.material.imagen
-          console.log("material antes de PUT", JSON.stringify(this.material))
-        
           this.putMaterial(this.material).then(() => { this.getMateriales() })
           toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 })
         } else {
-          console.log("material antes de POST", JSON.stringify(this.material))
-          this.postMaterial(this.material).then(() => { this.getMateriales() })
+          postMaterial(this.material).then(r => {
+            if (r.status == 201) {
+              this.materiales.push(r.data)
+            }
+          })
           toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 })
         }
 
-        if (this.material.bonificacion) {
+        if (this.material.bonificacion && !this.material.id) {
           toast.add({ severity: 'info', summary: 'Bonificación obtenida', detail: this.material.bonificacion + " μilis", life: 3050 })
           this.actualizarMilisMenu(this.material.bonificacion)
         }
@@ -116,8 +117,8 @@ export default {
         this.materialDialog = false
         this.inicializarSelectorCategorias()
         this.material = {}
-
       }
+      
     }
 
     const patchFechaEntregaModal = () => {
@@ -162,23 +163,7 @@ export default {
     ...mapState(departamentosStore, ['milisMenu']),
     ...mapState(materialesStore, ['materialActual']),
 
-
-    isInventariable() {
-      switch (this.material.tipoMaterial) {
-        case "Inventariable":
-          this.esInventariable = true
-          return true
-        case "noInventariable":
-          this.esInventariable = false
-          return false
-        default:
-          return this.esInventariable
-      }
-    },
-
-
     materialesFiltrados() {
-    
       switch (this.tipoVista) {
         case "ofertados":
           return this.categoriasSeleccionadas.length === 0
@@ -197,7 +182,6 @@ export default {
             )
 
         case "pendientes":
-          //asiganmos el valor "entregado" en los casos que corresponda
           this.asignarPendientes()
           return this.categoriasSeleccionadas.length === 0
             ? this.materiales.filter((material) => (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
@@ -210,8 +194,6 @@ export default {
             )
 
         case "entregados":
-          //asiganmos el valor "entregado" en los casos que corresponda
-
           this.asignarEntregados()
           return this.categoriasSeleccionadas.length === 0
             ? this.materiales.filter((material) => (material.estado === "recepcionado" || material.estado === "entregado") &&
@@ -238,12 +220,11 @@ export default {
         this.maxMilis = categoria.maxMilis
         this.idCategoria = categoria.id
         this.categoria = undefined
-        
       }
       else {
-          this.minMilis = null
-          this.maxMilis = null
-          this.categoria = undefined
+        this.minMilis = null
+        this.maxMilis = null
+        this.categoria = undefined
       }
     },
 
@@ -261,7 +242,6 @@ export default {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
-    ...mapActions(materialesStore, ['postMaterial']),
     ...mapActions(materialesStore, ['putMaterial']),
     ...mapActions(materialesStore, ['patchFechaEntrega']),
     ...mapActions(materialesStore, ['deleteMaterial']),
@@ -273,10 +253,8 @@ export default {
       await this.getMaterialPorId(id)
       this.material = this.materialActual
       this.materialDialog = true
-      console.log("editttttttttttttttttttttttttttttttttt amaterial", JSON.stringify(this.material))
       this.cabecera = "Editar material"
     },
-
 
     async asignarFechaEntrega(id) {
       await this.getMaterialPorId(id)
@@ -284,8 +262,6 @@ export default {
       this.asignarFechaDialog = true
       this.cabecera = "Confirme la fecha de entrega/recepción"
     },
-
-
 
     initFilters() {
       this.filters = {
@@ -340,7 +316,7 @@ export default {
 
     asignarPendientes() {
       this.materiales.forEach(material => {
-            if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
+        if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
           material.estado = "pendiente entrega"
         } else if (material.estado === "pendiente" || material.estado == "pendiente entrega" && material.dptoAdquisicionN === this.dptoActual) {
           material.estado = "pendiente recepcion"
@@ -371,7 +347,6 @@ export default {
       this.categoriasAgrupadas = this.categorias.reduce((grupos, categoria) => {
         let grupo = grupos.find(g => g.label === categoria.grupo)
         if (!grupo) {
-          // Si no existe, crear un nuevo grupo
           grupo = {
             label: categoria.grupo,
             code: categoria.grupo,
@@ -386,32 +361,12 @@ export default {
     },
 
     actualizarCategorias() {
-      //const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado || grupo.label === this.material.grupoN)
       const grupo = this.categoriasAgrupadas.find(grupo => grupo.label === this.grupoSeleccionado)
-      console.log("grupo seleccionado", grupo)
       this.material.categoriaN = undefined
       this.categoriasSeleccionadas = grupo ? grupo.items : []
     },
 
     formularioRellenado(mat) {
-       console.log("dentro de formularioRelllllllllllllllenado", JSON.stringify(mat))
-       console.log("validando  ", this.minMilis, " ", this.maxMilis, " ", this.material.milis)
-       console.log("mat.nombre",mat.nombre)
-       console.log("mat.descripcion",mat.descripcion)
-       console.log("mat.milis", mat.milis)
-       console.log("this.minmilis",this.minMilis)
-       console.log("mat.milis",mat.milis)
-       console.log("this.maxMilis",this.maxMilis) 
-       console.log("mat.milis", mat.milis)
-       console.log("mat.categoria", mat.categoria)
-       console.log("mat.imagen", mat.imagen)
-        
-
-      // console.log(mat.nombre && mat.descripcion && mat.milis >= this.minMilis
-      //   && mat.milis <= this.maxMilis && mat.milis > 0 && mat.categoria && mat.imagen)
-      console.log(mat.nombre != null && mat.descripcion != null && mat.milis >= this.minMilis
-        && mat.milis <= this.maxMilis && mat.milis > 0 && mat.imagen != null)
-        
       return (mat.nombre != null && mat.descripcion != null && mat.milis >= this.minMilis
         && mat.milis <= this.maxMilis && mat.milis > 0 && mat.imagen != null)
     },
@@ -429,12 +384,8 @@ export default {
 
   async created() {
     this.initFilters()
-
     await this.getCategorias()
     await this.getMateriales()
-
-    console.log("DPTO ACTUAL API", JSON.stringify(this.dptoActualAPI))
-
     this.inicializarSelectorCategorias()
   }
 
@@ -484,7 +435,7 @@ export default {
       <Column field="descripcion" header="Descripción" :sortable="false"></Column>
       <Column field="milis" header="μilis" :sortable="true"> </Column>
       <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
-       <Column field="grupoN" header="Grupo" :sortable="true"></Column>
+      <Column field="grupoN" header="Grupo" :sortable="true"></Column>
       <Column v-if="tipoVista === 'pendientes'" header="Estado" :sortable="true">
         <template #body="material">
           <Tag :value="material.data.estado" :severity="getSeverity(material)"
@@ -524,8 +475,6 @@ export default {
 
         </template>
       </Column>
-
-      <!-- <template #footer> Total: {{ materialesFiltrados ? materialesFiltrados.length : 0 }} </template> -->
     </DataTable>
   </div>
 
@@ -562,19 +511,21 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="grupo">Grupo: </label>
-        <Dropdown v-model="grupoSeleccionado" :options="grupos" :placeholder="material.id ? material.grupoN : 'Seleccione un grupo'"
-          @change="actualizarCategorias" required="true" />
+        <Dropdown v-model="grupoSeleccionado" :options="grupos"
+          :placeholder="material.id ? material.grupoN : 'Seleccione un grupo'" @change="actualizarCategorias"
+          required="true" />
       </div>
       <div class="field col custom-field">
         <label for="categoria">Categoría: </label>
-        <Dropdown  v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
-          :placeholder="material.id ? material.categoriaN : 'Seleccione una categoría'" @change="getMilisDeCategoria" required="true" />
-      </div> 
+        <Dropdown v-model="categoriaSeleccionada" :options="categoriasSeleccionadas" optionLabel="label"
+          :placeholder="material.id ? material.categoriaN : 'Seleccione una categoría'" @change="getMilisDeCategoria"
+          required="true" />
+      </div>
       <div class="field col custom-field">
         <label for="milis">Milis: </label>
         <InputNumber id="milis" v-model="material.milis" required="true"
           :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis) }"
-          :required="true" :placeholder="categoriaSeleccionada  ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
+          :required="true" :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
       </div>
     </div>
     <div class="field d-flex mt-2">
@@ -600,26 +551,20 @@ export default {
     <div class="field d-flex mt-2">
       <div class="field col custom-field-switch">
         <label for="inventariable" class="custom-label">Inventariable: </label>
-        <InputSwitch v-if="material.id" v-model="isInventariable" class="custom-input-switch" />
-        <InputSwitch v-else v-model="esInventariable" class="custom-input-switch" />
+        <InputSwitch v-model="esInventariable" class="custom-input-switch" />
       </div>
-      <div v-if="esInventariable || isInventariable" class="field col custom-field">
+      <div v-if="esInventariable" class="field col custom-field">
         <label for="noc">NOC: </label>
         <InputText id="noc" v-model="material.noc" :required="false" />
       </div>
-      <div v-if="esInventariable || isInventariable" class="field col custom-field">
+      <div v-if="esInventariable" class="field col custom-field">
         <label for="numeroSerie">Número de Serie: </label>
         <InputText id="numSerie" v-model="material.numeroSerie" :required="false" />
       </div>
-      <div v-if="!esInventariable || !isInventariable" class="field col custom-field">
+      <div v-if="!esInventariable" class="field col custom-field">
         <label for="bonificacion">Bonificación: </label>
         <InputText id="bonificacion" v-model.trim="bonificacion" disabled />
-        <!-- <InputText id="bonificacion" v-model="material.bonificacion" :required="false" readonly /> -->
       </div>
-      <!-- <div v-if="!esInventariable || !isInventariable" class="field col custom-field">
-        <label for="null"> </label>
-      </div> -->
-
     </div>
 
     <template #footer>
