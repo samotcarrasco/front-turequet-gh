@@ -27,7 +27,6 @@ export default {
     }
   },
 
-
   computed: {
     ...mapState(materialesStore, ['materiales']),
     ...mapState(materialesStore, ['materialActual']),
@@ -42,13 +41,6 @@ export default {
     ...mapActions(departamentosStore, ['putAumentarCretido']),
 
     materialAdquirido(material) {
-      // console.log("acutal", this.dptoActual)
-      // console.log("adquisicion", this.dptoActualAPI);
-      // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href);
-      // console.log("ofertante", material.dptoOfertaN)
-      // console.log("estado", material.estado)
-      //console.log("material actual", JSON.stringify(this.materialActual))
-
       return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) 
              && (material.estado == "entregado" || material.estado=="recepcionado")
     },
@@ -62,7 +54,6 @@ export default {
 
     adquirirMaterial(material) {
       this.material = material
-      console.log(this.material)
       this.adquirirDialog = true
       this.cabecera = "Adquirir material"
     },
@@ -79,11 +70,8 @@ export default {
       const logo = new Image()
       const logoACING = new Image()
 
-      //estas imagenes las hemos cargado en "public" por compatibilidad con netlifly
       logo.src = "./logo.png"
       logoACING.src = "./logoACING.png"
-      // logo.src = "./src/assets/img/logos/logo.png";
-      // logoACING.src = "./src/assets/img/logos/logoACING.png";
       
       const logoWidth = 12
       const logoHeight = 12
@@ -98,7 +86,6 @@ export default {
       doc.setFontSize(14)
       doc.text('DOCUMENTO DE INTERCAMBIO DE MATERIAL', doc.internal.pageSize.getWidth() / 2, 20, null, null, 'center')
       doc.setFontSize(12)
-      // línea horizontal
       doc.line(10, 30, doc.internal.pageSize.getWidth() - 10, 30)
       doc.text(`Material intercambiado: ${material.nombre}`, 10, 40)
       doc.text(`Descripción: ${material.descripcion}`, 10, 50)
@@ -109,28 +96,16 @@ export default {
       doc.text(`Unidad que adquiere el material: ${material.dptoAdquisicionN}`, 10, 100)
       doc.text('Responsable:', 10, 110)
       doc.text('Teléfono:', 10, 120)
-
-      // línea horizontal
       doc.line(10, 130, doc.internal.pageSize.getWidth() - 10, 130)
-
       doc.text(`Fecha del sistema: ${new Date().toLocaleDateString('es-ES')}`, 10, 140)
       doc.text('Fecha en la que se produce el intercambio:____________________', 10, 150)
-
       doc.text('Fdo: Unidad que entrega el material         Fdo: Unidad que adquiere el material', 10, 200)
       doc.save(`intercambio-material${material.nombre}.pdf`)
 
     },
 
-    goBack() {
-      console.log('Botón volver presionado')
-      this.$router.back()
-      window.location.reload()
-    }
-
-
   },
   mounted() {
-    // console.log("mountedddd ", this.$route.query.tipoVista)
 
     const toast = useToast()
 
@@ -163,25 +138,21 @@ export default {
       this.submitted = true
 
       this.generarPDF(this.material)
-      //console.log("actualizando material: " +  JSON.stringify(this.material))
-      //actualizamos el material con la info correspondiente
       this.material.estado = "pendiente"
-      //this.material.dptoAdquisicion = this.dptoActualAPI
       this.material.categoria = this.material._links.categoria.href
       this.material.dptoAdquisicion = this.dptoActualAPI._links.self.href
       this.material.dptoAdquisicionN = this.dptoActual
-      // console.log ("dpto adquisicion" + this.material.dptoAdquisicion)
       this.material.dptoOferta = this.material._links.dptoOferta.href
+      this.material.imgReducida = this.material.imagen
       delete this.material._links
       this.material.fechaAdquisicion = new Date()
-      //console.log("actualizando material: " +  JSON.stringify(this.material))
+
       Promise.all([
         this.putMaterial(this.material, this.material.id),
         this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis*this.material.cantidad),
         this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis*this.material.cantidad)
       ]).then(() => {
-        this.getMateriales()
-        console.log("Actualizando credito de unidades implicadas")
+        this.materiales.splice(this.materiales.indexOf(this.materiales), 1, this.material)  
         toast.add({ severity: 'success', summary: 'Adquisición realizada', detail: this.material.nombre, life: 3000 })
       }).catch((error) => {
         console.error('Error al actualizar material:', error)
@@ -193,22 +164,13 @@ export default {
     this.hideDialog = hideDialog
     this.hideDialogDet = hideDialogDet
     this.saveMaterial = saveMaterial
-
-
   },
 
-
   async created() {
-
-    //iniciamos la aplicación con rol gestor  
     this.isLoading = true
-    console.log("OBTENIDODO MATERIAL POR ID: ", this.$route.params.id)
-    await this.getMaterialPorId(this.$route.params.id)
-    // console.log("material string: ", JSON.stringify(this.materialActual))
+  //  await this.getMaterialPorId(this.$route.params.id)
     this.material = this.materialActual
-    console.log(JSON.stringify(this.material))
     this.isLoading = false
-
   }
 }
 </script>
@@ -289,14 +251,7 @@ export default {
 </template>
 
 <style scoped>
-.p-button {
-  margin: 1rem;
-}
 
-.p-card-content {
-  margin: 0;
-  padding: 0;
-}
 
 .dialog-label {
   font-weight: bold;

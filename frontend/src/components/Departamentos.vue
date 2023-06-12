@@ -37,6 +37,7 @@ export default {
       isLoading: true,
       filtroAcuartelamiento: null,
       acuartelamientoFiltroModal: undefined,
+      cabecera: null
     };
   },
 
@@ -85,13 +86,11 @@ export default {
       this.mostrarYCentrarMapa("mapModal")
     };
 
-
     //Autocompletado de dirección
     /* descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
        const autocomplete = new google.maps.places.Autocomplete(
          document.getElementById("direccion")
        );
-
        autocomplete.addListener("place_changed", () => {
          const place = autocomplete.getPlace();
          this.address = place.formatted_address;
@@ -331,16 +330,12 @@ export default {
       </div>
     </section>
     <section class="right-section">
-      <!-- descomentar para ver funcionlaidad de relleno de direccion en el mapa principal
-            (en modal no funciona)-->
-      <!-- <InputText id="direccion" v-model.trim="address" required="true" autofocus />   -->
-      <section id="map" ref="mapContainer">
+      <section id="map">
       </section>
     </section>
   </div>
 
   <Dialog v-model:visible="dptoDialog" :style="{ width: '70vw' }" :header="cabecera" :modal="true" class="p-fluid">
-    <!-- @show="onDialogShow"> -->
     <div class="field d-flex mt-2">
       <div class="field col custom-field">
         <label for="name">Nombre:</label>
@@ -401,7 +396,7 @@ export default {
         <label for="empleo">Acuartelamiento: </label>
         <Dropdown v-model="departamento.acuartelamientoN" :options="bases" placeholder="Seleccione"
           :class="{ 'p-invalid': submitted && !departamento.acuartelamiento && !departamento.id }"
-          @change="actualizarAcuartelamiento" :disabled="departamento.id">
+          @change="actualizarAcuartelamiento" :disabled="departamento.id != null">
           <template #value="base">
             <div>
               <span v-if="!base.value" class="departamento-placeholder">Seleccione</span>
@@ -437,33 +432,29 @@ export default {
 </template>
 
 <style scoped>
-.container {
-  display: flex;
-  margin-top: 20px !important;
-  padding-top: 0;
-}
+
 
 .left-section {
   flex: 1;
   padding-right: 1rem;
+  width: 20vw;
 }
 
 .right-section {
   flex: 1;
   padding-left: 1rem;
+  width: 20vw;
 }
 
 #map {
   width: 100%;
   height: 400px;
   margin-top: 4vw;
-  /* Ajusta la altura según tus necesidades */
 }
 
 #mapModal {
   width: 100%;
   height: 400px;
-  /* Ajusta la altura según tus necesidades */
 }
 
 .boton-nuevo {
@@ -473,10 +464,6 @@ export default {
 
 .filtro {
   margin-bottom: 20px;
-}
-
-.boton-mostrar {
-  margin-top: 25px;
 }
 
 
@@ -494,5 +481,9 @@ export default {
 
 .spacer {
   margin-right: 4vw;
+}
+
+.tabview-panels {
+  width: max-content;
 }
 </style>

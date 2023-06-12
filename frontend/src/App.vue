@@ -3,7 +3,7 @@ import Menu from '@/components/MenuNav.vue';
 
 export default {
   components: {
-    Menu  
+    Menu
   },
 }
 
@@ -11,24 +11,20 @@ export default {
 
 <template>
   <header class="menu">
-    <Menu />
-  </header> 
+  <Menu />
+  </header>
   <div class="container">
-
-      <router-view />  
-
-    <div class="main">
-   </div>
+    <router-view />
   </div>
 </template>
 
-
-
-<style>
+<style scoped>
 .container {
-  display: grid;
-  margin-top: 100px;
-  margin-left: 0;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  margin: 0 auto;
+  margin-top: 6vw;
 }
 
 .menu {
@@ -38,13 +34,8 @@ export default {
   width: 100%;
   background-color: white;
   z-index: 1;
+  margin-bottom: 2vw;
 }
 
-.sidebar {
-  grid-area: sidebar;
-}
 
-.content {
-  grid-area: content;
-}
-</style>
+</style> 

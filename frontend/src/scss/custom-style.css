@@ -5,3 +5,9 @@
   background: rgb(136, 158, 89);
   border: 0 none;
 }
+
+.small-spinner {
+  width: 45px; 
+  height: 45px; 
+}
+

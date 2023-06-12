@@ -12,8 +12,8 @@ import Calendar from 'primevue/calendar'
 import Textarea from 'primevue/textarea'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
-import InputText from 'primevue/inputtext'
 import Toolbar from 'primevue/toolbar'
+import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api'
@@ -57,7 +57,8 @@ export default {
       categoriaSeleccionada: null,
       categoriaLink: null,
       cabecera: null,
-      modalEditCreate: undefined
+      modalEditCreate: undefined,
+      changeCursor: undefined
     }
   },
   mounted() {
@@ -422,7 +423,7 @@ export default {
             </MultiSelect>
           </div>
           <div class="col-4 text-right">
-            <Button v-if="this.tipoVista == 'ofertados'" label="Crear nuevo" icon="pi pi-plus" @click="modalEditCreate" />
+            <Button v-if="this.tipoVista == 'ofertados' && this.dptoActual" label="Crear nuevo" icon="pi pi-plus" @click="modalEditCreate" />
           </div>
         </div>
       </template>
@@ -456,8 +457,17 @@ export default {
       <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
 
       <Column v-if="this.tipoVista == 'ofertados'" headerStyle="min-width:10rem;">
-        <template #body="material">
-          <Toolbar class="p-p-0 p-mb-2">
+          <Toolbar>
+            <template #end>
+    
+        <Button icon="pi pi-search" class="mr-2" />
+        <Button icon="pi pi-calendar" severity="success" class="mr-2" />
+        <Button icon="pi pi-times" severity="danger" />
+      </template>
+        </Toolbar>
+    
+        <!-- <template #body="material">
+           </Toolbar>class="p-p-0 p-mb-2"> 
             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
               @click="editMaterial(material.data.id)" />
 
@@ -468,7 +478,7 @@ export default {
               <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs" />
             </router-link>
           </Toolbar>
-        </template>
+        </template> -->
       </Column>
 
       <Column v-else header="+INFO">

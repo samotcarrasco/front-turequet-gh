@@ -78,19 +78,16 @@ export default {
 
     getNumMaterialesPorCategoria() {
       const categMateriales = []
-
       for (let i = 0; i < this.categorias.length; i++) {
         const categoria = this.categorias[i].categoria
         const numMateriales = this.categorias[i].numMateriales
         const categObjeto = { categoria: categoria, numMateriales: numMateriales }
         categMateriales.push(categObjeto)
       }
-
       return categMateriales
     },
 
     actualizarGraficos() {
-
       let labelsMateriales = []
       let labelsAcuartelamientos = []
       let data = []
@@ -100,7 +97,6 @@ export default {
       this.categMateriales.forEach(categoria => {
         labelsMateriales.push(categoria.categoria)
         data.push(categoria.numMateriales)
-        console.log("PUSH " + categoria.categoria, categoria.numMateriales)
       })
 
       this.acuartelamientos.forEach(acuartelamiento => {
@@ -139,9 +135,6 @@ export default {
       }
       return coloresExtendidos
     },
-
-
-
   },
   async created() {
     await this.getCategorias()
@@ -149,10 +142,9 @@ export default {
     this.categMateriales = this.getNumMaterialesPorCategoria()
     this.actualizarGraficos()
     await this.getAcuartelamientos()
-
   },
-
 }
+
 </script>
 <template>
   <div>

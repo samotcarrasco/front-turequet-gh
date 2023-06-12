@@ -15,26 +15,23 @@ export default {
     }
   },
   computed: {
-    ...mapState(departamentosStore, ['dptoActual']),
+    ...mapWritableState(departamentosStore, ['dptoActual']),
     ...mapWritableState(departamentosStore, ['rolActual']),
+    ...mapWritableState(departamentosStore, ['milisMenu']),
     ...mapState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['departamentosSiglas']),
     ...mapState(departamentosStore, ['dptoActualAPI']),
-       //writable para que sea reactiva
-    ...mapWritableState(departamentosStore, ['milisMenu']),
+    
 
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
     ...mapActions(departamentosStore, ['getBonificacion']),
-    ...mapActions(departamentosStore, ['getDeptoActualAPI']),
-
+    
     cambiarDpto(event) {
       const storeDepto = departamentosStore()
       storeDepto.cambiarDpto(event.target.value)
-      console.log("milis", this.milisMenu)
-      //this.getBonificacion(this.dptoActualAPI.id)
-    },
+   },
 
     cambiarRol(event) {
       const storeDepto = departamentosStore()
@@ -44,28 +41,14 @@ export default {
       } else {
         this.$router.push({ name: 'materiales' })
         this.getDepartamentos()
-        this.getDeptoActualAPI()
-      }
+       }
     },
-
-   
   },
+  
   async created() {
-
     this.loading = true
-
     await this.getDepartamentos()
-    //console.log("long dptos siglas:" + this.departamentosSiglas.length)
-    //iniciamos la aplicación con rol gestor  
-
-   // await this.getDeptoActualAPI()
-
     this.loading = false
-
-
-    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI)
-    // console.log("DPTO ACTUAL API:" + this.dptoActualAPI._links.self.href)
-    //iniciamos la aplicación con rol gestor  
   },
 }
 </script>
@@ -121,9 +104,6 @@ export default {
 </template>
 
 <style scoped>
-/* .navbar-nav .nav-link {
-  width: 100%;
-} */
 .fixed-top {
   position: relative
 }
@@ -132,13 +112,10 @@ export default {
   align-self: center;
   margin-right: 2vw
 }
-.small-spinner {
-  width: 45px; /* Ajusta el ancho del contenedor */
-  height: 45px; /* Ajusta la altura del contenedor */
-}
+
 
 .milis-menu {
-  background-color: #e6f1e8; /* Fondo verde militar claro */
+  background-color: #e6f1e8; 
   background-color: rgb(174, 190, 140);
   padding: 6px;
   border-radius: 8px;

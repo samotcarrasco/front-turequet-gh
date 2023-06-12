@@ -240,12 +240,12 @@ export default {
 <style scoped>
  .container {
   display: flex;
-  margin-top: 20px;
+  margin-top: 20vw;
   padding-top: 0;
 } 
 
 .left-section {
-  flex: 1;
+  flex: 0.6;
   padding-right: 1rem;
 }
 

@@ -49,17 +49,8 @@ export const departamentosStore = defineStore('departamentos', {
       
     },
 
-    async postDepartamento(dpto) {
-      await postDepartamento(dpto);
-    },
-
     async getMaterialPorId(id) {
       await getMaterialPorId(id);
-    },
-
-
-    async putDepartamento(dpto) {
-      await putDepartamento(dpto);
     },
 
     async putAumentarCretido(departamento, creditos) {
@@ -76,10 +67,6 @@ export const departamentosStore = defineStore('departamentos', {
       await getBases().then(r => {
         this.bases = r.data;
       });
-    },
-
-    async deleteDpto(dpto) {
-      await deleteDepartamento(dpto)
     },
 
     actualizarMilisMenu(bonificacion){

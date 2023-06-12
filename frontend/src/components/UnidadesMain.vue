@@ -1,5 +1,4 @@
 <script>
-import Panel from 'primevue/panel'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import Departamentos from './Departamentos.vue'
@@ -7,11 +6,11 @@ import Acuartelamientos from './Acuartelamientos.vue'
 
 
 export default {
-  components: { Panel, TabView, TabPanel, Departamentos, Acuartelamientos },
+  components: { TabView, TabPanel, Departamentos, Acuartelamientos },
   
   data() {
     return {
-      currentTab: 'departamentos'
+      currentTab: undefined
     }
   },
   methods: {
@@ -32,3 +31,9 @@ export default {
     </TabPanel>
   </TabView>
 </template> 
+
+<style>
+.tabview-panels {
+  width: max-content;
+}
+</style>
