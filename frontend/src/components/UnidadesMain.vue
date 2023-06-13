@@ -31,9 +31,3 @@ export default {
     </TabPanel>
   </TabView>
 </template> 
-
-<style>
-.tabview-panels {
-  width: max-content;
-}
-</style>

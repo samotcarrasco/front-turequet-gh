@@ -238,19 +238,19 @@ export default {
 </template>
 
 <style scoped>
- .container {
+ 
+.container {
   display: flex;
-  margin-top: 20vw;
-  padding-top: 0;
-} 
-
+}
 .left-section {
-  flex: 0.6;
-  padding-right: 1rem;
+  flex: 1;
+  padding-right: 1vw;
+  width: 40vw;
 }
 
 .boton-nuevo {
-  margin-bottom: 20px;
+  margin-top: 1vw;
+  margin-bottom: 1vw;
 }
 
 .card {

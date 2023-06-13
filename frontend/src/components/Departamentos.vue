@@ -433,17 +433,20 @@ export default {
 
 <style scoped>
 
+.container {
+  display: flex;
+}
 
 .left-section {
   flex: 1;
   padding-right: 1rem;
-  width: 20vw;
+  width: 40vw;
 }
 
 .right-section {
   flex: 1;
   padding-left: 1rem;
-  width: 20vw;
+  width: 40vw;
 }
 
 #map {
@@ -458,12 +461,13 @@ export default {
 }
 
 .boton-nuevo {
-  margin-bottom: 20px;
-  margin-right: 80px;
+  margin-bottom: 1vh;
+  margin-right: 1vw;
 }
 
 .filtro {
-  margin-bottom: 20px;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
 }
 
 
