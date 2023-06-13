@@ -11,3 +11,6 @@
   height: 45px; 
 }
 
+.p-card {
+  height: fit-content;
+}

@@ -168,7 +168,7 @@ export default {
 
   async created() {
     this.isLoading = true
-  //  await this.getMaterialPorId(this.$route.params.id)
+    await this.getMaterialPorId(this.$route.params.id)
     this.material = this.materialActual
     this.isLoading = false
   }
@@ -251,8 +251,6 @@ export default {
 </template>
 
 <style scoped>
-
-
 .dialog-label {
   font-weight: bold;
   font-size: 1.2em; 
@@ -261,4 +259,5 @@ export default {
 .dialog-value {
   font-size: 1.2em; 
 }
+
 </style>

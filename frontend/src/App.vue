@@ -22,9 +22,8 @@ export default {
 .container {
   display: flex;
   justify-content: center;
-  height: 100vh;
   margin: 0 auto;
-  margin-top: 6vw;
+  margin-top: 100px;
 }
 
 .menu {
@@ -34,7 +33,6 @@ export default {
   width: 100%;
   background-color: white;
   z-index: 1;
-  margin-bottom: 2vw;
 }
 
 

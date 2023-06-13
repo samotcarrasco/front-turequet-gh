@@ -1,7 +1,6 @@
 <script>
 import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
-import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
@@ -12,7 +11,6 @@ import Calendar from 'primevue/calendar'
 import Textarea from 'primevue/textarea'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
-import Toolbar from 'primevue/toolbar'
 import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
@@ -27,7 +25,7 @@ import { mapState, mapActions } from 'pinia'
 export default {
   components: {
     Toast, Button, Dropdown, DataTable, Textarea, InputText, Column, InputNumber, Dialog,
-    Card, Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch, Toolbar
+    Button, MultiSelect, Tag, FileUpload, Calendar, InputSwitch
   },
   props: {
     tipoVista: {
@@ -123,7 +121,7 @@ export default {
         this.inicializarSelectorCategorias()
         this.material = {}
       }
-      
+
     }
 
     const patchFechaEntregaModal = () => {
@@ -423,7 +421,8 @@ export default {
             </MultiSelect>
           </div>
           <div class="col-4 text-right">
-            <Button v-if="this.tipoVista == 'ofertados' && this.dptoActual" label="Crear nuevo" icon="pi pi-plus" @click="modalEditCreate" />
+            <Button v-if="this.tipoVista == 'ofertados' && this.dptoActual" label="Crear nuevo" icon="pi pi-plus"
+              @click="modalEditCreate" />
           </div>
         </div>
       </template>
@@ -453,34 +452,20 @@ export default {
         </template>
       </Column>
 
-
       <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
-
       <Column v-if="this.tipoVista == 'ofertados'" headerStyle="min-width:10rem;">
-          <Toolbar>
-            <template #end>
-    
-        <Button icon="pi pi-search" class="mr-2" />
-        <Button icon="pi pi-calendar" severity="success" class="mr-2" />
-        <Button icon="pi pi-times" severity="danger" />
-      </template>
-        </Toolbar>
-    
-        <!-- <template #body="material">
-           </Toolbar>class="p-p-0 p-mb-2"> 
+        <template #body="material">
+          <div class="d-flex">
             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
               @click="editMaterial(material.data.id)" />
-
             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning p-mr-2"
               @click="confirmDeleteMaterial(material.data)" />
-
             <router-link :to="{ name: 'material', params: { id: material.data.id } }">
               <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs" />
             </router-link>
-          </Toolbar>
-        </template> -->
+          </div>
+        </template>
       </Column>
-
       <Column v-else header="+INFO">
         <template #body="material">
           <router-link :to="{ name: 'material', params: { id: material.data.id } }">
@@ -547,8 +532,7 @@ export default {
         <label for="cantidad">Cantidad: </label>
         <div class="p-inputgroup">
           <Button icon="pi pi-minus" @click="decrementarCantidad" />
-          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" placeholder="1"
-            class="c-cantidad" />
+          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" placeholder="1" class="c-cantidad" />
           <Button icon="pi pi-plus" @click="incrementarCantidad" />
         </div>
       </div>
@@ -636,7 +620,7 @@ export default {
 }
 
 .p-button-rounded {
-  margin: 4px;
+  margin: 2px;
 }
 
 .p-button.p-button-success,
