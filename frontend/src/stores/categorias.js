@@ -30,17 +30,6 @@ export const categoriasStore = defineStore('categorias', {
     async getCategorias() {
       await getCategorias().then(r => this.categorias = r.data._embedded.categorias);
     },
-
-    async postCategoria(categoria) {
-      await postCategoria(categoria);
-    },
-
-    async putCategoria(categoria, id) {
-      await putCategoria(categoria, id);
-    },
-
-    async deleteCategoria(categoria) {
-      await deleteCategoria(categoria);
-    },    
+    
   },
 })

@@ -15,7 +15,7 @@ import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import FileUpload from 'primevue/fileupload'
 import { FilterMatchMode } from 'primevue/api'
-import { llamadaAPI, postMaterial } from '@/stores/api-service'
+import { putMaterial, postMaterial, deleteMaterial, patchFechaEntrega } from '@/stores/api-service'
 import { departamentosStore } from '@/stores/departamentos'
 import { materialesStore } from '@/stores/materiales'
 import { categoriasStore } from '@/stores/categorias'
@@ -99,16 +99,20 @@ export default {
 
       if (this.formularioRellenado(this.material)) {
         if (this.material.id) {
-          this.material.imgReducida = this.material.imagen
-          this.putMaterial(this.material).then(() => { this.getMateriales() })
-          toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 })
-        } else {
-          postMaterial(this.material).then(r => {
-            if (r.status == 201) {
-              this.materiales.push(r.data)
+
+          putMaterial(this.material).then(r => {
+            if (r.status == 200) {
+              this.materiales.splice(this.materiales.indexOf(this.material), 1, r.data)
+              toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 })
             }
           })
-          toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 })
+        } else {
+          postMaterial(this.material).then(r => {
+            if (r.status == 200) {
+              this.materiales.unshift(r.data)
+              toast.add({ severity: 'success', summary: 'Material creado', detail: this.material.nombre, life: 3000 })
+            }
+          })
         }
 
         if (this.material.bonificacion && !this.material.id) {
@@ -127,8 +131,12 @@ export default {
     const patchFechaEntregaModal = () => {
       const modeloFecha = JSON.stringify({ fechaEntrega: this.fechaCalendario })
       this.submitted = true
-      this.patchFechaEntrega(modeloFecha, this.material.id).then(() => { this.getMateriales() })
-      toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 })
+      patchFechaEntrega(modeloFecha, this.material.id).then(r => {
+        if (r.status == 200) {
+          this.materiales.splice(this.materiales.indexOf(this.material), 1, r.data)
+          toast.add({ severity: 'success', summary: 'Entrega finalizada', detail: this.material.nombre, life: 3000 })
+        }
+      })
       this.asignarFechaDialog = false
     }
 
@@ -139,13 +147,16 @@ export default {
 
     const borrarMaterial = () => {
       this.deleteMaterialDialog = false
-      if (this.material.bonificacion) {
-        this.actualizarMilisMenu(-this.material.bonificacion)
-      }
-      this.deleteMaterial(this.material).then(() => { this.getMateriales() })
-      toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.material.nombre, life: 3000 })
+      deleteMaterial(this.material).then(r => {
+        if (r.status == 204) {
+          this.materiales.splice(this.materiales.indexOf(this.material), 1)
+          toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.material.nombre, life: 3000 })
+          if (this.material.bonificacion) {
+            this.actualizarMilisMenu(-this.material.bonificacion)
+          }
+        }
+      })
     }
-
 
     this.modalEditCreate = modalEditCreate
     this.hideDialog = hideDialog
@@ -153,8 +164,6 @@ export default {
     this.patchFechaEntregaModal = patchFechaEntregaModal
     this.confirmDeleteMaterial = confirmDeleteMaterial
     this.borrarMaterial = borrarMaterial
-
-
   },
 
   computed: {
@@ -232,11 +241,11 @@ export default {
     },
 
     fechaFormateada() {
-      const today = new Date()
-      const day = String(today.getDate()).padStart(2, '0')
-      const month = String(today.getMonth() + 1).padStart(2, '0')
-      const year = today.getFullYear()
-      return `${day}/${month}/${year}`
+      const hoy = new Date()
+      const dia = String(hoy.getDate()).padStart(2, '0')
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0')
+      const anio = hoy.getFullYear()
+      return `${dia}/${mes}/${anio}`
     },
 
   },
@@ -245,9 +254,6 @@ export default {
     ...mapActions(materialesStore, ['materialesDptoActual']),
     ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(materialesStore, ['getMaterialPorId']),
-    ...mapActions(materialesStore, ['putMaterial']),
-    ...mapActions(materialesStore, ['patchFechaEntrega']),
-    ...mapActions(materialesStore, ['deleteMaterial']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(departamentosStore, ['actualizarMilisMenu']),
 
@@ -286,14 +292,13 @@ export default {
           return 'warning'
         case 'recepcionado':
           return 'success'
-
         default:
           return null
       }
     },
 
-    cargarImagen(e) {
-      let file = e.files[0]
+    cargarImagen(foto) {
+      let file = foto.files[0]
       let reader = new FileReader()
       reader.onload = () => {
         this.material.imagen = reader.result
@@ -335,15 +340,6 @@ export default {
           material.estado = "recepcionado"
         }
       })
-    },
-
-    asignarCategoriaMaterial() {
-      this.materiales.forEach(m => {
-        llamadaAPI('get', null, m._links.categoria.href).then(r => {
-          m.categoria = r.data
-        })
-      })
-
     },
 
     inicializarSelectorCategorias() {
@@ -523,7 +519,7 @@ export default {
       <div class="field col custom-field">
         <label for="milis">Milis: </label>
         <InputNumber id="milis" v-model="material.milis" required="true"
-          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !milis) }"
+          :class="{ 'p-invalid': submitted && (material.milis > maxMilis || material.milis < minMilis || !material.milis) }"
           :required="true" :placeholder="categoriaSeleccionada ? ' (entre ' + minMilis + ' y ' + maxMilis + ') ' : ''" />
       </div>
     </div>
@@ -585,8 +581,6 @@ export default {
     </template>
   </Dialog>
 
-
-
   <Dialog v-model:visible="deleteMaterialDialog" :style="{ width: '450px' }" header="Confirmación de borrado de material"
     :modal="true">
     <div class="flex align-items-center justify-content-center">
@@ -615,20 +609,8 @@ export default {
   margin-right: 1rem;
 }
 
-.justify-between {
-  justify-content: space-between;
-}
-
 .p-button-rounded {
   margin: 2px;
-}
-
-.p-button.p-button-success,
-.p-button.p-button-warning,
-.p-button.p-button-info {
-  color: #fff;
-  background: rgb(136, 158, 89);
-  border: 0 none;
 }
 
 .pi {

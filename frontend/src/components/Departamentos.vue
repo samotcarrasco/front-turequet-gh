@@ -117,7 +117,8 @@ export default {
 
           putDepartamento(this.departamento).then(r => {
             if (r.status == 200) {
-              this.departamentos.splice(this.departamentos.indexOf(this.departamentos), 1, r.data)
+              this.getDepartamentos()
+              //this.departamentos.splice(this.departamentos.indexOf(this.departamentos), 1, r.data)
               toast.add({ severity: 'success', summary: 'Departamento actualizado', detail: this.departamento.nombre, life: 3000 })
             }
           })
@@ -151,7 +152,8 @@ export default {
       this.deleteDptoDialog = false;
       deleteDepartamento(this.departamento).then(r => {
        if (r.status == 200) {  
-          this.departamentos.splice(this.departamentos.indexOf(this.departamentos), 1)
+          //this.departamentos.splice(this.departamentos.indexOf(this.departamentos), 1)
+          this.getDepartamentos()
           toast.add({ severity: 'success', summary: 'Departamento eliminado', detail: this.departamento.nombre, life: 3000 });
         }
       })

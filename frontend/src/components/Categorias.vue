@@ -1,6 +1,5 @@
 
 <script>
-
 import { useToast } from 'primevue/usetoast'
 import { FilterMatchMode } from 'primevue/api'
 import Toast from 'primevue/toast'
@@ -16,7 +15,8 @@ import InputSwitch from 'primevue/inputswitch'
 import ProgressSpinner from 'primevue/progressspinner'
 import { categoriasStore } from '@/stores/categorias'
 import { mapState, mapActions } from 'pinia'
-import { host } from '@/stores/api-service'
+import { putCategoria, postCategoria, deleteCategoria } from '@/stores/api-service'
+
 
 
 export default {
@@ -35,7 +35,7 @@ export default {
       dt: null,
       filters: {},
       submitted: false,
-      minMilis: undefined,  //para solucionar warings al cargar las categorias
+      minMilis: undefined, 
       modalEditCreate: null,
       isLoading: true,
       esPrincipal: undefined
@@ -60,39 +60,27 @@ export default {
 
     const saveCategoria = () => {
       this.submitted = true
-
       const catPadre = this.catPrincipales.find(cat => cat.categoria === this.categoria.grupo)
-
       if (catPadre) {
-        this.categoria.categoriaPadre = host + "api/categorias/" + catPadre.id
+        this.categoria.categoriaPadre =  catPadre._links.self.href
       }
-
-      console.log("entrando en la funcion saveCategoria con la categoria: " + this.categoria)
-
-      //detalle para mostrar en los toast
-      const detalle = this.categoria.categoria
+      
 
       if (this.formularioRellenado(this.categoria)) {
-        //  console.log("punto 1")
         if (this.categoria.id) {
-            //  console.log("punto 2", this.categoria.categoria)
-          this.putCategoria(this.categoria).then(() => { this.getCategorias() 
-          toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: detalle, life: 3000 })
+          putCategoria(this.categoria).then(r => {
+            if (r.status == 200) {
+              this.getCategorias()
+              toast.add({ severity: 'success', summary: 'Categoría modificada', detail: this.categoria.categoria, life: 3000 })
+            }
           })
-          .catch(error => {
-              toast.add({ severity: 'error', summary: 'Error. No se ha podido crear la categoría', detail: detalle, life: 4000 })
-            })
         } else {
-          //     console.log("punto 3")
-
-          console.log(JSON.stringify(this.categoria))
-          this.postCategoria(this.categoria).then(() => {
-            this.getCategorias()
-            toast.add({ severity: 'success', summary: 'Categoría creada', detail: detalle, life: 4000 })
+          postCategoria(this.categoria).then(r => {
+            if (r.status == 200) {
+              this.categorias.unshift(r.data)
+              toast.add({ severity: 'success', summary: 'Categoría creada', detail: this.categoria.categoria, life: 3000 })
+            }
           })
-            .catch(error => {
-              toast.add({ severity: 'error', summary: 'Error. No se ha podido editar la categoría', detail: detalle, life: 4000 })
-            })
         }
         this.categoriaDialog = false
         this.categoria = {}
@@ -101,7 +89,6 @@ export default {
 
     const editCategoria = (editCategoria) => {
       this.categoria = { ...editCategoria }
-      console.log(this.categoria)
       this.categoriaDialog = true
       this.cabecera = "Editar categoría"
 
@@ -115,12 +102,15 @@ export default {
     //cambiamos deleteCategoria por borrarCategoria
     //para que no entre en bucle con la variable del store
     const borrarCategoria = () => {
-      //this.categorias = this.categorias.filter((val) => val.id !== this.categoria.id)
       this.deleteCategoriaDialog = false
-      //console.log("antes de borrar")
-      this.deleteCategoria(this.categoria).then(() => { this.getCategorias() })
-      toast.add({ severity: 'success', summary: 'Categoría eliminada', detail: this.categoria.categoria, life: 3000 })
 
+      deleteCategoria(this.categoria).then(r => {
+        if (r.status == 200) {
+          this.categorias.splice(this.categorias.indexOf(this.categoria), 1)
+          //this.categorias = this.categorias.filter(item => item !== this.categoria);
+          toast.add({ severity: 'success', summary: 'Categoria eliminado', detail: this.categoria.categoria, life: 3000 })
+        }
+      })
     }
 
     this.modalEditCreate = modalEditCreate
@@ -132,7 +122,6 @@ export default {
   },
   computed: {
     ...mapState(categoriasStore, ['categorias']),
-    //  ...mapState(categoriasStore, ['grupos']),
     ...mapState(categoriasStore, ['catPrincipales']),
 
     getGrupos() {
@@ -146,10 +135,6 @@ export default {
 
   methods: {
     ...mapActions(categoriasStore, ['getCategorias']),
-    ...mapActions(categoriasStore, ['postCategoria']),
-    ...mapActions(categoriasStore, ['putCategoria']),
-    ...mapActions(categoriasStore, ['deleteCategoria']),
-    // ...mapActions(categoriasStore, ['getGrupos']),
     ...mapActions(categoriasStore, ['getCategoriasPrincipales']),
 
     initFilters() {
@@ -176,31 +161,17 @@ export default {
     this.initFilters()
     this.isLoading = true
     await this.getCategorias()
-
-    //await this.getGrupos()
-
     await this.getCategoriasPrincipales()
-
     this.isLoading = false
-
-    //console.log("categorias desde el Componente: " + this.categorias)
-    // this.categorias.forEach(categoria => {
-    //   console.log("categoria: ", categoria.categoria)
-    //   console.log("id: ", categoria.id)
-    // })
-    // console.log("grupos", this.getGrupos)
   },
 }
 </script>
-
-
 
 <template>
   <div class="grid">
     <div class="col-11">
       <div class="card">
         <Toast />
-        <!-- <DataTable ref="dt" :value="categorias" v-model:selection="selectedCategorias" dataKey="categoria.id" -->
         <div class="card flex justify-content-center" v-if="isLoading">
           <ProgressSpinner />
         </div>
@@ -327,13 +298,6 @@ export default {
   margin-left: 4px;
 }
 
-.p-button.p-button-success,
-.p-button.p-button-warning {
-  color: #fff;
-  background: rgb(136, 158, 89);
-  border: 0 none;
-}
-
 .formgrid.grid .field.col {
   display: flex;
   align-items: center;
@@ -342,11 +306,6 @@ export default {
 .formgrid.grid .field.col label {
   width: 100px;
   margin: 1vw;
-}
-
-.p-datatable-tbody .p-datatable-row {
-  padding-top: 0;
-  padding-bottom: 0;
 }
 
 .custom-input-switch {

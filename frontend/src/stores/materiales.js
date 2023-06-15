@@ -25,22 +25,9 @@ export const materialesStore = defineStore('materiales', {
       return this.materiales.filter(material => material.dptoOfertante === this.dptoActual)
     },
 
-    async putMaterial(material, id) {
-      await putMaterial(material, id);
-    },
-
     async getCategoriaDeMaterial(id){
       await getCategoriaDeMaterial(id)
     },
-
-    async deleteMaterial(material) {
-      await deleteMaterial(material);
-    },
-
-    async patchFechaEntrega(modeloFecha, idMaterial) {
-      await patchFechaEntrega(modeloFecha, idMaterial);
-    },
-
 
   },
 })

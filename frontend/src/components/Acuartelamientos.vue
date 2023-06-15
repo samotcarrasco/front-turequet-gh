@@ -61,7 +61,8 @@ export default {
         if (this.acuartelamiento.id) {
           putAcuartelamiento(this.acuartelamiento).then(r => {
             if (r.status == 200) {
-              this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1, r.data)
+              this.getAcuartelamientos()
+              //this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1, r.data)
               toast.add({ severity: 'success', summary: 'Acuartelamiento actualizado', detail: this.acuartelamiento.nombre, life: 3000 })
             }
           })
@@ -95,7 +96,8 @@ export default {
       this.deleteAcuartDialog = false
       deleteAcuartelamiento(this.acuartelamiento).then(r => {
        if (r.status == 200) {  
-          this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1)
+          this.getAcuartelamientos()
+          //this.acuartelamientos.splice(this.acuartelamientos.indexOf(this.acuartelamientos), 1)
           toast.add({ severity: 'success', summary: 'Acuartelamiento eliminado', detail: this.acuartelamiento.nombre, life: 3000 })
         }
       })
