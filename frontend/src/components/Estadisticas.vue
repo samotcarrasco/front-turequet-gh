@@ -72,7 +72,6 @@ export default {
   },
   methods: {
     ...mapActions(categoriasStore, ['getCategorias']),
-    ...mapActions(materialesStore, ['getMateriales']),
     ...mapActions(acuartelamientosStore, ['getAcuartelamientos']),
 
 

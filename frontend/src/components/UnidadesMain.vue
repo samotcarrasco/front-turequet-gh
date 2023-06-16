@@ -4,7 +4,6 @@ import TabPanel from 'primevue/tabpanel'
 import Departamentos from './Departamentos.vue'
 import Acuartelamientos from './Acuartelamientos.vue'
 
-
 export default {
   components: { TabView, TabPanel, Departamentos, Acuartelamientos },
   
@@ -21,7 +20,7 @@ export default {
 }
 </script>
 
- <template>
+<template>
   <TabView>
     <TabPanel header="DEPARTAMENTOS"> 
       <Departamentos/>

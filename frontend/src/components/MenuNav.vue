@@ -20,13 +20,10 @@ export default {
     ...mapWritableState(departamentosStore, ['milisMenu']),
     ...mapState(departamentosStore, ['departamentos']),
     ...mapState(departamentosStore, ['departamentosSiglas']),
-    ...mapState(departamentosStore, ['dptoActualAPI']),
-    
 
   },
   methods: {
     ...mapActions(departamentosStore, ['getDepartamentos']),
-    ...mapActions(departamentosStore, ['getBonificacion']),
     
     cambiarDpto(event) {
       const storeDepto = departamentosStore()
@@ -84,7 +81,6 @@ export default {
           <ProgressSpinner class="small-spinner"/>
         </div>
         <ul v-else class="navbar-nav me-5">
-          <!-- <li class="milisMenu" v-if="getMilisUnidad > 0"> milis: {{ getMilisUnidad }} </li>  -->
           <li v-if="departamentosSiglas.length > 0
             && $route.name !== 'material'
             && rolActual == 'Departamento'">
@@ -107,15 +103,8 @@ export default {
 .fixed-top {
   position: relative
 }
-.textoDpto {
-  color: white;
-  align-self: center;
-  margin-right: 2vw
-}
-
 
 .milis-menu {
-  background-color: #e6f1e8; 
   background-color: rgb(174, 190, 140);
   padding: 6px;
   border-radius: 8px;

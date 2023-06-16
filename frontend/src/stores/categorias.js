@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getCategorias, getCategoriasPrincipales, putCategoria, postCategoria, deleteCategoria, getGrupos } from './api-service'
+import { getCategorias, getCategoriasPrincipales, getGrupos } from './api-service'
 
 
 export const categoriasStore = defineStore('categorias', {

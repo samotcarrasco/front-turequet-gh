@@ -1,8 +1,6 @@
 import axios from 'axios'
 
 export const host = "https://truequet-carrascodim.b4a.run/"
-//export const host = "http://localhost:8080/"
-
 
 export function llamadaAPI(method, body, path) {
   let config = {
@@ -101,7 +99,6 @@ export function deleteCategoria(categoria) {
 export function getMateriales() {
   return getEntidades('materiales')
 }
-
 
 export function getMaterialPorId(id) {
   return getEntidadPorId('materiales', id)

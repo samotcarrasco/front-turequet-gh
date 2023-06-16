@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { getDepartamentos, putDepartamento, deleteDepartamento, postDepartamento, getDeptoPorSiglas, 
-  putAumentarCretido, getEmpleos, getBases, getBonificacion, getMaterialPorId } from './api-service'
+import { getDepartamentos, getDeptoPorSiglas, putAumentarCretido, 
+         getEmpleos, getBases, getBonificacion, getMaterialPorId } from './api-service'
 
 
 export const departamentosStore = defineStore('departamentos', {
@@ -22,7 +22,7 @@ export const departamentosStore = defineStore('departamentos', {
     async cambiarDpto(departamento) {
       this.dptoActual = departamento
       await this.getDeptoActualAPI(departamento)
-      },
+    },
 
     cambiarRol(rol) {
       this.rolActual = rol
@@ -32,7 +32,7 @@ export const departamentosStore = defineStore('departamentos', {
       await getDepartamentos().then(r => {
         this.departamentos = r.data._embedded.departamentos;
         this.departamentosSiglas = this.departamentos.map(dpto => {
-          return { id: dpto.id, siglas: dpto.abreviatura};
+          return { id: dpto.id, siglas: dpto.abreviatura };
         });
       });
     },
@@ -45,8 +45,8 @@ export const departamentosStore = defineStore('departamentos', {
 
       await getBonificacion(this.dptoActualAPI.id).then(r => {
         this.bonificacion = r.data.bonificacion;
-      }); 
-      
+      });
+
     },
 
     async getMaterialPorId(id) {
@@ -62,14 +62,14 @@ export const departamentosStore = defineStore('departamentos', {
         this.empleos = r.data;
       });
     },
-   
+
     async getBases() {
       await getBases().then(r => {
         this.bases = r.data;
       });
     },
 
-    actualizarMilisMenu(bonificacion){
+    actualizarMilisMenu(bonificacion) {
       this.milisMenu += bonificacion
     }
 

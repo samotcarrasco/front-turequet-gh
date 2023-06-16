@@ -8,7 +8,6 @@ export default {
 </script>
 <template>
   <div>
-
     <h1>Bienvenido al proyecto Truequet</h1>
     <p>En esta plataforma, se permite realizar el <b>intercambio de materiales entre dieferentes Unidades del E.T. </b></p>
     <p>Para comenzar, <b>seleccione on Rol, </b> eligiendo el correspondiente en el desplegable que aparece en la parte superior
@@ -32,6 +31,7 @@ export default {
         <img src="@/assets/img/inicio/dpto.png" height="50">
       </p>
     </Fieldset>
+    
     <Fieldset legend="INFO" :toggleable="true">
       <p>
         Los materiales podrán estar en uno de los siguientes estados:

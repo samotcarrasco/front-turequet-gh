@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { departamentosStore } from './departamentos.js'
 import { mapState } from 'pinia'
-import { getMateriales, putMaterial, getMaterialPorId, deleteMaterial, patchFechaEntrega } from './api-service'
+import { getMateriales, getMaterialPorId } from './api-service'
 
  
 export const materialesStore = defineStore('materiales', {

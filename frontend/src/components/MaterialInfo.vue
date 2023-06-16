@@ -41,8 +41,8 @@ export default {
     ...mapActions(departamentosStore, ['putAumentarCretido']),
 
     materialAdquirido(material) {
-      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual) 
-             && (material.estado == "entregado" || material.estado=="recepcionado")
+      return (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual)
+        && (material.estado == "entregado" || material.estado == "recepcionado")
     },
     materialOfertado(material) {
       return material.dptoOfertaN == this.dptoActual && material.estado == "disponible"
@@ -72,7 +72,7 @@ export default {
 
       logo.src = "./logo.png"
       logoACING.src = "./logoACING.png"
-      
+
       const logoWidth = 12
       const logoHeight = 12
       const logoACINGWidth = 12
@@ -149,10 +149,10 @@ export default {
 
       Promise.all([
         this.putMaterial(this.material, this.material.id),
-        this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis*this.material.cantidad),
-        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis*this.material.cantidad)
+        this.putAumentarCretido(this.material.dptoAdquisicion.split("/").pop(), -this.material.milis * this.material.cantidad),
+        this.putAumentarCretido(this.material.dptoOferta.split("/").pop(), this.material.milis * this.material.cantidad)
       ]).then(() => {
-        this.materiales.splice(this.materiales.indexOf(this.materiales), 1, this.material)  
+        this.materiales.splice(this.materiales.indexOf(this.materiales), 1, this.material)
         toast.add({ severity: 'success', summary: 'Adquisición realizada', detail: this.material.nombre, life: 3000 })
       }).catch((error) => {
         console.error('Error al actualizar material:', error)
@@ -194,9 +194,11 @@ export default {
           <div class="p-mb-2"><strong>Dimensiones:</strong> {{ material.dimensiones }}</div>
           <div class="p-mb-2"><strong>Fecha de adquisición:</strong> {{ material.fechaAdquisicion }}</div>
           <div class="p-mb-2"><strong>Tipo de material:</strong> {{ material.tipoMaterial }}</div>
-          <div v-if="material.tipoMaterial == 'Inventariable'" class="p-mb-2"><strong>NOC:</strong> {{ material.noc }}</div>
-          <div v-if="material.tipoMaterial == 'Inventariable'" class="p-mb-2"><strong>Número de serie:</strong> {{ material.numeroSerie }}</div>
-          
+          <div v-if="material.tipoMaterial == 'Inventariable'" class="p-mb-2"><strong>NOC:</strong> {{ material.noc }}
+          </div>
+          <div v-if="material.tipoMaterial == 'Inventariable'" class="p-mb-2"><strong>Número de serie:</strong> {{
+            material.numeroSerie }}</div>
+
         </div>
         <div class="col-sm-4">
           <img :src="material.imagen" alt="Imagen del material" style="max-width: 30vw">
@@ -204,24 +206,28 @@ export default {
         <div class="p-mb-2">
           <Button v-if="materialDisponible(this.materialActual)" label="Adquirir" icon="pi pi-shopping-cart"
             @click="adquirirMaterial(material)" />
-          <Button v-if="materialAdquirido(material)" label="Ver detalles intercambio" class="p-button-info" 
+          <Button v-if="materialAdquirido(material)" label="Ver detalles intercambio" class="p-button-info"
             @click="mostrarDetallesAdq(material)" />
         </div>
       </div>
+      <router-link :to="{ name: 'materiales' }" class="centrado-verde">Volver a materiales</router-link>
     </template>
   </Card>
 
   <Dialog v-model:visible="adquirirDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
-  <div>
-    <p><span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span></p>
-    <Divider />
-    <p><span class="dialog-label">Fecha de la operación:</span> <span class="dialog-value">{{ new Date().toLocaleDateString('es-ES') }}</span></p>
-    <Divider />
-    <p><span class="dialog-label">μilis:</span> <span class="dialog-value">{{ material.milis }}</span></p>
-    <Divider />
-    <p><span class="dialog-label">Unidad ofertante:</span> <span class="dialog-value">{{ material.dptoOfertaN }}</span></p>
-    <Divider />
-  </div>
+    <div>
+      <p><span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span>
+      </p>
+      <Divider />
+      <p><span class="dialog-label">Fecha de la operación:</span> <span class="dialog-value">{{ new
+        Date().toLocaleDateString('es-ES') }}</span></p>
+      <Divider />
+      <p><span class="dialog-label">μilis:</span> <span class="dialog-value">{{ material.milis }}</span></p>
+      <Divider />
+      <p><span class="dialog-label">Unidad ofertante:</span> <span class="dialog-value">{{ material.dptoOfertaN }}</span>
+      </p>
+      <Divider />
+    </div>
 
     <template #footer>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -231,33 +237,41 @@ export default {
   </Dialog>
 
   <Dialog v-model:visible="detallesAdqDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
-  <div>
-    <span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span>
-    <Divider />
-    <span class="dialog-label">Fecha de la operación:</span> <span class="dialog-value">{{ material.fechaAdquisicion }}</span>
-    <Divider />
-    <span class="dialog-label">Milis:</span> <span class="dialog-value">{{ material.milis }}</span>
-    <Divider />
-    <span class="dialog-label">Unidad ofertante:</span> <span class="dialog-value">{{ material.dptoOfertaN }}</span>
-    <Divider />
-    <Divider />
-    <span class="dialog-label">Fecha de entrega/recepción:</span> <span class="dialog-value">{{ material.fechaEntregaFisica }}</span>
-    <Divider />
-  </div>
-  <template #footer>
-    <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
-  </template>
-</Dialog>
+    <div>
+      <span class="dialog-label">Nombre del material:</span> <span class="dialog-value">{{ material.nombre }}</span>
+      <Divider />
+      <span class="dialog-label">Fecha de la operación:</span> <span class="dialog-value">{{ material.fechaAdquisicion
+      }}</span>
+      <Divider />
+      <span class="dialog-label">Milis:</span> <span class="dialog-value">{{ material.milis }}</span>
+      <Divider />
+      <span class="dialog-label">Unidad ofertante:</span> <span class="dialog-value">{{ material.dptoOfertaN }}</span>
+      <Divider />
+      <Divider />
+      <span class="dialog-label">Fecha de entrega/recepción:</span> <span class="dialog-value">{{
+        material.fechaEntregaFisica }}</span>
+      <Divider />
+    </div>
+    <template #footer>
+      <Button label="OK" icon="pi pi-times" class="p-button-text" @click="hideDialogDet" />
+    </template>
+  </Dialog>
 </template>
 
 <style scoped>
 .dialog-label {
   font-weight: bold;
-  font-size: 1.2em; 
+  font-size: 1.2em;
 }
 
 .dialog-value {
-  font-size: 1.2em; 
+  font-size: 1.2em;
+}
+
+.centrado-verde {
+  display: block;
+  text-align: center;
+  color:  rgb(77, 102, 23);
 }
 
 </style>

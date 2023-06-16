@@ -15,8 +15,6 @@ import Dropdown from 'primevue/dropdown'
 import ProgressSpinner from 'primevue/progressspinner'
 import { postDepartamento, putDepartamento, deleteDepartamento } from '@/stores/api-service'
 
-
-
 export default {
   components: {
     Toast, InputText, Button, Accordion, AccordionTab, Dialog, Dropdown, ProgressSpinner
@@ -198,11 +196,9 @@ export default {
           const { latitude, longitude } = position.coords
           this.getAddressFrom(latitude, longitude)
           this.mostrarUbicacion(idMapa, latitude, longitude)
-
         }, error => {
           this.error = error;
         });
-
       } else {
         this.error = "El navegador no soporta geolocalización";
       }
@@ -407,10 +403,6 @@ export default {
           </template>
         </Dropdown>
       </div>
-
-      <!-- <div class="field col custom-field">
-        <Button class="boton-mostrar" label="Mostrar mapa" @click="mostrarYCentrarMapa('mapModal')" />
-      </div> -->
     </div>
     <div id="mapModal">
     </div>

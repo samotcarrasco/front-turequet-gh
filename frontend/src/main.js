@@ -47,14 +47,12 @@ const router = createRouter({
 
 const pinia = createPinia()
 
-
 library.add(faUser)
 library.add(faCoins)
 library.add(faPhone)
 library.add(faAddressCard)
 library.add(faEnvelope)
 library.add(faDolly)
-
 
 const app = createApp(App)
 app.use(PrimeVue)
