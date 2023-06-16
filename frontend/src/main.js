@@ -12,13 +12,13 @@ const Unidades = () => import('@/components/UnidadesMain.vue')
 const NotFound = () => import('@/components/NotFound.vue')
 import Home from '@/components/ComponenteInicio.vue'
 
-import 'bootstrap/dist/css/bootstrap.css'
+import * as bootstrap from 'bootstrap'
 import 'primeicons/primeicons.css'
 import 'primevue/resources/primevue.min.css'
-
 //tema personalizado creado desde el editor de temas de primevue
 import '@/scss/tema-verde-militar.css'
 import '@/scss/custom-style.css'
+import '@/scss/styles.scss'
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'

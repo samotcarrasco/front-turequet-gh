@@ -14,3 +14,52 @@
 .p-card {
   height: fit-content;
 }
+
+
+
+
+
+.field.d-flex {
+  margin-bottom: 1rem;
+}
+
+.custom-field {
+  margin-right: 1rem;
+}
+
+.custom-field-switch {
+  display: flex;
+  justify-content: center;
+}
+
+.custom-input-switch {
+  margin-top: 2rem;
+  margin-right: 1rem;
+}
+
+.custom-label {
+  margin-top: 1.7rem;
+  margin-right: 1rem;
+}
+
+.field.d-flex {
+  margin-bottom: 1rem;
+}
+
+.custom-field {
+  margin-right: 1rem;
+}
+
+.p-button-rounded {
+  background: rgb(136, 158, 89);
+  margin: 2px;
+}
+
+
+.multiSelect {
+  margin-right: 1vw;
+}
+
+.p-inputtext {
+  margin-right: 1rem;
+}

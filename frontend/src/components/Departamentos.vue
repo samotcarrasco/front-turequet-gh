@@ -472,24 +472,7 @@ export default {
   margin-bottom: 1vh;
 }
 
-
-.p-button-rounded {
-  margin-left: 4px;
-}
-
-.field.d-flex {
-  margin-bottom: 1rem;
-}
-
-.custom-field {
-  margin-right: 1rem;
-}
-
 .spacer {
   margin-right: 4vw;
-}
-
-.tabview-panels {
-  width: max-content;
 }
 </style>

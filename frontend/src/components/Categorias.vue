@@ -309,10 +309,12 @@ export default {
 }
 
 .custom-input-switch {
-  margin-top: 4px;
+  margin-top: 8px;
   margin-left: 1rem;
 }
-
+ .custom-label {
+  margin-top: 4px;
+ }
 .custom-field-switch {
   display: flex;
   justify-content: center;

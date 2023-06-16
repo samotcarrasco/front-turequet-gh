@@ -102,7 +102,8 @@ export default {
 
           putMaterial(this.material).then(r => {
             if (r.status == 200) {
-              this.materiales.splice(this.materiales.indexOf(this.material), 1, r.data)
+              //this.materiales.splice(this.materiales.indexOf(this.material), 1, r.data)
+              this.getMateriales()
               toast.add({ severity: 'success', summary: 'Material modificado', detail: this.material.nombre, life: 3000 })
             }
           })
@@ -125,7 +126,6 @@ export default {
         this.inicializarSelectorCategorias()
         this.material = {}
       }
-
     }
 
     const patchFechaEntregaModal = () => {
@@ -467,7 +467,6 @@ export default {
           <router-link :to="{ name: 'material', params: { id: material.data.id } }">
             <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs mt-2" />
           </router-link>
-
         </template>
       </Column>
     </DataTable>
@@ -595,22 +594,10 @@ export default {
   </Dialog>
 </template>
 
-<style scoped   >
+<style scoped>
 .img-small {
   width: 50px;
   height: auto;
-}
-
-.multiSelect {
-  margin-right: 1vw;
-}
-
-.p-inputtext {
-  margin-right: 1rem;
-}
-
-.p-button-rounded {
-  margin: 2px;
 }
 
 .pi {
@@ -621,34 +608,9 @@ export default {
   text-align: center;
 }
 
-.field.d-flex {
-  margin-bottom: 1rem;
+.p-button-rounded {
+  background: rgb(136, 158, 89);
+  margin: 2px;
 }
 
-.custom-field {
-  margin-right: 1rem;
-}
-
-.custom-field-switch {
-  display: flex;
-  justify-content: center;
-}
-
-.custom-input-switch {
-  margin-top: 2rem;
-  margin-right: 1rem;
-}
-
-.custom-label {
-  margin-top: 1.7rem;
-  margin-right: 1rem;
-}
-
-.field.d-flex {
-  margin-bottom: 1rem;
-}
-
-.custom-field {
-  margin-right: 1rem;
-}
 </style>

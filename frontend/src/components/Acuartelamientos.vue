@@ -259,18 +259,4 @@ export default {
   margin-top: 1rem;
 }
 
-.p-button-rounded {
-  margin-left: 4px;
-}
-
-
-.field.d-flex {
-  margin-bottom: 1rem;
-}
-
-.custom-field {
-  margin-right: 1rem;
-}
-
-
 </style>

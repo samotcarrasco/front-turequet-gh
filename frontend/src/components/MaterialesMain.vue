@@ -20,15 +20,6 @@ export default {
       entregados: 'entregados',
       valorReactivo: 0
     }
-  },
-  computed: {
-
-  },
-  methods: {
-
-  },
-  mounted() {
-
   }
 }
 </script>

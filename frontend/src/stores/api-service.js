@@ -26,7 +26,7 @@ function llamadaApiPUTParams(path, params = {}) {
     maxBodyLength: Infinity,
     url: path,
     headers: {},
-    params: params // Añadimos los parámetros a la llamada
+    params: params
   };
   return axios.request(config);
 }
