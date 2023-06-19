@@ -1,7 +1,6 @@
 import axios from 'axios'
 
-//export const host = "https://truequet-carrascodim.b4a.run/"
-export const host = "http://localhost:8080/"
+export const host = "https://truequet-carrascodim.b4a.run/"
 
 export function llamadaAPI(method, body, path) {
   let config = {
