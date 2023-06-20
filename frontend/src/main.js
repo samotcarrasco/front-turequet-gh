@@ -48,7 +48,13 @@ const router = createRouter({
 import { departamentosStore } from '@/stores/departamentos'
 router.beforeEach(async (to) => {
   const auth = departamentosStore()
-  if (auth.rolActual == 'Departamento' && to.meta.requiresGestor || auth.rolActual == 'Gestor' && to.meta.requiresDpto) {
+  console.log("rol actual" + auth.rolActual)
+
+  if (to.name !== 'home' &&
+    ((typeof auth.rolActual === 'undefined') ||
+    (auth.rolActual === 'Departamento' && to.meta.requiresGestor) ||
+    (auth.rolActual === 'Gestor' && to.meta.requiresDpto))
+  ) {
     return { name: 'home' }
   }
 })
