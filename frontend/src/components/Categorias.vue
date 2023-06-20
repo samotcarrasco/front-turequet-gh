@@ -224,6 +224,17 @@ export default {
             <label for="esPrincipal" class="custom-label">Categoría principal </label>
             <InputSwitch v-model="esPrincipal" class="custom-input-switch" />
           </div>
+          <div v-if="!esPrincipal" class="field">
+            <Dropdown v-if="catPrincipales" id="grupo" v-model="categoria.grupo" :options="getGrupos"
+              :class="{ 'p-invalid': submitted && !categoria.grupo }" placeholder="Seleccione ctegoría principal">
+              <template #value="grupo">
+                <div>
+                  <span v-if="!grupo.value" class="categoria-placeholder">Seleccione</span>
+                  <span v-else :class="'categoria-badge status-' + grupo.value">{{ grupo.value }}</span>
+                </div>
+              </template>
+            </Dropdown>
+          </div>
           <div class="field">
             <label for="name">Nombre de la categoría</label>
             <InputText id="name" v-model.trim="categoria.categoria" required="true" autofocus
@@ -233,19 +244,6 @@ export default {
             <label for="descripcion">Descripción</label>
             <Textarea id="descripcion" v-model="categoria.descripcion" required="true" rows="2" cols="20"
               :class="{ 'p-invalid': submitted && !categoria.descripcion }" :required="true" />
-          </div>
-
-          <div v-if="!esPrincipal" class="field">
-            <label for="grupo" class="mb-3">Grupo</label>
-            <Dropdown v-if="catPrincipales" id="grupo" v-model="categoria.grupo" :options="getGrupos"
-              :class="{ 'p-invalid': submitted && !categoria.grupo }" placeholder="Seleccione grupo">
-              <template #value="grupo">
-                <div>
-                  <span v-if="!grupo.value" class="categoria-placeholder">Seleccione</span>
-                  <span v-else :class="'categoria-badge status-' + grupo.value">{{ grupo.value }}</span>
-                </div>
-              </template>
-            </Dropdown>
           </div>
 
           <div v-if="!esPrincipal" class="formgrid grid">
@@ -310,6 +308,7 @@ export default {
 
 .custom-input-switch {
   margin-top: 8px;
+  margin-bottom: 8px;
   margin-left: 1rem;
 }
 
