@@ -324,7 +324,7 @@ export default {
 
     asignarPendientes() {
       this.materiales.forEach(material => {
-        if (material.estado === "pendiente" || material.estado === "pendiente recpecion" && material.dptoOfertaN === this.dptoActual) {
+        if (material.estado === "pendiente" || material.estado === "pendiente recepcion" && material.dptoOfertaN === this.dptoActual) {
           material.estado = "pendiente entrega"
         } else if (material.estado === "pendiente" || material.estado == "pendiente entrega" && material.dptoAdquisicionN === this.dptoActual) {
           material.estado = "pendiente recepcion"
