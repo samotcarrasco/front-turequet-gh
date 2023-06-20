@@ -35,7 +35,7 @@ export default {
       dt: null,
       filters: {},
       submitted: false,
-      minMilis: undefined, 
+      minMilis: undefined,
       modalEditCreate: null,
       isLoading: true,
       esPrincipal: undefined
@@ -62,9 +62,9 @@ export default {
       this.submitted = true
       const catPadre = this.catPrincipales.find(cat => cat.categoria === this.categoria.grupo)
       if (catPadre) {
-        this.categoria.categoriaPadre =  catPadre._links.self.href
+        this.categoria.categoriaPadre = catPadre._links.self.href
       }
-      
+
 
       if (this.formularioRellenado(this.categoria)) {
         if (this.categoria.id) {
@@ -162,6 +162,7 @@ export default {
     this.isLoading = true
     await this.getCategorias()
     await this.getCategoriasPrincipales()
+
     this.isLoading = false
   },
 }
@@ -226,10 +227,10 @@ export default {
           </div>
           <div v-if="!esPrincipal" class="field">
             <Dropdown v-if="catPrincipales" id="grupo" v-model="categoria.grupo" :options="getGrupos"
-              :class="{ 'p-invalid': submitted && !categoria.grupo }" placeholder="Seleccione ctegoría principal">
+              :class="{ 'p-invalid': submitted && !categoria.grupo }">
               <template #value="grupo">
                 <div>
-                  <span v-if="!grupo.value" class="categoria-placeholder">Seleccione</span>
+                  <span v-if="!grupo.value" class="categoria-placeholder">Seleccione categoría principal</span>
                   <span v-else :class="'categoria-badge status-' + grupo.value">{{ grupo.value }}</span>
                 </div>
               </template>
@@ -312,10 +313,10 @@ export default {
   margin-left: 1rem;
 }
 
- .custom-label {
+.custom-label {
   margin-top: 4px;
- }
- 
+}
+
 .custom-field-switch {
   display: flex;
   justify-content: center;
