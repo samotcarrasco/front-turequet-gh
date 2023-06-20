@@ -23,20 +23,20 @@ import '@/scss/styles.scss'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUser ,faCoins, faEnvelope, faPhone, faAddressCard, faDolly} from '@fortawesome/free-solid-svg-icons'
+import { faUser, faCoins, faEnvelope, faPhone, faAddressCard, faDolly } from '@fortawesome/free-solid-svg-icons'
 import { createPinia } from 'pinia'
 
 const routes = [
   {
     path: '/', component: Home, name: 'home'
   },
-  { path: '/materiales', component: MaterialesMain, name: 'materiales' },
-   {
-     path: '/material/:id', component: MaterialInfo, name: 'material', props: true 
-   },
-  { path: '/categorias', component: Categorias, name: 'categorias' },
-  { path: '/estadisticas', component: Estadisticas, name: 'estadisticas' },
-  { path: '/unidades', component: Unidades, name: 'unidades' },
+  { path: '/materiales', component: MaterialesMain, name: 'materiales',   meta: { requiresDpto: true } },
+  {
+    path: '/material/:id', component: MaterialInfo, name: 'material', props: true,  meta: { requiresDpto: true } 
+  },
+  { path: '/categorias', component: Categorias, name: 'categorias', meta: { requiresGestor: true } },
+  { path: '/estadisticas', component: Estadisticas, name: 'estadisticas', meta: { requiresGestor: true } },
+  { path: '/unidades', component: Unidades, name: 'unidades', meta: { requiresGestor: true } },
   { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound' },
 ]
 
@@ -44,6 +44,19 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
+
+import { departamentosStore } from '@/stores/departamentos'
+router.beforeEach(async (to) => {
+  const auth = departamentosStore()
+   if (auth.rolActual == 'Departamento' && to.meta.requiresGestor) {
+     return { name: 'home' }
+   }
+   else 
+    if (auth.rolActual == 'Gestor' && to.meta.requiresDpto) {
+     return { name: 'home' }
+   }
+ })
+
 
 const pinia = createPinia()
 
