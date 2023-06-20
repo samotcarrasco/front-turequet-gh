@@ -30,9 +30,9 @@ const routes = [
   {
     path: '/', component: Home, name: 'home'
   },
-  { path: '/materiales', component: MaterialesMain, name: 'materiales',   meta: { requiresDpto: true } },
+  { path: '/materiales', component: MaterialesMain, name: 'materiales', meta: { requiresDpto: true } },
   {
-    path: '/material/:id', component: MaterialInfo, name: 'material', props: true,  meta: { requiresDpto: true } 
+    path: '/material/:id', component: MaterialInfo, name: 'material', props: true, meta: { requiresDpto: true }
   },
   { path: '/categorias', component: Categorias, name: 'categorias', meta: { requiresGestor: true } },
   { path: '/estadisticas', component: Estadisticas, name: 'estadisticas', meta: { requiresGestor: true } },
@@ -48,14 +48,10 @@ const router = createRouter({
 import { departamentosStore } from '@/stores/departamentos'
 router.beforeEach(async (to) => {
   const auth = departamentosStore()
-   if (auth.rolActual == 'Departamento' && to.meta.requiresGestor) {
-     return { name: 'home' }
-   }
-   else 
-    if (auth.rolActual == 'Gestor' && to.meta.requiresDpto) {
-     return { name: 'home' }
-   }
- })
+  if (auth.rolActual == 'Departamento' && to.meta.requiresGestor || auth.rolActual == 'Gestor' && to.meta.requiresDpto) {
+    return { name: 'home' }
+  }
+})
 
 
 const pinia = createPinia()
