@@ -148,7 +148,7 @@ export default {
     const borrarMaterial = () => {
       this.deleteMaterialDialog = false
       deleteMaterial(this.material).then(r => {
-        if (r.status == 204) {
+        if (r.status == 200) {
           this.materiales.splice(this.materiales.indexOf(this.material), 1)
           toast.add({ severity: 'success', summary: 'Material eliminado', detail: this.material.nombre, life: 3000 })
           if (this.material.bonificacion) {
