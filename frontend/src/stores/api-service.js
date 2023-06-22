@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-export const host = "https://truequet-carrascodim.b4a.run/"
+//export const host = "https://truequet-carrascodim.b4a.run/"
+export const host = "https://container-apitruequet.qhjvje6n3n75q.eu-west-3.cs.amazonlightsail.com/"
 
 export function llamadaAPI(method, body, path) {
   let config = {
