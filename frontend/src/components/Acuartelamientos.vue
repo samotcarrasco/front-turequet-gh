@@ -35,8 +35,7 @@ export default {
   },
 
   computed: {
-    ...mapState(acuartelamientosStore, ['acuartelamientos']),
-    ...mapState(acuartelamientosStore, ['empleos']),
+    ...mapState(acuartelamientosStore, ['acuartelamientos', 'empleos']),
   },
 
   mounted() {
@@ -112,9 +111,8 @@ export default {
 
   },
   methods: {
-    ...mapActions(acuartelamientosStore, ['getAcuartelamientos']),
-    ...mapActions(acuartelamientosStore, ['getEmpleos']),
-
+    ...mapActions(acuartelamientosStore, ['getAcuartelamientos', 'getEmpleos']),
+    
     formularioRellenado(acu) {     
       return !(!acu.nombre || ! acu.abreviatura ||
         !acu.email || !acu.responsableNombre ||

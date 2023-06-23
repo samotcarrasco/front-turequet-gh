@@ -59,3 +59,23 @@
 .p-inputtext {
   margin-right: 1rem;
 }
+
+
+@media (max-width: 480px) {
+  .p-dialog {
+    width: 60% !important;
+    max-width: 60% !important;
+    margin: 0 auto !important;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  .custom-field {
+    flex: 1;
+  }
+}
+

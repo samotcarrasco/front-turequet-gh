@@ -40,8 +40,7 @@ export default {
   },
 
   computed: {
-    ...mapState(departamentosStore, ['empleos']),
-    ...mapState(departamentosStore, ['bases']),
+    ...mapState(departamentosStore, ['empleos', 'bases']),
     ...mapWritableState(acuartelamientosStore, ['acuartelamiento']),
     ...mapWritableState(departamentosStore, ['departamentos']),
 
@@ -166,11 +165,8 @@ export default {
 
   },
   methods: {
-    ...mapActions(departamentosStore, ['getDepartamentos']),
-    ...mapActions(departamentosStore, ['getEmpleos']),
-    ...mapActions(departamentosStore, ['getBases']),
+    ...mapActions(departamentosStore, ['getDepartamentos','getEmpleos','getBases']),
     ...mapActions(acuartelamientosStore, ['getAcuartPorSiglas']),
-
 
     actualizarAcuartelamiento() {
       this.getAcuartPorSiglas(this.acuartFiltroModal)

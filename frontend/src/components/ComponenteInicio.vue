@@ -18,7 +18,7 @@ export default {
       <b>Departamentos</b>, que serán realmente los encargados de la gestión de los <b>materiales. </b>
         También podrá <b>gestionar las categorías</b> donde se podrán encuandrar los materiales, y finalmente, podrá visualizar
         diferentes <b>estadísticas. </b>
-        <img src="@/assets/img/inicio/gestor.png" height="50">
+        <img src="/inicio/gestor.png" height="50">
       </p>
     </Fieldset>
 
@@ -28,7 +28,7 @@ export default {
         departamentos </b>que los soliciten. También podrá adquirir materiales.
         En la parte superior de la imagen podrá ver el <b>crédido (&mu;ilis)</b> del que dispone.
         <br>
-        <img src="@/assets/img/inicio/dpto.png" height="50">
+        <img src="/inicio/dpto.png" height="50">
       </p>
     </Fieldset>
     
@@ -36,11 +36,11 @@ export default {
       <p>
         Los materiales podrán estar en uno de los siguientes estados:
       <ul>
-        <li>  <img src="@/assets/img/inicio/disponible.png" height="30"> Material <b>disponible para ser solicitado </b></li>
-        <li>  <img src="@/assets/img/inicio/pendiente_entrega.png" height="30"> Material <b>ofertado por mi departamento </b>y que está pendiente de ser entregado</li>
-        <li>  <img src="@/assets/img/inicio/pendiente_recepcion.png" height="30"> Material <b>solicitado por mi departamento </b>y que está pendiente de ser recibido</li>
-        <li>  <img src="@/assets/img/inicio/entregado.png" height="30"> Material que fue ofertado por mi departamento y ya <b>se ha entregado físicamente </b></li>
-        <li>  <img src="@/assets/img/inicio/recepcionado.png" height="30"> Material que fue solicitado por mi departamento y ya <b>se ha recibido físicamente </b></li>
+        <li>  <img src="/inicio/disponible.png" height="30"> Material <b>disponible para ser solicitado </b></li>
+        <li>  <img src="/inicio/pendiente_entrega.png" height="30"> Material <b>ofertado por mi departamento </b>y que está pendiente de ser entregado</li>
+        <li>  <img src="/inicio/pendiente_recepcion.png" height="30"> Material <b>solicitado por mi departamento </b>y que está pendiente de ser recibido</li>
+        <li>  <img src="/inicio/entregado.png" height="30"> Material que fue ofertado por mi departamento y ya <b>se ha entregado físicamente </b></li>
+        <li>  <img src="/inicio/recepcionado.png" height="30"> Material que fue solicitado por mi departamento y ya <b>se ha recibido físicamente </b></li>
       </ul>
       </p>
     </Fieldset>

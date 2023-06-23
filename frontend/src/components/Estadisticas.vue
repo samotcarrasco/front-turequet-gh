@@ -3,7 +3,6 @@ import Chart from 'primevue/chart'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import { categoriasStore } from '@/stores/categorias'
-import { materialesStore } from '@/stores/materiales'
 import { acuartelamientosStore } from '@/stores/acuartelamientos'
 import { mapState, mapActions } from 'pinia'
 

@@ -66,6 +66,9 @@ export default {
       this.material = {}
       this.submitted = false
       this.materialDialog = true
+      if (this.material.cantidad == undefined) {
+        this.material.cantidad = 1
+      }
       this.cabecera = "Alta de nuevo material"
     }
 
@@ -167,13 +170,9 @@ export default {
   },
 
   computed: {
-    ...mapState(materialesStore, ['materiales']),
+    ...mapState(materialesStore, ['materiales', 'materialActual']),
     ...mapState(categoriasStore, ['categorias']),
-    ...mapState(departamentosStore, ['dptoActual']),
-    ...mapState(departamentosStore, ['dptoActualAPI']),
-    ...mapState(departamentosStore, ['bonificacion']),
-    ...mapState(departamentosStore, ['milisMenu']),
-    ...mapState(materialesStore, ['materialActual']),
+    ...mapState(departamentosStore, ['dptoActual', 'dptoActualAPI', 'bonificacion', 'milisMenu']),
 
     materialesFiltrados() {
       switch (this.tipoVista) {
@@ -251,9 +250,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(materialesStore, ['materialesDptoActual']),
-    ...mapActions(materialesStore, ['getMateriales']),
-    ...mapActions(materialesStore, ['getMaterialPorId']),
+    ...mapActions(materialesStore, ['materialesDptoActual', 'getMateriales', 'getMaterialPorId']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(departamentosStore, ['actualizarMilisMenu']),
 
@@ -527,7 +524,7 @@ export default {
         <label for="cantidad">Cantidad: </label>
         <div class="p-inputgroup">
           <Button icon="pi pi-minus" @click="decrementarCantidad" />
-          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" placeholder="1" class="c-cantidad" />
+          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100"  class="c-cantidad" />
           <Button icon="pi pi-plus" @click="incrementarCantidad" />
         </div>
       </div>
@@ -613,4 +610,29 @@ export default {
   margin: 2px;
 }
 
+@media (max-width: 480px) {
+  .p-datatable {
+    width: 100% !important;
+    overflow-x: auto;
+  }
+
+  .p-datatable table {
+    width: auto !important;
+  }
+
+  .p-datatable th,
+  .p-datatable td,
+  .p-datatable .p-column-title {
+    white-space: normal !important;
+    width: auto !important;
+  }
+}
+
+
 </style>
+
+
+
+
+
+

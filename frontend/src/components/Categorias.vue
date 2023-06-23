@@ -121,9 +121,8 @@ export default {
     this.borrarCategoria = borrarCategoria
   },
   computed: {
-    ...mapState(categoriasStore, ['categorias']),
-    ...mapState(categoriasStore, ['catPrincipales']),
-
+    ...mapState(categoriasStore, ['categorias', 'catPrincipales']),
+    
     getGrupos() {
       const grupos = []
       this.catPrincipales.forEach(cat => {
@@ -134,8 +133,8 @@ export default {
   },
 
   methods: {
-    ...mapActions(categoriasStore, ['getCategorias']),
-    ...mapActions(categoriasStore, ['getCategoriasPrincipales']),
+    ...mapActions(categoriasStore, ['getCategorias', 'getCategoriasPrincipales']),
+    
 
     initFilters() {
       this.filters = {
@@ -321,4 +320,6 @@ export default {
   display: flex;
   justify-content: center;
 }
+
+
 </style>

@@ -1,6 +1,5 @@
-import { defineStore } from 'pinia'
+import { defineStore, mapState } from 'pinia'
 import { departamentosStore } from './departamentos.js'
-import { mapState } from 'pinia'
 import { getMateriales, getMaterialPorId, putMaterial } from './api-service'
 
  

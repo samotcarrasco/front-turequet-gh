@@ -70,8 +70,8 @@ export default {
       const logo = new Image()
       const logoACING = new Image()
 
-      logo.src = "./logo.png"
-      logoACING.src = "./logoACING.png"
+      logo.src = "./logos/logo.png"
+      logoACING.src = "./logos/logoACING.png"
 
       const logoWidth = 12
       const logoHeight = 12

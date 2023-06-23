@@ -15,11 +15,8 @@ export default {
     }
   },
   computed: {
-    ...mapWritableState(departamentosStore, ['dptoActual']),
-    ...mapWritableState(departamentosStore, ['rolActual']),
-    ...mapWritableState(departamentosStore, ['milisMenu']),
-    ...mapState(departamentosStore, ['departamentos']),
-    ...mapState(departamentosStore, ['departamentosSiglas']),
+    ...mapWritableState(departamentosStore, ['dptoActual','rolActual','milisMenu']),
+    ...mapState(departamentosStore, ['departamentos','departamentosSiglas']),
 
   },
   methods: {
@@ -55,7 +52,7 @@ export default {
     <div class="container-fluid">
       <a class="navbar-brand">
         <router-link :to="{ name: 'home' }">
-          <img class="logo" src="../assets/img/logos/logo.png" alt="Logo Truequet">
+          <img class="logo" src="/logos/logo.png" alt="Logo Truequet">
         </router-link>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
