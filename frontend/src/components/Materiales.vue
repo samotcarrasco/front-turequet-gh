@@ -388,7 +388,8 @@ export default {
 }
 </script>
 <template>
-  <div class="materiales-container">
+   <div class="grid">
+    <div class="col-11">
     <Toast />
     <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
       :filters="filters"
@@ -467,6 +468,7 @@ export default {
         </template>
       </Column>
     </DataTable>
+  </div>
   </div>
 
   <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
@@ -608,24 +610,6 @@ export default {
 .p-button-rounded {
   background: rgb(136, 158, 89);
   margin: 2px;
-}
-
-@media (max-width: 480px) {
-  .p-datatable {
-    width: 100% !important;
-    overflow-x: auto;
-  }
-
-  .p-datatable table {
-    width: auto !important;
-  }
-
-  .p-datatable th,
-  .p-datatable td,
-  .p-datatable .p-column-title {
-    white-space: normal !important;
-    width: auto !important;
-  }
 }
 
 

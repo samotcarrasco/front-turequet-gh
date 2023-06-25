@@ -25,18 +25,35 @@ export default {
 </script>
 
 <template>
-  <TabView>
-    <TabPanel header="MATERIALES DISPONIBLES"> 
-     <Materiales :tipoVista="disponibles" />
-    </TabPanel>
-    <TabPanel header="MIS MATERIALES OFERTADOS">
-      <Materiales :tipoVista="ofertados" />
-    </TabPanel>
-    <TabPanel header="PENDIENTES DE ENTREGA">
-      <Materiales :tipoVista="pendientes" />
-    </TabPanel>
-    <TabPanel header="ENTREGADOS/RECIBIDOS">
-      <Materiales :tipoVista="entregados" />
-    </TabPanel> 
-  </TabView>
+  <div class="tabs">
+    <TabView>
+      <TabPanel header="MATERIALES DISPONIBLES">
+        <Materiales :tipoVista="disponibles" />
+      </TabPanel>
+      <TabPanel header="MIS MATERIALES OFERTADOS">
+        <Materiales :tipoVista="ofertados" />
+      </TabPanel>
+      <TabPanel header="PENDIENTES DE ENTREGA">
+        <Materiales :tipoVista="pendientes" />
+      </TabPanel>
+      <TabPanel header="ENTREGADOS/RECIBIDOS">
+        <Materiales :tipoVista="entregados" />
+      </TabPanel> 
+    </TabView>
+  </div>
 </template>
+
+<style scoped>
+@media (max-width: 600px) {
+  .p-tabview .p-tabview-nav {
+    flex-direction: column;
+  }
+  .p-tabview .p-tabview-nav .p-tabview-nav-item {
+    width: 100%;
+  }
+
+  .tabs{
+    margin-left: 200vw; 
+  }
+}
+</style>

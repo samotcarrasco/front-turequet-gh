@@ -4,6 +4,8 @@ import App from './App.vue'
 import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice';
 
+
+
 const MaterialInfo = () => import('@/components/MaterialInfo.vue')
 const MaterialesMain = () => import('@/components/MaterialesMain.vue')
 const Categorias = () => import('@/components/Categorias.vue')
@@ -19,6 +21,7 @@ import 'primevue/resources/primevue.min.css'
 import '@/scss/tema-verde-militar.css'
 import '@/scss/custom-style.css'
 import '@/scss/styles.scss'
+//import "primeflex/primeflex.css";
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'

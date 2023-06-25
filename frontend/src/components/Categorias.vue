@@ -177,7 +177,7 @@ export default {
         </div>
 
         <DataTable v-else ref="dt" :value="categorias" dataKey="categoria.id" :paginator="true" :rows="10"
-          :filters="filters"
+          :filters="filters" tableStyle="min-width: 50rem"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           :rowsPerPageOptions="[5, 10, 25]"
           currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} categorias" responsiveLayout="scroll">
@@ -218,7 +218,7 @@ export default {
           </Column>
         </DataTable>
 
-        <Dialog v-model:visible="categoriaDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true"
+        <Dialog v-model:visible="categoriaDialog" :header="cabecera" :modal="true"
           class="p-fluid">
           <div class="field col custom-field-switch">
             <label for="esPrincipal" class="custom-label">Categoría principal </label>
@@ -281,45 +281,23 @@ export default {
     </div>
   </div>
 </template>
+ 
 
 <style scoped>
-.flex-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.p-button-rounded {
-  margin-left: 4px;
-}
-
-.formgrid.grid .field.col {
-  display: flex;
-  align-items: center;
-}
-
-.formgrid.grid .field.col label {
-  width: 100px;
-  margin: 1vw;
-}
-
-.custom-input-switch {
-  margin-top: 8px;
-  margin-bottom: 8px;
-  margin-left: 1rem;
-}
-
-.custom-label {
-  margin-top: 4px;
-}
-
-.custom-field-switch {
-  display: flex;
+.grid {
+  display: grid;
   justify-content: center;
 }
 
+.card {
+  margin-top: 16px;
+}
 
+@media (max-width: 600px) {
+  .col-11 {
+    width: auto;
+    max-width: none;
+    margin-left: 200vw;
+  }
+}
 </style>
