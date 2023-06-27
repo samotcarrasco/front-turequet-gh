@@ -178,43 +178,31 @@ export default {
       switch (this.tipoVista) {
         case "ofertados":
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => material.estado === "disponible" && material.dptoOfertaN == this.dptoActual)
-            : this.materiales.filter((material) =>
-              material.estado === "disponible" &&
-              material.dptoOfertaN == this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
-            )
+            ? this.getMaterialesOfertados()
+            : this.getMaterialesOfertados().filter(material =>
+            this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
+            );
         case "disponibles":
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => material.estado === "disponible" && material.dptoOfertaN !== this.dptoActual && this.dptoActual)
-            : this.materiales.filter((material) => material.estado === "disponible" &&
-              material.dptoOfertaN !== this.dptoActual && this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
-            )
-
+            ? this.getMaterialesDisponibles()
+            : this.getMaterialesDisponibles().filter(material =>
+              this.categoriasSeleccionadas.some(c => c.label === material.categoriaN)
+            );
         case "pendientes":
           this.asignarPendientes()
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
-              (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
-            : this.materiales.filter((material) => (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
-              (material.estado === "pendiente entrega" || material.estado === "pendiente recepcion") &&
-              (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual) &&
-              this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
-            )
+          ? this.getMaterialesPendientes()
+            : this.getMaterialesPendientes().filter(material =>
+              this.categoriasSeleccionadas.some(c => c.label === material.categoriaN)
+            );
 
         case "entregados":
           this.asignarEntregados()
           return this.categoriasSeleccionadas.length === 0
-            ? this.materiales.filter((material) => (material.estado === "recepcionado" || material.estado === "entregado") &&
-              (material.dptoAdquisicionN == this.dptoActual || material.dptoOfertaN == this.dptoActual))
-            : this.materiales.filter((material) => (material.estado === "recepcionado" || material.estado === "entregado") &&
-              (material.estado === "recepcionado" || material.estado === "entregado") &&
-              (material.dptoOfertaN == this.dptoActual || material.dptoAdquisicionN == this.dptoActual) &&
-              this.dptoActual &&
-              this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
-            )
+          ? this.getMaterialesEntregados()
+            : this.getMaterialesEntregados().filter(material =>
+              this.categoriasSeleccionadas.some(c => c.label === material.categoriaN)
+            );
       }
     },
 
@@ -250,7 +238,8 @@ export default {
   },
 
   methods: {
-    ...mapActions(materialesStore, ['materialesDptoActual', 'getMateriales', 'getMaterialPorId']),
+    ...mapActions(materialesStore, ['getMateriales', 'getMaterialPorId', 'getMaterialesOfertados', 
+                                  'getMaterialesDisponibles', 'getMaterialesPendientes' , 'getMaterialesEntregados']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(departamentosStore, ['actualizarMilisMenu']),
 
@@ -388,87 +377,87 @@ export default {
 }
 </script>
 <template>
-   <div class="grid">
+  <div class="grid">
     <div class="col-11">
-    <Toast />
-    <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
-      :filters="filters"
-      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      :rowsPerPageOptions="[5, 10, 25]"
-      currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} materiales" responsiveLayout="scroll">
+      <Toast />
+      <DataTable :value="materialesFiltrados" tableStyle="min-width: 50rem; margin-top: 1vw" :paginator="true" :rows="10"
+        :filters="filters"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        :rowsPerPageOptions="[5, 10, 25]"
+        currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} materiales" responsiveLayout="scroll">
 
-      <template #header>
-        <div class="row justify-content-between align-items-center">
-          <div class="col-6 d-flex align-items-center">
-            <span class="block p-input-icon-left mr-2 flex-grow-1">
-              <i class="pi pi-search" />
-              <InputText v-model="filters['global'].value" placeholder="Buscar..." class="flex-grow-1" />
-            </span>
-            <MultiSelect v-model="categoriasSeleccionadas" :options="categoriasAgrupadas" optionLabel="label"
-              optionGroupLabel="label" optionGroupChildren="items" placeholder="Categorías" :maxSelectedLabels="3"
-              class="w-80 multiSelect">
-              <template #optiongroup="slotProps">
-                <div class="flex align-items-center">
-                  <div>{{ slotProps.option.label }}</div>
-                </div>
-              </template>
-            </MultiSelect>
+        <template #header>
+          <div class="row justify-content-between align-items-center">
+            <div class="col-6 d-flex align-items-center">
+              <span class="block p-input-icon-left mr-2 flex-grow-1">
+                <i class="pi pi-search" />
+                <InputText v-model="filters['global'].value" placeholder="Buscar..." class="flex-grow-1" />
+              </span>
+              <MultiSelect v-model="categoriasSeleccionadas" :options="categoriasAgrupadas" optionLabel="label"
+                optionGroupLabel="label" optionGroupChildren="items" placeholder="Categorías" :maxSelectedLabels="3"
+                class="w-80 multiSelect">
+                <template #optiongroup="slotProps">
+                  <div class="flex align-items-center">
+                    <div>{{ slotProps.option.label }}</div>
+                  </div>
+                </template>
+              </MultiSelect>
+            </div>
+            <div class="col-4 text-right">
+              <Button v-if="this.tipoVista == 'ofertados' && this.dptoActual" label="Crear nuevo" icon="pi pi-plus"
+                @click="modalEditCreate" />
+            </div>
           </div>
-          <div class="col-4 text-right">
-            <Button v-if="this.tipoVista == 'ofertados' && this.dptoActual" label="Crear nuevo" icon="pi pi-plus"
-              @click="modalEditCreate" />
-          </div>
-        </div>
-      </template>
-
-      <Column field="nombre" header="Nombre" :sortable="true"></Column>
-
-      <Column header="imagen">
-        <template #body="material">
-          <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
-          <img :src="material.data.imgReducida" :alt="material.data.imagen"
-            class="w-6rem shadow-2 border-round img-small" />
         </template>
-      </Column>
-      <Column field="descripcion" header="Descripción" :sortable="false"></Column>
-      <Column field="milis" header="μilis" :sortable="true"> </Column>
-      <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
-      <Column field="grupoN" header="Grupo" :sortable="true"></Column>
-      <Column v-if="tipoVista === 'pendientes'" header="Estado" :sortable="true">
-        <template #body="material">
-          <Tag :value="material.data.estado" :severity="getSeverity(material)"
-            @click="asignarFechaEntrega(material.data.id)" @mouseover="changeCursor" style="cursor: pointer" />
-        </template>
-      </Column>
-      <Column v-else header="Estado" :sortable="true">
-        <template #body="material">
-          <Tag :value="material.data.estado" :severity="getSeverity(material)" />
-        </template>
-      </Column>
 
-      <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
-      <Column v-if="this.tipoVista == 'ofertados'" headerStyle="min-width:10rem;">
-        <template #body="material">
-          <div class="d-flex">
-            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
-              @click="editMaterial(material.data.id)" />
-            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning p-mr-2"
-              @click="confirmDeleteMaterial(material.data)" />
+        <Column field="nombre" header="Nombre" :sortable="true"></Column>
+
+        <Column header="imagen">
+          <template #body="material">
+            <!-- <img :src="material.data.imagen" :alt="material.data.imagen" class="w-6rem shadow-2 border-round img-small" /> -->
+            <img :src="material.data.imgReducida" :alt="material.data.imagen"
+              class="w-6rem shadow-2 border-round img-small" />
+          </template>
+        </Column>
+        <Column field="descripcion" header="Descripción" :sortable="false"></Column>
+        <Column field="milis" header="μilis" :sortable="true"> </Column>
+        <Column field="categoriaN" header="Categoria" :sortable="true"></Column>
+        <Column field="grupoN" header="Grupo" :sortable="true"></Column>
+        <Column v-if="tipoVista === 'pendientes'" header="Estado" :sortable="true">
+          <template #body="material">
+            <Tag :value="material.data.estado" :severity="getSeverity(material)"
+              @click="asignarFechaEntrega(material.data.id)" @mouseover="changeCursor" style="cursor: pointer" />
+          </template>
+        </Column>
+        <Column v-else header="Estado" :sortable="true">
+          <template #body="material">
+            <Tag :value="material.data.estado" :severity="getSeverity(material)" />
+          </template>
+        </Column>
+
+        <Column field="dptoOfertaN" header="Ofertante" :sortable="true"></Column>
+        <Column v-if="this.tipoVista == 'ofertados'" headerStyle="min-width:10rem;">
+          <template #body="material">
+            <div class="d-flex">
+              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                @click="editMaterial(material.data.id)" />
+              <Button icon="pi pi-trash" class="p-button-rounded p-button-warning p-mr-2"
+                @click="confirmDeleteMaterial(material.data)" />
+              <router-link :to="{ name: 'material', params: { id: material.data.id } }">
+                <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs" />
+              </router-link>
+            </div>
+          </template>
+        </Column>
+        <Column v-else header="+INFO">
+          <template #body="material">
             <router-link :to="{ name: 'material', params: { id: material.data.id } }">
-              <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs" />
+              <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs mt-2" />
             </router-link>
-          </div>
-        </template>
-      </Column>
-      <Column v-else header="+INFO">
-        <template #body="material">
-          <router-link :to="{ name: 'material', params: { id: material.data.id } }">
-            <Button icon="pi pi-info" class="p-button-rounded p-button-info p-button-xs mt-2" />
-          </router-link>
-        </template>
-      </Column>
-    </DataTable>
-  </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 
   <Dialog v-model:visible="materialDialog" :style="{ width: '50vw' }" :header="cabecera" :modal="true" class="p-fluid">
@@ -526,7 +515,7 @@ export default {
         <label for="cantidad">Cantidad: </label>
         <div class="p-inputgroup">
           <Button icon="pi pi-minus" @click="decrementarCantidad" />
-          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100"  class="c-cantidad" />
+          <InputNumber id="cantidad" v-model="material.cantidad" :min="1" :max="100" class="c-cantidad" />
           <Button icon="pi pi-plus" @click="incrementarCantidad" />
         </div>
       </div>
@@ -611,8 +600,6 @@ export default {
   background: rgb(136, 158, 89);
   margin: 2px;
 }
-
-
 </style>
 
 

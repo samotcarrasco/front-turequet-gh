@@ -53,7 +53,9 @@ export default {
   }
 
   .tabs{
+    position: sticky;
     margin-left: 200vw; 
+    margin-top: 70px;
   }
 }
 </style>
