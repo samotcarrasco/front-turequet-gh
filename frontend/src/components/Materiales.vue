@@ -56,9 +56,31 @@ export default {
       categoriaLink: null,
       cabecera: null,
       modalEditCreate: undefined,
-      changeCursor: undefined
+      changeCursor: undefined,
+      materialesFiltrados: []
     }
   },
+
+
+  watch: {
+    tipoVista: {
+      handler(nuevaVista) {
+        this.getElementosVista(nuevaVista, this.categoriasSeleccionadas);
+      }
+    },
+    categoriasSeleccionadas: {
+      handler(nuevasCategoriasSeleccionadas) {
+        this.getElementosVista(this.tipoVista, nuevasCategoriasSeleccionadas);
+      }
+    },
+    dptoActual: {
+      handler() {
+        this.getElementosVista(this.tipoVista, this.categoriasSeleccionadas);
+      }
+    }
+  },
+
+
   mounted() {
     const toast = useToast()
     const modalEditCreate = () => {
@@ -98,7 +120,6 @@ export default {
       }
 
       this.submitted = true
-
 
       if (this.formularioRellenado(this.material)) {
         if (this.material.id) {
@@ -174,38 +195,6 @@ export default {
     ...mapState(categoriasStore, ['categorias']),
     ...mapState(departamentosStore, ['dptoActual', 'dptoActualAPI', 'bonificacion', 'milisMenu']),
 
-    materialesFiltrados() {
-      switch (this.tipoVista) {
-        case "ofertados":
-          return this.categoriasSeleccionadas.length === 0
-            ? this.getMaterialesOfertados()
-            : this.getMaterialesOfertados().filter(material =>
-            this.categoriasSeleccionadas.some((c) => c.label === material.categoriaN)
-            );
-        case "disponibles":
-          return this.categoriasSeleccionadas.length === 0
-            ? this.getMaterialesDisponibles()
-            : this.getMaterialesDisponibles().filter(material =>
-              this.categoriasSeleccionadas.some(c => c.label === material.categoriaN)
-            );
-        case "pendientes":
-          this.asignarPendientes()
-          return this.categoriasSeleccionadas.length === 0
-          ? this.getMaterialesPendientes()
-            : this.getMaterialesPendientes().filter(material =>
-              this.categoriasSeleccionadas.some(c => c.label === material.categoriaN)
-            );
-
-        case "entregados":
-          this.asignarEntregados()
-          return this.categoriasSeleccionadas.length === 0
-          ? this.getMaterialesEntregados()
-            : this.getMaterialesEntregados().filter(material =>
-              this.categoriasSeleccionadas.some(c => c.label === material.categoriaN)
-            );
-      }
-    },
-
     getMilisDeCategoria() {
       let categoria = undefined
       if (this.categoriaSeleccionada) {
@@ -238,11 +227,28 @@ export default {
   },
 
   methods: {
-    ...mapActions(materialesStore, ['getMateriales', 'getMaterialPorId', 'getMaterialesOfertados', 
-                                  'getMaterialesDisponibles', 'getMaterialesPendientes' , 'getMaterialesEntregados']),
+    ...mapActions(materialesStore, ['getMateriales', 'getMaterialPorId', 'getMaterialesOfertados',
+      'getMaterialesDisponibles', 'getMaterialesPendientes', 'getMaterialesEntregados']),
     ...mapActions(categoriasStore, ['getCategorias']),
     ...mapActions(departamentosStore, ['actualizarMilisMenu']),
 
+    getElementosVista(tipoVista, categoriasSeleccionadas) {
+      let materiales = [];
+
+      if (tipoVista === "ofertados") {
+        materiales = this.getMaterialesOfertados();
+      } else if (tipoVista === "disponibles") {
+        materiales = this.getMaterialesDisponibles();
+      } else if (tipoVista === "pendientes") {
+        this.asignarPendientes();
+        materiales = this.getMaterialesPendientes();
+      } else if (tipoVista === "entregados") {
+        this.asignarEntregados();
+        materiales = this.getMaterialesEntregados();
+      }
+
+      this.materialesFiltrados = this.filtrarMaterialesPorCategoria(materiales, categoriasSeleccionadas);
+    },
 
     async editMaterial(id) {
       await this.getMaterialPorId(id)
@@ -306,6 +312,13 @@ export default {
         img.src = this.material.imagen
       }
       reader.readAsDataURL(file)
+    },
+
+    filtrarMaterialesPorCategoria(materiales, categoriasSeleccionadas) {
+      console.log("cat seleccionadas: " + categoriasSeleccionadas.length)
+      return categoriasSeleccionadas.length === 0
+        ? materiales
+        : materiales.filter(material => categoriasSeleccionadas.some(c => c.label === material.categoriaN));
     },
 
     asignarPendientes() {
@@ -601,9 +614,3 @@ export default {
   margin: 2px;
 }
 </style>
-
-
-
-
-
-
