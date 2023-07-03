@@ -315,7 +315,6 @@ export default {
     },
 
     filtrarMaterialesPorCategoria(materiales, categoriasSeleccionadas) {
-      console.log("cat seleccionadas: " + categoriasSeleccionadas.length)
       return categoriasSeleccionadas.length === 0
         ? materiales
         : materiales.filter(material => categoriasSeleccionadas.some(c => c.label === material.categoriaN));
